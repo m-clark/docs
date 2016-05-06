@@ -6,13 +6,12 @@ author: |
   | CSCAR, ARC, U of Michigan
 date: '`r Sys.Date()`'
 output:
-  github_document:
-    toc: yes
   html_document:
-    css: ../../other.css
+    #css: ../../other.css
     theme: cosmo
     toc: yes
     toc_float: yes
+    highlight: pygments
   pdf_document:
     toc: yes
 references:
