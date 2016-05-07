@@ -1,12 +1,17 @@
 ---
 title: "Mixed Model Estimation, <br> a Connection to Additive Models,<br>and Beyond..."
+author: |
+  | Michael Clark
+  | Statistician Lead
+  | CSCAR, ARC, U of Michigan
+date: '`r Sys.Date()`'
 output:
   html_document:
-    keep_md: yes
-    theme: united
+    css: ../other.css
+    theme: cosmo
     toc: yes
-  pdf_document:
-    toc: yes
+    toc_float: yes
+    highlight: pygments
 references:
 - author:
   - family: Wood
@@ -36,13 +41,13 @@ knitr::opts_chunk$set(message=F)
 
 
 
-## Introduction
+# Introduction
 The goal is to express the tie between generalized additive models and mixed models, and open the door to further modeling expansion. The following is based on the @Wood text on additive models, chapter 6 in particular. It assumes familiarity with standard regression from a matrix perspective and at least passing familiarity with mixed models. 
 
 <br>
 <br>
 
-## Model Formulation
+# Model Formulation
 
 We can start with a standard linear model (SLiM) expressed as follows:
 
@@ -88,12 +93,12 @@ where $\Sigma_\theta\ = \frac{Z\psi_{\theta}Z^\intercal}{\sigma^2} + I$.
 <br>
 <br>
 
-## Maximum Likelihood Estimation
+# Maximum Likelihood Estimation
 
 Given where we are now, we can proceed to estimate a mixed model via maximum likelihood. For this we'll use the sleepstudy data from the <span style="color:#1e90ff">lme4</span> package. The data has reaction times for 18 individuals over 10 days each (see the help file for the sleepstudy object for more details).
 
 
-### Data
+## Data
 ```{r dataSetup, cache=TRUE}
 data(sleepstudy, package='lme4')
 X = model.matrix(~Days, sleepstudy)
@@ -104,7 +109,7 @@ y = sleepstudy$Reaction
 ```
 
 
-### ML function
+## ML function
 The following is based on the code in Wood (6.2.2), with a couple modifications for consistent nomenclature and presentation. We use <span style="color:#8b0000">optim</span> and a minimizing function, in this case the negative log likelihood, to estimate the parameters of interest, collectively $\theta$, in the code below. The (square root of the) variances will be estimated on the log scale. In Wood, he simply extracts the 'fixed effects' for the intercept and days effects using lm (6.2.3), and we'll do the same.
 
 ```{r mlfunc, cache=TRUE}
@@ -148,7 +153,7 @@ llMixedMV = function(y, X, Z, theta){
 ```
 
 
-### Results
+## Results
 
 Now we're ready to use the <span style="color:#8b0000">optim</span> function for estimation.  A slight change to tolerance is included to get closer estimates to <span style="color:#1e90ff">lme4</span>, which we will compare shortly.
 
@@ -184,11 +189,11 @@ ranefEstimated = tausq*t(Z)%*%solve(Sigma) %*% resid(lm(y~X-1))/sigmasq
 data.frame(ranefEstimated, lme4 = ranef(lmeMod)$Subject[[1]]) %>% round(2)
 ```
 
-### Issues with ML estimation
+## Issues with ML estimation
 Situations arise in which using maximum likelihood for mixed models would result in notably biased estimates (e.g. small N, lots of fixed effects), and so it is typically not used.  Standard software usually defaults to *restricted* maximum likelihood.  However, our purpose here has been served, so we will not dwell further on mixed model estimation.
 
 
-### Link with penalized regression
+## Link with penalized regression
 A link exists between mixed models and a penalized likelihood approach.  For a penalized approach with the SLiM, the objective function we want to minimize can be expressed as follows:
 
 $$ \lVert y- X\beta \rVert^2 + \beta^\intercal\beta $$
@@ -205,11 +210,11 @@ We'll take this penalized approach explicitly with the generalized additive mode
 <br>
 <br>
 
-## Additive model as a mixed model 
+# Additive model as a mixed model 
 
 At this point I'd like to demonstrate some concepts from section 6.6 in Wood. Conceptually, the take home idea is that an additive model, or generalized additive model (GAM), can be seen as a mixed model, which is interesting in and of itself (at least to me), but it also means that GAMs meld nicely with mixed models to form a more general modeling framework.  For an introduction to additive models, one can see my [document](https://sites.google.com/a/umich.edu/micl/miscfiles/GAMS.pdf), which is more or less an overview of Wood's text.
 
-### Data set up
+## Data set up
 
 The <span title="See Wood 3.2." style="color:#dd4814">data</span> regards motor engine size and wear in 19 Volvos, with the initial assumption that larger capacity engines will wear out less quickly.
 
@@ -222,7 +227,7 @@ x = x / max(x)
 d = data.frame(wear, x)
 ```
 
-### Relevant functions
+## Relevant functions
 
 We'll create functions for the cubic spline operation, the creation of a model matrix, the creation of the penalty matrix, and finally the fitting function.
 
@@ -272,7 +277,7 @@ prsFit <- function(y, x, knots, lambda) {
 ```
 
 
-### Fit a penalized model
+## Fit a penalized model
 
 Now we can fit the model and visualize. There does not seem to be a straightforward relationship between engine size and engine wear.
 
@@ -290,7 +295,7 @@ lines(x_pred, predictions, col='#1e90ff')
 ```
 
 
-### As a mixed model
+## As a mixed model
 
 One can use the result of eigen decomposition on the penalty matrix to ultimately produce a re-parameterization of the original matrix as fixed and random effects components.
 
@@ -351,11 +356,11 @@ plot(modGamS$gam)
 <br>
 <br>
 
-## Wrap Up
+# Wrap Up
 So we've seen that GAMs can be seen as having a fixed and random effect as in mixed models, which means we can use them within the mixed model framework. Another way to look at this is that we have added the capacity to examine nonlinear relationships and other covariance structures to the standard mixed model framework, making a very flexible modeling approach even more so.
 
 
-### It's full of STARs...
+## It's full of STARs...
 However, this goes even further.  ***St****ructured* ***A****dditive* ***R****egression models* (STAR) build upon the notion just demonstrated (nicely illustrated in @Fahrmeir). Not only we can combine mixed and additive models, but other model classes as well.  This includes interactions and varying coefficient models, spatial effects, gaussian processes/kriging, markov random fields and others.  Each model class has a particular design and penalty matrix as we saw in the examples previously, but otherwise can be added to the current model being considered.  We can also use other techniques, like <span title="which itself can be seen as an additive modeling approach!" style="color:#dd4814">boosting</span> to estimate them. Standard regression, glm, gam, etc. are thus special cases of the STAR model. In short, we now have a highly flexible modeling environment within which to tackle the questions we seek to answer with our data.
 
 
