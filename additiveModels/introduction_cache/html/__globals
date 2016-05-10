@@ -1,0 +1,3 @@
+unnamed-chunk-1	~	lm	mydata
+fitPlotsDataSetup	$	%>%	^	~	==	arrange	data.frame	fitted	library	lm	predict	rgamma	rnorm	round	set.seed	sort	which
+loessgraph1	

@@ -42,7 +42,7 @@ knitr::opts_chunk$set(message=F)
 
 
 # Introduction
-The goal is to express the tie between generalized additive models and mixed models, and open the door to further modeling expansion. The following is based on the @Wood text on additive models, chapter 6 in particular. It assumes familiarity with standard regression from a matrix perspective and at least passing familiarity with mixed models. 
+The goal is to show mixed model estimation, express the tie between generalized additive models and mixed models, and open the door to further modeling expansion. The following is based on the @Wood text on additive models, chapter 6 in particular. It assumes familiarity with standard regression from a matrix perspective and at least passing familiarity with mixed models. 
 
 <br>
 <br>
@@ -61,11 +61,15 @@ $$y = Xb + Zg + \epsilon$$
 
 Where Z is a design matrix pertaining to the grouping structure. Consider a factor z representing group/cluster membership, this would convert z to the following:
 
+
+
 ```{r dummycode, echo=FALSE}
 z = Z = factor(c('A','A','B','B','C','C'))
 Z =  model.matrix(~ Z-1)
 pander::pander(data.frame(z, Z))
 ```
+
+
 
 The coefficients $g$ are the random effects, assumed $\mathcal{N}(0,\tau^2)$, i.e. normally distributed with zero mean and $\tau$ standard deviation. While we are often interested in these specific effects, they do not have to be estimated directly for modeling purposes.
 
@@ -331,7 +335,7 @@ The Z in the code above represents part of the mixed model Z we had before in th
 $$\mathbf{X}_F\mathbf{\beta}_F + \mathbf{Zg}$$
 $$\mathbf{g} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}/\lambda) $$
 
-To incorporate a gamm, i.e. a *generalized additive mixed model*, the X_F above would be appended to the 'fixed' effect design matrix, while Z would be added to the random effects component, and estimation would proceed normally as for a mixed model.  
+To incorporate a gamm, i.e. a *generalized additive mixed model*, the $X_F$ above would be appended to the 'fixed' effect design matrix, while Z would be added to the random effects component, and estimation would proceed normally as for a mixed model.  
 
 
 The <span style="color:#1e90ff">mgcv</span> and associated packages allow us to see this explicitly. Initially we'll just duplicate a standard mixed model using <span style="color:#1e90ff">mgcv</span> and <span style="color:#1e90ff">gamm4</span> packages.  One can see that the gamm4 is using lme4 and produces the same output.
