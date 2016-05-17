@@ -6,8 +6,10 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F)
+knitr::opts_chunk$set(message=F, cache=FALSE, comment=NA, warning=F, echo=F)
 ```
+
+Summary of Pearl 2014
 
 # Sex differences in weight gain (original Lord formulation)
 
@@ -59,11 +61,56 @@ digraph dag1 {
 
 ```
 
-Indirect effect: is a*c
+**Indirect effect**: is a*c
 
-Direct effect: b
+**Direct effect**: b
 
-Total effect: b + a*c - a
+**Total effect**: b + a*c - a
+
+## Data Example
+
+```{r dataSetup, echo=T}
+library(dplyr)
+group  = rep(c('B', 'A'), e=5)
+pre = c(20,10,60,20,10,50,10,40,20,10)
+post = c(70,50,90,60,50,20,10,30,50,10)
+
+df = data.frame(id=factor(1:10), group, pre, post)
+change = post-pre
+
+dflong = tidyr::gather(df, key=time, value=score, pre:post) %>% arrange(id)
+head(df)
+head(dflong)
+```
+
+It's an extremely large group difference.
+
+```{r}
+library(plotly); library(dplyr)
+ 
+plot_ly(filter(dflong, group=='A'), x=time, y=score, group=id, mode='line', showlegend=F, line=list(color='#ff5500')) %>% 
+  add_trace(data=filter(dflong, group=='B'), x=time, y=score, group=id, showlegend=F, line=list(color='dodgerblue'))
+```
+
+
+```{r echo=T}
+mod = "
+  pre ~ a*group
+  post ~ b*group + c*pre
+  # change ~ -1*pre + 1*post
+ 
+  # total effect
+  TE := (b + a*c) - a
+"
+
+library(lavaan)
+lpmod = sem(mod, data=df)
+
+summary(lpmod)
+summary(lm(change~group, df))  # t-test on change scores = total effect
+summary(lm(post~group+pre, df)) # 'ancova' uncovers direct effect etc.
+```
+
  
 # Treatment with confounding (Wainer & Brown)
 ## Variables
