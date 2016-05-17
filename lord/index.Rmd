@@ -134,24 +134,61 @@ digraph dag1 {
 ## Results
 ### Collider bias (explain away effect)
 
+
 ```{r}
-library(DiagrammeR)
 grViz("
-digraph boxes_and_circles {
+digraph dag1 {
 
   # a 'graph' statement
-  graph [overlap = false, fontsize = 10, rankdir=LR]
+  graph [fontsize = 10, layout=circo] #rankdir ignored for circo
 
   # several 'node' statements
-  node [shape = box,
-        fontname = Helvetica]
-  Smoking; BW; 'Other Causes'; Death
+  node [shape = box, fontname = Helvetica, fontcolor='gray50', style=filled, penwidth=0]
+  Other[color=navajowhite]; 
+  BW[color=lightsalmon]; 
+  Smoking[color=navajowhite]; 
+  Death[color=navajowhite]; 
 
 
-  # several 'edge' statements
-  Smoking->BW 'Other Causes'->BW 
-  BW->Death Smoking->Death 'Other Causes'->Death
+  # edge statements
+  edge [color='gray50']
+  Smoking->BW Other->BW 
+  BW->Death Smoking->Death Other->Death
 }
 ")
 ```
 
+## Explanation
+
+### Problem 1
+- Controlling just for smoking leaves other causes, resulting in bias
+- Controlling for smoking changes the probability of other causes (due to BW collider) for any stratum of BW
+- Example: for BW='low, if we compare smoking vs. non-smoking we are also comparing rare other causes vs. likely other causes
+
+### Problem 2
+- Mediation context of previous: we want to know the mortality rate of babies e.g. smokers vs. non if BW controlled for
+- However here we have confounders, whereas before, the fundamental assumption was that there weren't any.
+- Ajusting for BW actually opens up a new path, and the effect is now spurious
+
+```{r}
+grViz("
+digraph dag1 {
+
+  # a 'graph' statement
+  graph [fontsize = 10, layout=circo] #rankdir ignored for circo
+
+  # several 'node' statements
+  node [shape = box, fontname = Helvetica, fontcolor='gray50', style=filled, penwidth=0]
+  Other[color=navajowhite]; 
+  Death[color=navajowhite]; 
+  BW[color=lightsalmon]; 
+  Smoking[color=navajowhite]; 
+
+
+  # edge statements
+  edge [color='gray50']
+  Smoking->BW Other->BW 
+  Other->Death
+}
+")
+```
