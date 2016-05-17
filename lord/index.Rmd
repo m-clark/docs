@@ -1,0 +1,157 @@
+---
+title: "Lord's Paradox"
+author: "Michael Clark"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+```
+
+# Sex differences in weight gain (original Lord formulation)
+
+## Variables
+- weight time 1
+- weight time 2
+- weight change
+- sex
+
+## Issues
+
+- t-test on change vs. ancova
+- Statistician 1 concludes no difference in *change*
+- Statistician 2 concludes a difference in time 2 if controlling for time 1
+
+
+## Results
+
+- Both statisticians are correct
+- t-test on change = total effect
+- ancova = direct effect
+
+## DAG
+
+```{r}
+library(DiagrammeR)
+grViz("
+digraph dag1 {
+
+  # a 'graph' statement
+  graph [fontsize = 10, layout=circo] #rankdir ignored for circo
+
+  # several 'node' statements
+  Change[shape = doublecircle, fontname = Helvetica, fontcolor='gray50', fillcolor='gray95', width=.5, penwidth=0.2];
+  node [shape = box, fontname = Helvetica, fontcolor='gray50', style=filled, penwidth=0]
+  Sex[color=lightsalmon]; 
+  T1[color=navajowhite]; 
+  T2[color=navajowhite]; 
+
+
+  # edge statements
+  Sex -> T1[label='a' fontcolor='gray25'  color='dodgerblue'] 
+  Sex->T2 [label='b' fontcolor='gray25'  color='darkred']
+  T1->T2 [label='c' fontcolor='gray25'  color='dodgerblue']
+  T1->Change [label='-1' color='gray75' fontcolor='gray25'  ]
+  T2->Change [label='+1' color='gray75' fontcolor='gray25'  ]
+}
+")
+
+```
+
+Indirect effect: is a*c
+
+Direct effect: b
+
+Total effect: b + a*c - a
+ 
+# Treatment with confounding (Wainer & Brown)
+## Variables
+- weight time 1
+- weight time 2
+- weight change
+- table A vs. B
+
+## Issues
+
+- Heavier kids more likely to sit at table B
+- Two statisticians come the conclusions as before
+
+## Results
+
+```{r}
+grViz("
+digraph dag1 {
+
+  # a 'graph' statement
+  graph [fontsize = 10, layout=circo] #rankdir ignored for circo
+
+  # several 'node' statements
+  Change[shape = doublecircle, fontname = Helvetica, fontcolor='gray50', fillcolor='gray95', width=.5, penwidth=0.2];
+  node [shape = box, fontname = Helvetica, fontcolor='gray50', style=filled, penwidth=0]
+  Group[color=lightsalmon]; 
+  T1[color=navajowhite]; 
+  T2[color=navajowhite]; 
+
+
+  # edge statements
+  T1 -> Group[label='a' fontcolor='gray25'  color='dodgerblue'] 
+  Group->T2 [label='b' fontcolor='gray25'  color='darkred']
+  T1->T2 [label='c' fontcolor='gray25'  color='dodgerblue']
+  T1->Change [label='-1' color='gray85' fontcolor='gray25'  ]
+  T2->Change [label='+1' color='gray85' fontcolor='gray25'  ]
+}
+")
+
+```
+
+- Weight time 1 is now a confounder
+- Arrow *from* time 1 to 'treatment'
+- Statistician 1 is incorrect because they do not adjust
+- Statistician 2
+
+
+# Birth Weight Paradox
+## Variables
+- birthweight
+- smoking mom
+- infant mortality
+
+## Issues
+- No difference score
+- Before, focus on clash between two seemingly legitimate methods of analysis
+- Now using ancova but results seem implausible
+
+
+## Results
+
+>- low birthweight children have higher mortality rate (100 fold higher)
+- children of smoking mothers notably more likely to have low birghtweight
+- low birthweight children born to smoking mothers have a lower mortality rate
+- Conclusion: expectant mothers should start smoking!
+
+
+## Results
+### Collider bias (explain away effect)
+
+```{r}
+library(DiagrammeR)
+grViz("
+digraph boxes_and_circles {
+
+  # a 'graph' statement
+  graph [overlap = false, fontsize = 10, rankdir=LR]
+
+  # several 'node' statements
+  node [shape = box,
+        fontname = Helvetica]
+  Smoking; BW; 'Other Causes'; Death
+
+
+  # several 'edge' statements
+  Smoking->BW 'Other Causes'->BW 
+  BW->Death Smoking->Death 'Other Causes'->Death
+}
+")
+```
+
