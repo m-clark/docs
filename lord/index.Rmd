@@ -160,15 +160,16 @@ digraph dag1 {
 
 ## Explanation
 
-### Problem 1
+### Perspective 1
 - Controlling just for smoking leaves other causes, resulting in bias
 - Controlling for smoking changes the probability of other causes (due to BW collider) for any stratum of BW
 - Example: for BW='low, if we compare smoking vs. non-smoking we are also comparing rare other causes vs. likely other causes
 
-### Problem 2
+### Perspective 2
 - Mediation context of previous: we want to know the mortality rate of babies e.g. smokers vs. non if BW controlled for
 - However here we have confounders, whereas before, the fundamental assumption was that there weren't any.
-- Ajusting for BW actually opens up a new path, and the effect is now spurious
+- Ajusting for BW doesn't sever all paths traversing the mediator, and actually opens up a new path, and the effect is now spurious
+- For low BW, comparison of smoking vs. non-smoking compares no other causes vs. other causes
 
 ```{r}
 grViz("
