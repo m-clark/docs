@@ -112,6 +112,15 @@ summary(lm(post~group+pre, df)) # 'ancova' uncovers direct effect etc.
 ```
 
  
+### Aside
+Use change score adjusting for pre. Identical result, but where coef for pre  = ancova coef for pre -1
+
+```{r}
+summary(lm(change~group+pre, df))
+
+```
+
+
 # Treatment with confounding (Wainer & Brown)
 ## Variables
 - weight time 1
@@ -156,6 +165,7 @@ digraph dag1 {
 - Arrow *from* time 1 to 'treatment'
 - Statistician 1 is incorrect because they do not adjust
 - Statistician 2
+
 
 
 # Birth Weight Paradox
