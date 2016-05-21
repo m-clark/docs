@@ -2,7 +2,9 @@
 title: "Lord's Paradox"
 author: "Michael Clark"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document:
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -11,28 +13,37 @@ knitr::opts_chunk$set(message=F, cache=FALSE, comment=NA, warning=F, echo=F)
 
 Summary of Pearl 2014
 
-# Sex differences in weight gain (original Lord formulation)
+# Lord's paradox
+## Background
 
-## Variables
+Two statisticians are interested in determining whether there are differences among males and females in weight gain over the course of semester.  In the original depiction by Lord, there is an implication of some diet treatment, but all that can be assumed is that those under consideration both received the 'treatment' if there was one.  The two statisticians take different approaches to examining the data, yet come to different conclusions.
+
+### Variables
+- sex
 - weight time 1
 - weight time 2
 - weight change
-- sex
 
-## Issues
+### Issues
+The following graph is from Pearl 2014. The ellipses represent the scatterplots for boys and girls.  The diagonal 45^o^ degree line would represent no change from time 1 to time 2.  The center of the ellipses are both on this line, and thus the mean change for boys and girls are identical and zero.  The density plot in the lower left depicts the distribution of change scores centered on this zero estimate.
 
-- t-test on change vs. ancova
-- Statistician 1 concludes no difference in *change*
-- Statistician 2 concludes a difference in time 2 if controlling for time 1
+<img src="img/lp1.png" style="display:block; margin: 0 auto;">
+
+
 
 
 ## Results
 
-- Both statisticians are correct
-- t-test on change = total effect
-- ancova = direct effect
+Statistician 1 focuses on change scores, while statistician 2 uses an ancova to examine sex differences at time 2 while adjusting for initial weight.
 
-## DAG
+- t-test for group difference on change score vs. ancova approach
+- Statistician 1 concludes no difference in *change*
+- Statistician 2 concludes a difference in time 2 if controlling for time 1
+
+### DAG
+
+The model can be depicted as a directed acyclic graph as follows.
+
 
 ```{r}
 library(DiagrammeR)
@@ -61,37 +72,64 @@ digraph dag1 {
 
 ```
 
-**Indirect effect**: is a*c
 
-**Direct effect**: b
+In the above we can define the following effects of sex on weight:
 
-**Total effect**: b + a*c - a
+- <span style="color:#1e90ff">**Indirect effect**</span>: is a*c
+- <span style="color:#8b0000">**Direct effect**</span>: b
+- <span style="color:#66023C">**Total effect**</span>: b + a*c - a
 
-## Data Example
+Gain is completely determined as the difference between final weight and initial weight. 
+
+### Who is *correct*?
+
+- Both statisticians are correct
+- t-test on change = total effect
+- ancova = direct effect
+
+In summary, the two statisticians are focused on different effects from the same model.
+
+### Data Example
+
+We can get an explicit sense of the results by means of a hands on example.  In the following we have simulated data that will reproduce the situation described thus far.  Parameters were chosen for visual effect.  One thing that's not been noted about the example is that it likely would not occur. The total effect by definition would be larger than the direct effect as there would be strong sex differences at initial weight, and a strong correlation between initial and final weight, all in a positive manner. The other issue unadressed is that the entire focus is on whether an effect exists hinges on p-values, and with large enough data and such simple models, anything would flag significant. Plus there are issues of variance, nonlinear relations etc.
 
 ```{r dataSetup, echo=T}
 library(dplyr)
-group  = rep(c('B', 'A'), e=5)
-pre = c(20,10,60,20,10,50,10,40,20,10)
-post = c(70,50,90,60,50,20,10,30,50,10)
-
-df = data.frame(id=factor(1:10), group, pre, post)
+set.seed(1234)
+N = 200
+group  = rep(c(0, 1), e=N/2)
+pre = .75*group + rnorm(N, sd=.25)
+post = .4*pre + .5*group + rnorm(N, sd=.1)
 change = post-pre
-
+df = data.frame(id=factor(1:N), group=factor(group, labels=c('Female', 'Male')), pre, post, change)
 dflong = tidyr::gather(df, key=time, value=score, pre:post) %>% arrange(id)
 head(df)
 head(dflong)
 ```
 
-It's an extremely large group difference.
 
 ```{r}
-library(plotly); library(dplyr)
+library(ggplot2); library(plotly); library(dplyr)
  
-plot_ly(filter(dflong, group=='A'), x=time, y=score, group=id, mode='line', showlegend=F, line=list(color='#ff5500')) %>% 
-  add_trace(data=filter(dflong, group=='B'), x=time, y=score, group=id, showlegend=F, line=list(color='dodgerblue'))
+# plot_ly(filter(dflong, group=='Female'), x=time, y=score, group=id, mode='line', showlegend=F, line=list(color='#ff5500')) %>% 
+#   add_trace(data=filter(dflong, group=='Male'), x=time, y=score, group=id, showlegend=F, line=list(color='dodgerblue'))
+
+coefm = coef(lm(post~pre, filter(df, group=='Male')))
+coeff = coef(lm(post~pre, filter(df, group=='Female')))
+g = ggplot(aes(x=pre, y=post), data=df) +
+  geom_abline(intercept=0, slope=1, color='gray50', alpha=.5) +
+  geom_point(aes(color=group), alpha=.5) +
+  stat_ellipse(aes(color=group), level=.999) +
+  # geom_smooth(aes(color=group), method='lm', se=F) +
+  scale_color_manual(values=c('#ff5503', 'dodgerblue')) +
+  geom_abline(intercept=coefm[1], slope=coefm[2], color='dodgerblue') +
+  geom_abline(intercept=coeff[1], slope=coeff[2], color='#ff5503') +
+  lazerhawk::theme_trueMinimal()
+ggplotly(g)
+
 ```
 
+In the following we'll use lavaan to estimate the full mediation model, then run separate regressions to demonstrate the t-test on change vs. the ancova approach.  As noted above, the t-test on change score measures the total effect of sex on final weight, while the ancova measures the direct effect. It is unnecessary to distinguish them as separate modeling approaches, as they are merely regressions with different target variables.
 
 ```{r echo=T}
 mod = "
@@ -113,27 +151,36 @@ summary(lm(post~group+pre, df)) # 'ancova' uncovers direct effect etc.
 
  
 ### Aside
-Use change score adjusting for pre. Identical result, but where coef for pre  = ancova coef for pre -1
+Use change score adjusting for initial weight. Note that this duplicates the ancova result for the group effect (i.e. it is the direct effect). But note that the coefficient for initial weight is equivalent to the ancova coefficient -1. See for example, Senn 2006.
 
 ```{r}
 summary(lm(change~group+pre, df))
-
 ```
 
 
-# Treatment with confounding (Wainer & Brown)
-## Variables
+## Treatment with confounding
+### Background
+Wainer & Brown 2007 took a different interpretation of the paradox
+
+### Variables
 - weight time 1
 - weight time 2
 - weight change
 - table A vs. B
 
-## Issues
+
+
+### Issues
+<img src="img/lp2.png" style="display:block; margin: 0 auto;">
+
+*<span style='font-size:75%'>The choice of comic sans font in the graph due to Wainer and Brown and should be held against them.</span> 
 
 - Heavier kids more likely to sit at table B
 - Two statisticians come the conclusions as before
 
-## Results
+
+
+### Results
 
 ```{r}
 grViz("
@@ -166,29 +213,29 @@ digraph dag1 {
 - Statistician 1 is incorrect because they do not adjust
 - Statistician 2
 
+<img src="img/lp2_afteradj.png" style="display:block; margin: 0 auto;">
 
 
-# Birth Weight Paradox
-## Variables
+## Birth Weight Paradox
+### Backgroundo
+### Variables
 - birthweight
 - smoking mom
 - infant mortality
 
-## Issues
+### Issues
 - No difference score
 - Before, focus on clash between two seemingly legitimate methods of analysis
 - Now using ancova but results seem implausible
 
 
-## Results
+### Results
 
 >- low birthweight children have higher mortality rate (100 fold higher)
 - children of smoking mothers notably more likely to have low birghtweight
 - low birthweight children born to smoking mothers have a lower mortality rate
 - Conclusion: expectant mothers should start smoking!
 
-
-## Results
 ### Collider bias (explain away effect)
 
 
@@ -215,14 +262,13 @@ digraph dag1 {
 ")
 ```
 
-## Explanation
-
-### Perspective 1
+### Explanation
+#### Perspective 1
 - Controlling just for smoking leaves other causes, resulting in bias
 - Controlling for smoking changes the probability of other causes (due to BW collider) for any stratum of BW
 - Example: for BW='low, if we compare smoking vs. non-smoking we are also comparing rare other causes vs. likely other causes
 
-### Perspective 2
+#### Perspective 2
 - Mediation context of previous: we want to know the mortality rate of babies e.g. smokers vs. non if BW controlled for
 - However here we have confounders, whereas before, the fundamental assumption was that there weren't any.
 - Ajusting for BW doesn't sever all paths traversing the mediator, and actually opens up a new path, and the effect is now spurious
@@ -250,3 +296,7 @@ digraph dag1 {
 }
 ")
 ```
+
+# Simpson's paradox more generally
+
+Pearl 2013
