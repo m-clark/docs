@@ -25,7 +25,7 @@ Two statisticians are interested in determining whether there are differences am
 - weight change
 
 ### Issues
-The following graph is from Pearl 2014. The ellipses represent the scatterplots for boys and girls.  The diagonal 45^o^ degree line would represent no change from time 1 to time 2.  The center of the ellipses are both on this line, and thus the mean change for boys and girls are identical and zero.  The density plot in the lower left depicts the distribution of change scores centered on this zero estimate.
+The following graph is from Pearl 2014. The ellipses represent the scatter plots for boys and girls.  The diagonal 45^o^ degree line would represent no change from time 1 to time 2.  The center of the ellipses are both on this line, and thus the mean change for boys and girls are identical and zero.  The density plot in the lower left depicts the distribution of change scores centered on this zero estimate.
 
 <img src="img/lp1.png" style="display:block; margin: 0 auto;">
 
@@ -34,9 +34,9 @@ The following graph is from Pearl 2014. The ellipses represent the scatterplots 
 
 ## Results
 
-Statistician 1 focuses on change scores, while statistician 2 uses an ancova to examine sex differences at time 2 while adjusting for initial weight.
+Statistician 1 focuses on change scores, while statistician 2 uses an ANCOVA to examine sex differences at time 2 while adjusting for initial weight.
 
-- t-test for group difference on change score vs. ancova approach
+- t-test for group difference on change score vs. ANCOVA approach
 - Statistician 1 concludes no difference in *change*
 - Statistician 2 concludes a difference in time 2 if controlling for time 1
 
@@ -85,9 +85,9 @@ Gain is completely determined as the difference between final weight and initial
 
 - Both statisticians are correct
 - t-test on change = total effect
-- ancova = direct effect
+- ANCOVA = direct effect
 
-In summary, the two statisticians are focused on different effects from the same model.
+In summary, the two statisticians are focused on different effects from the same model- one the total effect, the other the direct effect.
 
 ### Data Example
 
@@ -129,7 +129,7 @@ ggplotly(g)
 
 ```
 
-In the following we'll use lavaan to estimate the full mediation model, then run separate regressions to demonstrate the t-test on change vs. the ancova approach.  As noted above, the t-test on change score measures the total effect of sex on final weight, while the ancova measures the direct effect. It is unnecessary to distinguish them as separate modeling approaches, as they are merely regressions with different target variables.
+In the following we'll use lavaan to estimate the full mediation model, then run separate regressions to demonstrate the t-test on change vs. the ANCOVA approach.  As noted above, the t-test on change score measures the total effect of sex on final weight, while the ANCOVA measures the direct effect. It is unnecessary to distinguish them as separate modeling approaches, as they are merely regressions with different target variables.
 
 ```{r echo=T}
 mod = "
@@ -151,7 +151,7 @@ summary(lm(post~group+pre, df)) # 'ancova' uncovers direct effect etc.
 
  
 ### Aside
-Use change score adjusting for initial weight. Note that this duplicates the ancova result for the group effect (i.e. it is the direct effect). But note that the coefficient for initial weight is equivalent to the ancova coefficient -1. See for example, Senn 2006.
+We can model the change score while adjusting for initial weight (and we should if it correlates with the effect of interest). Note that doing so duplicates the ANCOVA result for the group effect (i.e. it is the direct effect). But note that the coefficient for initial weight is equivalent to the ANCOVA coefficient -1. See for example, Senn 2006.
 
 ```{r}
 summary(lm(change~group+pre, df))
@@ -160,20 +160,23 @@ summary(lm(change~group+pre, df))
 
 ## Treatment with confounding
 ### Background
-Wainer & Brown 2007 took a different interpretation of the paradox
+Wainer & Brown 2007 took a different interpretation of the paradox. Here we can think of a similar situation, but instead of sex differences we now have a group difference regarding whether one dines in a particular room[^wb].
 
 ### Variables
 - weight time 1
 - weight time 2
 - weight change
-- table A vs. B
+- room A vs. B
 
 
 
 ### Issues
+
+Visually we can depict it as before but showing the difference. The choice of comic sans font in the graph is due to Wainer and Brown and should be held against them.
+
 <img src="img/lp2.png" style="display:block; margin: 0 auto;">
 
-*<span style='font-size:75%'>The choice of comic sans font in the graph due to Wainer and Brown and should be held against them.</span> 
+
 
 - Heavier kids more likely to sit at table B
 - Two statisticians come the conclusions as before
@@ -181,6 +184,8 @@ Wainer & Brown 2007 took a different interpretation of the paradox
 
 
 ### Results
+
+The DAG makes clear the difference in the model compared to the previous scenario.
 
 ```{r}
 grViz("
@@ -210,34 +215,50 @@ digraph dag1 {
 
 - Weight time 1 is now a confounder
 - Arrow *from* time 1 to 'treatment'
-- Statistician 1 is incorrect because they do not adjust
-- Statistician 2
+- Statistician 1 concludes no change
+- Statistician 2 concludes a difference (seen next)
 
 <img src="img/lp2_afteradj.png" style="display:block; margin: 0 auto;">
 
 
+While Wainer and Brown again suggest that both statisticians are correct, Pearl disagrees. Statistician 1 is incorrect because they do not adjust for the confounder, which is necessary to determine causal effects.  
+
+Note that both paradox scenarios presented assume no latent confounders. If present then both statisticians are potentially wrong in both cases. As depicted however, it was not the case that two legitimate methods gave two different answers to the same research question, as Lord concluded originally.
+
+
+
 ## Birth Weight Paradox
-### Backgroundo
+
+### Background
+The problem discussed thus far extends beyond controlling for baseline scores to involving any covariate, where the focus on change scores isn't even possible[^lord].
+
+Here we are concerned with the relationship of birth weight and infant mortality rate. In general, low birth weight is associated with higher likelihood of death.  The paradox arises from the fact that low birth weight children born to smoking mothers have a lower mortality rate.
+
 ### Variables
-- birthweight
+- birth weight
 - smoking mom
 - infant mortality
+- other causes
 
 ### Issues
 - No difference score
 - Before, focus on clash between two seemingly legitimate methods of analysis
-- Now using ancova but results seem implausible
+- Now using standard regression approach but results seem implausible
 
 
 ### Results
 
->- low birthweight children have higher mortality rate (100 fold higher)
-- children of smoking mothers notably more likely to have low birghtweight
-- low birthweight children born to smoking mothers have a lower mortality rate
-- Conclusion: expectant mothers should start smoking!
+- low birth weight children have higher mortality rate (100 fold higher)
+- children of smoking mothers notably more likely to have low birth weight
+- low birth weight children born to smoking mothers have a lower mortality rate
+- Conclusion: expectant mothers should start smoking?!
 
-### Collider bias (explain away effect)
 
+### Explanation
+
+#### Collider bias (explain away effect)
+
+The DAG for this situation is depicted as follows. Smoking does have an effect on birth weight and infant mortality, but so do a host of other variables, at least some of which are far more detrimental.
 
 ```{r}
 grViz("
@@ -262,17 +283,20 @@ digraph dag1 {
 ")
 ```
 
-### Explanation
+Pearl explains the result from two perspectives.
+
 #### Perspective 1
+What is the causal effect of birth weight on death?
+
+- Birth weight is confounded by smoking and other causes
 - Controlling just for smoking leaves other causes, resulting in bias
-- Controlling for smoking changes the probability of other causes (due to BW collider) for any stratum of BW
-- Example: for BW='low, if we compare smoking vs. non-smoking we are also comparing rare other causes vs. likely other causes
+- In addition, controlling for smoking changes the probability of other causes (due to BW collider) for any stratum of BW
+-- Example: for BW='low', if we compare smoking vs. non-smoking mothers, we are also comparing situations where other causes are rare vs. one where other causes are likely, thus leading to the paradoxical conclusion.
 
 #### Perspective 2
-- Mediation context of previous: we want to know the mortality rate of babies e.g. smokers vs. non if BW controlled for
-- However here we have confounders, whereas before, the fundamental assumption was that there weren't any.
-- Ajusting for BW doesn't sever all paths traversing the mediator, and actually opens up a new path, and the effect is now spurious
-- For low BW, comparison of smoking vs. non-smoking compares no other causes vs. other causes
+Another perspective is from the point of Lord's paradox. Here we are concerned with the effect of smoking on mortality above and beyond its effect though birth weight (i.e. the mediation context of previous).  Unlike before (or at least what was assumed before), here we have other confounders.
+
+In this case, adjusting for birthweight doesn't sever all paths though the mediator, and actually opens up a new path, and the effect is now spurious.
 
 ```{r}
 grViz("
@@ -294,9 +318,67 @@ digraph dag1 {
   Smoking->BW Other->BW 
   Other->Death
 }
-")
+", height=200)
 ```
+
+Essentially we end up in the same situation.  By conditioning on birthweight == 'low', it does not physically keep birthweight from changing. Comparison of smoking vs. non-smoking leads to a comparison of infants with no other causes vs. those with other causes.
 
 # Simpson's paradox more generally
 
-Pearl 2013
+Pearl 2013 notes
+
+## Description
+Simpson's paradox refers to a general phenomenon of reversal of results from what is expected. Lord's paradox can be seen as a special case, and while we have gone through the details of that particular aspect, we can describe Simpson's paradox with a simple example.
+
+Consider a treatment given to males and females with the following success rates:
+
+```{r}
+# vals = data.frame(Sex=c('Male','Female'), Control=c('234/270','55/80'), Treamtent=c('81/87','192/263'))
+# vals2 = data.frame(Sex=c('Male','Female'), 
+#                    Control=round(c(234/270,55/80),2), 
+#                    Treamtent=round(c(81/87,192/263), 2))
+
+vals =data.frame(Sex=c('Male','Female'), 
+                 Control=c('23/27','5/8'), 
+                 Treamtent=c('8/9','19/26'))
+vals2 = data.frame(Sex=c('Male','Female'), 
+                   Control=round(c(23/27,5/8),2), 
+                   Treamtent=round(c(8/9,19/26), 2))
+htmlTable::htmlTable(vals, rnames=F, 
+                     css.table='margin-left:auto; margin-right:auto; border:none;')
+```
+
+<br>
+
+```{r}
+htmlTable::htmlTable(vals2, rnames=F, 
+                     css.table='margin-left:auto; margin-right:auto; border:none;')
+```
+
+<br>
+
+And what are the total results across male and females?
+
+<br>
+
+```{r}
+vals = data.frame(Sex=c('All', ''),
+                  Control=c('28/35','80%'), 
+                  Treamtent=c('27/35','77%'))
+htmlTable::htmlTable(vals, rnames=F, 
+                     css.table='margin-left:auto; margin-right:auto; border:none;')
+```
+
+So we are back to our low birth weight issue.
+
+Pearl notes three things are required for resolving such a paradox.
+
+- The solution must explain why the results are seen to be surprising
+- The solution must identify those cases where the paradox will arise
+- The solution must provide a means for making a *correct* decision
+
+
+
+[^wb]: The reasoning behind not using sex was because it is not a manipulable variable. See Holland & Rubin (1986) "No causation without manipulation."
+
+[^lord]: Lord himself acknowledged this in determining group differences on college freshman grade point average while adjusting for 'aptitude'.
