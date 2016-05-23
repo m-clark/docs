@@ -7,3 +7,5 @@ ggplot2
 plotly
 MASS
 reshape2
+psych
+car

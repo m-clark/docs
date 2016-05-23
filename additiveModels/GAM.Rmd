@@ -51,5 +51,8 @@ R Info: **`r sessionInfo()$R.version$version.string` `r sessionInfo()$R.version$
 ```{r child='introduction.Rmd'}
 ```
 
+```{r child='application.Rmd'}
+```
+
 
 # References

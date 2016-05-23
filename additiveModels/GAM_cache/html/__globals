@@ -1,6 +1,7 @@
 unnamed-chunk-2	~	lm	mydata
-unnamed-chunk-3	$	%>%	^	~	==	add_trace	arrange	data.frame	F	fitted	layout	library	list	lm	plot_ly	predict	rgamma	rnorm	round	set.seed	sort	theme_plotly	which
+unnamed-chunk-3	~	lm	mydata
 setupIntro	$	::	F	library	list	T
 fitPlotsDataSetup	$	%>%	^	~	==	arrange	data.frame	fitted	library	lm	predict	rgamma	rnorm	round	set.seed	sort	which
 loessgraph1	
 mcycleDataSetup	$	$<-	::	~	accel	attach	c	data.frame	detach	factor	fitted	ksmooth	library	lm	lowess	mcycle	melt	smooth.spline	times
+initial_inspection_of_pisa	describe	library	read.csv
