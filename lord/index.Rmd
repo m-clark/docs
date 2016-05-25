@@ -139,6 +139,7 @@ mod = "
  
   # total effect
   TE := (b + a*c) - a
+  TE2 := (a*-1) + (a*c*1) + (b*1)  # using tracing rules
 "
 
 library(lavaan)
@@ -151,7 +152,11 @@ summary(lm(post~group+pre, df)) # 'ancova' uncovers direct effect etc.
 
  
 ### Aside
-We can model the change score while adjusting for initial weight (and we should if it correlates with the effect of interest). Note that doing so duplicates the ANCOVA result for the group effect (i.e. it is the direct effect). But note that the coefficient for initial weight is equivalent to the ANCOVA coefficient -1. See for example, Senn 2006.
+We can model the change score while adjusting for initial weight (and we should generally). Note that the coefficient for initial weight `r round(coef(lm(change~group+pre, df))[3],2)` is equivalent to the ANCOVA coefficient (`r round(coef(lm(post~group+pre, df))[3],2)`) minus 1. One way to think about this is just as we have been, but focus on the initial weight score instead of the coefficient for sex.  The indirect effect on change through final weight is its coefficient * +1, but the total effect includes the indirect plus the direct effect (i.e. direct effect - 1).
+
+The change score result duplicates the ANCOVA result for the group effect. In fact all coefficients for covariates would be identical in a model for final weight vs. weight gain, as long as the baseline value is controlled for.  They are the direct effects for a model with final weight times + 1.  We can also calculate the total effect of Sex on change using Wright's tracing rules, and that sums up all paths leading from Sex to Change. That is the TE2 in the lavaan output.
+
+See for example, Laird 1983.
 
 ```{r}
 summary(lm(change~group+pre, df))
@@ -378,7 +383,18 @@ Pearl notes three things are required for resolving such a paradox.
 - The solution must provide a means for making a *correct* decision
 
 
+# References
+
+Laird, N. 1983. *Further Comparative Analyses of Pretest-Posttest Research Designs*. [link](http://www.tandfonline.com/doi/abs/10.1080/00031305.1983.10483133)
+
+Pearl, J. 2014.  *Lord's Paradox Revisited -- (Oh Lord! Kumbaya!)*. [link](http://ftp.cs.ucla.edu/pub/stat_ser/r436.pdf)
+
+Pearl, J. 2013. *Understanding Simpson's Paradox*. [link](http://ftp.cs.ucla.edu/pub/stat_ser/r414-reprint.pdf)
+
+Senn, S. 2006. *Change from baseline and analysis of covariance revisited*. [link](http://onlinelibrary.wiley.com/doi/10.1002/sim.2682/pdf)
+
 
 [^wb]: The reasoning behind not using sex was because it is not a manipulable variable. See Holland & Rubin (1986) "No causation without manipulation."
 
 [^lord]: Lord himself acknowledged this in determining group differences on college freshman grade point average while adjusting for 'aptitude'.
+
