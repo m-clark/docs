@@ -73,13 +73,13 @@ digraph dag1 {
 ```
 
 
-In the above we can define the following effects of sex on weight:
+In the above we can define the following effects of sex on final weight, or on change through effects on initial and final weight.
 
 - <span style="color:#1e90ff">**Indirect effect**</span>: is a*c
 - <span style="color:#8b0000">**Direct effect**</span>: b
-- <span style="color:#66023C">**Total effect**</span>: b + a*c - a
+- <span style="color:#66023C">**Total effect**</span>: (a\*-1) + (a\*c\*1) + (b\*1)
 
-Gain is completely determined as the difference between final weight and initial weight. 
+Gain is completely determined as the difference between final weight and initial weight, and so its direct effects from initial and final weight are not estimated, but fixed to -1 and +1 respectively.  To calculate the total effect of Sex on weight gain, we must sum all the paths from Sex to it- from sex-final-gain, sex-initial-gain, sex-initial-final-gain.
 
 ### Who is *correct*?
 
@@ -91,7 +91,7 @@ In summary, the two statisticians are focused on different effects from the same
 
 ### Data Example
 
-We can get an explicit sense of the results by means of a hands on example.  In the following we have simulated data that will reproduce the situation described thus far.  Parameters were chosen for visual effect.  One thing that's not been noted about the example is that it likely would not occur. The total effect by definition would be larger than the direct effect as there would be strong sex differences at initial weight, and a strong correlation between initial and final weight, all in a positive manner. The other issue unadressed is that the entire focus is on whether an effect exists hinges on p-values, and with large enough data and such simple models, anything would flag significant. Plus there are issues of variance, nonlinear relations etc.
+We can get an explicit sense of the results by means of a hands on example.  In the following we have simulated data that will reproduce the situation described thus far.  Parameters were chosen for visual and statistical effect.  One thing that's not been noted about the example is that it likely would not occur, in the sense that the total effect would likely be positive, as there would be strong sex differences at initial weight, and a strong correlation between initial and final weight, all in a positive manner (and not construed in a way to nullify the effect). The other issue unadressed is that the entire focus on whether an effect exists hinges on p-values, and with large enough data and such simple models, anything would flag significant. Plus there are other general modeling issues ignored. A goal here is conceptual simplicity however.
 
 ```{r dataSetup, echo=T}
 library(dplyr)
@@ -129,32 +129,31 @@ ggplotly(g)
 
 ```
 
-In the following we'll use lavaan to estimate the full mediation model, then run separate regressions to demonstrate the t-test on change vs. the ANCOVA approach.  As noted above, the t-test on change score measures the total effect of sex on final weight, while the ANCOVA measures the direct effect. It is unnecessary to distinguish them as separate modeling approaches, as they are merely regressions with different target variables.
+In the following we'll use lavaan to estimate the full mediation model, then run separate regressions to demonstrate the t-test on change vs. the ANCOVA approach.  For the mediation model, we only need to estimate the relevant effects on initial and final weight.  As noted above, the t-test on change score measures the total effect of sex, while the ANCOVA measures the direct effect on final weight. It is unnecessary to distinguish them as separate modeling approaches, as they are merely standard regressions with different target variables.  
 
 ```{r echo=T}
 mod = "
   pre ~ a*group
   post ~ b*group + c*pre
-  # change ~ -1*pre + 1*post
+  # change ~ -1*pre + 1*post   (implied)
  
   # total effect
-  TE := (b + a*c) - a
-  TE2 := (a*-1) + (a*c*1) + (b*1)  # using tracing rules
+  TE := (a*-1) + (a*c*1) + (b*1)  # using tracing rules
 "
 
 library(lavaan)
 lpmod = sem(mod, data=df)
 
 summary(lpmod)
-summary(lm(change~group, df))  # t-test on change scores = total effect
-summary(lm(post~group+pre, df)) # 'ancova' uncovers direct effect etc.
+summary(lm(change~group, df))           # t-test on change scores = total effect
+summary(lm(post~group+pre, df))         # 'ancova' uncovers direct effect etc.
 ```
 
  
 ### Aside
-We can model the change score while adjusting for initial weight (and we should generally). Note that the coefficient for initial weight `r round(coef(lm(change~group+pre, df))[3],2)` is equivalent to the ANCOVA coefficient (`r round(coef(lm(post~group+pre, df))[3],2)`) minus 1. One way to think about this is just as we have been, but focus on the initial weight score instead of the coefficient for sex.  The indirect effect on change through final weight is its coefficient * +1, but the total effect includes the indirect plus the direct effect (i.e. direct effect - 1).
+We can model the change score while adjusting for initial weight (and we should generally). Note that the coefficient for initial weight `r round(coef(lm(change~group+pre, df))[3],2)` is equivalent to the ANCOVA coefficient (`r round(coef(lm(post~group+pre, df))[3],2)`) minus 1. One way to think about this is just as we have been, but focus on the initial weight score instead of the coefficient for sex.  The indirect effect on change through final weight is its coefficient (path **c**) times +1, but the total effect includes the indirect plus the direct effect (i.e. direct effect - 1).
 
-The change score result duplicates the ANCOVA result for the group effect. In fact all coefficients for covariates would be identical in a model for final weight vs. weight gain, as long as the baseline value is controlled for.  They are the direct effects for a model with final weight times + 1.  We can also calculate the total effect of Sex on change using Wright's tracing rules, and that sums up all paths leading from Sex to Change. That is the TE2 in the lavaan output.
+The change score result duplicates the ANCOVA result for the group effect. In fact all coefficients for covariates would be identical in a model for final weight vs. weight gain, as long as the baseline value is controlled for.  They are the direct effects for a model with final weight times + 1.  
 
 See for example, Laird 1983.
 
@@ -301,7 +300,7 @@ What is the causal effect of birth weight on death?
 #### Perspective 2
 Another perspective is from the point of Lord's paradox. Here we are concerned with the effect of smoking on mortality above and beyond its effect though birth weight (i.e. the mediation context of previous).  Unlike before (or at least what was assumed before), here we have other confounders.
 
-In this case, adjusting for birthweight doesn't sever all paths though the mediator, and actually opens up a new path, and the effect is now spurious.
+In this case, adjusting for birth weight doesn't sever all paths though the mediator, and actually opens up a new path, and the effect is now spurious.
 
 ```{r}
 grViz("
@@ -326,7 +325,7 @@ digraph dag1 {
 ", height=200)
 ```
 
-Essentially we end up in the same situation.  By conditioning on birthweight == 'low', it does not physically keep birthweight from changing. Comparison of smoking vs. non-smoking leads to a comparison of infants with no other causes vs. those with other causes.
+Essentially we end up in the same situation.  By conditioning on birth weight == 'low', it does not physically keep birth weight from changing. Comparison of smoking vs. non-smoking leads to a comparison of infants with no other causes vs. those with other causes.
 
 # Simpson's paradox more generally
 
