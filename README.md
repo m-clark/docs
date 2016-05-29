@@ -6,6 +6,6 @@ Documents that go into methodological detail regarding various statistical proce
 
 [Mixed Models Overview](http://m-clark.github.io/docs/mixedModels.html) An overview that introduces mixed models for those with varying technical/statistical backgrounds.
 
-[ANOVA and Mixed Models](mixedModels/anovamixed.html) A demonstration of how mixed models generalize standard ANOVA procedures.
+[ANOVA and Mixed Models](http://m-clark.github.io/docs/mixedModels/anovamixed.html) A demonstration of how mixed models generalize standard ANOVA procedures.
 
-[Paradoxes](lord/index.Rmd) An examination of analyzing change scores vs. controlling for baseline, with a prelude to the more general Simpson's paradox.
+[Paradoxes](http://m-clark.github.io/docs/lord/) An examination of analyzing change scores vs. controlling for baseline, with a prelude to the more general Simpson's paradox.
