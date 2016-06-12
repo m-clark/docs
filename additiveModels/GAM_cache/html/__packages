@@ -9,3 +9,6 @@ MASS
 reshape2
 psych
 car
+tidyr
+nlme
+mgcv

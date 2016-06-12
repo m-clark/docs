@@ -4,4 +4,17 @@ setupIntro	$	::	F	library	list	T
 fitPlotsDataSetup	$	%>%	^	~	==	arrange	data.frame	fitted	library	lm	predict	rgamma	rnorm	round	set.seed	sort	which
 loessgraph1	
 mcycleDataSetup	$	$<-	::	~	accel	attach	c	data.frame	detach	factor	fitted	ksmooth	library	lm	lowess	mcycle	melt	smooth.spline	times
-initial_inspection_of_pisa	describe	library	read.csv
+initial_inspection_of_pisa	::	read.csv
+unnamed-chunk-4	
+unnamed-chunk-5	%>%	~	aes	Country	dmelt	element_rect	F	facet_wrap	geom_point	geom_smooth	geom_text	ggplot	ggplotly	labs	layout	Overall	theme	theme_trueMinimal	Value
+mod_lm	~	d	gam	library	summary
+polynomialBasis	$	$<-	%>%	^	~	aes	c	d	expression	F	facet_grid	factor	geom_line	geom_smooth	ggplot	ggplotly	Income	label_parsed	layout	levels<-	nrow	Overall	rbind	rep	theme_trueMinimal	ylab
+csbyhand	$	%>%	::	[<-	^	~	abs	aes	coef	d	data.frame	F	geom_line	geom_point	geom_smooth	ggplot	ggplotly	Income	layout	length	lm	matrix	outer	Overall	seq	theme_trueMinimal	xlim
+mod_gam1	~	d	gam	summary
+unnamed-chunk-6	
+plot_mod_gam1	mod_gam1	par	plot
+mod_lm_fit	$	AIC	mod_lm	summary
+compareLMGAM	$	AIC	c	colnames<-	data.frame	format	mod_gam1	mod_lm	pander	rbind	round	rownames<-	summary
+mod_lm_mod_gam1_anova	anova	mod_gam1	mod_lm
+scatterwrap	%>%	::	~	aes	Country	d	Evidence	Explain	facet_wrap	gather	geom_point	geom_text	ggplot	ggplotly	Issues	labs	layout	library	Overall	theme_trueMinimal	Value	Variable
+scatterwrapSmooth	%>%	~	aes	Country	dmelt	element_rect	F	facet_wrap	geom_point	geom_smooth	geom_text	ggplot	ggplotly	labs	layout	Overall	theme	theme_trueMinimal	Value

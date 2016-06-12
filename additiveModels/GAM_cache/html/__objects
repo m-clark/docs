@@ -5,3 +5,16 @@ fitPlotsDataSetup	dxy	fitat3	fitlm	fitx2	marker	neighborfit	neighborhood	neighbo
 loessgraph1	
 mcycleDataSetup	gamfit	ksfit	lowfit	mcycle2	mcycle3	nsfit	polyfit	ssfit
 initial_inspection_of_pisa	d
+unnamed-chunk-4	
+unnamed-chunk-5	g	.GAM_cache/html/unnamed-chunk-5_8ca55e3c99996d7ddce3b3bcf989ba7a_meta
+mod_lm	mod_lm
+polynomialBasis	dpoly	g	.GAM_cache/html/polynomialBasis_e197c6605a6a00e5df0c6a1726466860_meta
+csbyhand	g	mod.1	rk	spl.X	X	xk	xp	Xp	.GAM_cache/html/csbyhand_67a057175af3fbe8a8b9069f85b338de_meta
+mod_gam1	mod_gam1
+unnamed-chunk-6	
+plot_mod_gam1	
+mod_lm_fit	
+compareLMGAM	modcomp
+mod_lm_mod_gam1_anova	
+scatterwrap	dmelt	g	.GAM_cache/html/scatterwrap_e7f72bc5394257e2205944de66cd020e_meta
+scatterwrapSmooth	g	.GAM_cache/html/scatterwrapSmooth_00c98b330f19545674165b374c0889d2_meta
