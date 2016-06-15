@@ -18,3 +18,12 @@ compareLMGAM	$	AIC	c	colnames<-	data.frame	format	mod_gam1	mod_lm	pander	rbind	r
 mod_lm_mod_gam1_anova	anova	mod_gam1	mod_lm
 scatterwrap	%>%	::	~	aes	Country	d	Evidence	Explain	facet_wrap	gather	geom_point	geom_text	ggplot	ggplotly	Issues	labs	layout	library	Overall	theme_trueMinimal	Value	Variable
 scatterwrapSmooth	%>%	~	aes	Country	dmelt	element_rect	F	facet_wrap	geom_point	geom_smooth	geom_text	ggplot	ggplotly	labs	layout	Overall	theme	theme_trueMinimal	Value
+mod_lm2	~	d	gam	summary
+mod_gam2	~	d	gam	summary
+mod_gam2_update	~	mod_gam2	summary	update
+mod_gam2_plot	c	F	library	list	mod_gam2	par	visreg
+plot_mod_gam2_response	$	%>%	aes	data.frame	fit	geom_point	ggplot	ggplotly	Income	mean	mod_gam2	mutate	predict	se.fit	seq	T
+contour	$	$<-	::	c	colorRampPalette	Edu	Income	mod_gam2	names<-	Overall	plot_ly	rev	t	visreg2d	with
+mod_gam3	~	d	gam	summary
+mod_gam3_plot	$	$<-	::	c	colorRampPalette	duration	Edu	Income	mod_gam3	names<-	Overall	plot_ly	rev	t	visreg2d	waiting	with	x	y	z
+mod_lm2_mod_gam2_anova	anova	mod_gam2	mod_lm2

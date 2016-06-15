@@ -19,10 +19,7 @@ output:
     highlight: pygments
     toc: yes
 always_allow_html: yes
-bibliography: BayesBasics.bib
-nocite: | 
-  @kruschke_doing_2010, @gelman_arm, @mcgrayne_theory_2012, @gelmanPardoe2006,
-  @gelmanHwangVehtari, @gelmanVehtariWAIC, @mcelreath2016
+
 ---
 
 
@@ -134,7 +131,7 @@ One can verify this by running the same model via the <span class="func">glm</sp
 
 ### <a name='GAMSingle'>GAM</a>
 
-Let's now try some nonlinear approaches, keeping in mind that $\mu=f(x)$.  As a point of comparison, we can start by trying a standard polynomial regression, and it might do well enough<span class="marginnote">This example is pretty much straight from [^wood_generalized_2006] with little modification.</span>.  To start we must consider a basis for use, i.e. a set of basis functions $b_j$ that will be combined to produce $f(x)$:
+Let's now try some nonlinear approaches, keeping in mind that $\mu=f(x)$.  As a point of comparison, we can start by trying a standard polynomial regression, and it might do well enough<span class="marginnote">This example is pretty much straight from @wood_generalized_2006 with little modification.</span>.  To start we must consider a basis for use, i.e. a set of basis functions $b_j$ that will be combined to produce $f(x)$:
 
 
 $$f(x)=\displaystyle\sum\limits_{j=1}^q b_{j}(x)\beta_{j}$$
@@ -186,7 +183,7 @@ ggplotly(g) %>% layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0
 
 At this point we have done nothing we couldn't do in our regular regression approach, but the take home message is that as we move to GAMs we are going about things in much the same fashion; we are simply changing the nature of the basis, and have a great deal more flexibility in choosing the form.
 
-In the next figure I show the fit using a 'by-hand' cubic spline basis (see the appendix and p.126-7 in [^wood_generalized_2006]).  
+In the next figure I show the fit using a 'by-hand' cubic spline basis (see the appendix and p.126-7 in @wood_generalized_2006).  
 
 ```{r csbyhand, echo=FALSE}
 rk <- function(x,z) {
@@ -248,12 +245,12 @@ The GCV, or <span class="emph">generalized cross validation</span> score can be 
 
 One can get  sense of the form of the fit by simply plotting the model object as follows:
 
-```{r plot_mod_gam1}
+```{r plot_mod_gam1, echo=-1}
 par(bg='transparent')
 plot(mod_gam1)
 ```
 
-The intervals are Bayesian credible intervals based on the posterior predictive distribution. In this single predictor case one can also revisit the previous graph, where the dark red line was constructed directly from ggplot.  
+Note that this will only plot the smooth terms in the model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">A better alternative is with the <span class="pack">visreg</span> package, which will plot all effects, and by default be nicer looking and easier to customize. You can simply feed the model to the <span class="func">visreg</span> function. Also as 2 and 3d capabilities like the <span class="pack">mgcv</span> pacakge.</span>. The intervals are Bayesian credible intervals based on the posterior predictive distribution. In this single predictor case one can also revisit the previous graph, where the dark red line was constructed directly from ggplot.  
 
 
 ### <a name='modComparisonSingle'>Model Comparison</a>
@@ -282,136 +279,148 @@ Comparing these various measures, it's safe to conclude that the GAM fits better
 
 ```{r mod_lm_mod_gam1_anova}
 anova(mod_lm, mod_gam1, test="Chisq")
-
 ```
 
 It would appear the anova results tell us what we have probably come to believe already, that incorporating nonlinear effects has improved the model considerably.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Multiple Predictors}
+
+## <a name='multiplePredictors'>Multiple Predictors</a>
+
 Let's now see what we can do with a more realistic case where we have added model complexity.  
 
-\subsection{\small{Linear Fit}}
+### <a name='linearFitMulti'>Linear Fit</a>
+
 We'll start with the typical linear model approach again, this time adding the Health and Education indices.
 
-<<mod_lm2, size='footnotesize', message=FALSE, cache=TRUE>>=
+
+```{r mod_lm2}
 mod_lm2 <- gam(Overall ~ Income + Edu + Health, data=d)
 summary(mod_lm2)
-@
+```
 
-It appears we have statistical effects for Income and Education, but not for Health, and the adjusted R-squared suggests a notable amount of the variance is accounted for\sidenote{Note that a difference in sample sizes do not make this directly comparable to the first model.}.  Let's see about nonlinear effects.
+It appears we have statistical effects for Income and Education, but not for Health, and the adjusted R-squared suggests a notable amount of the variance is accounted for<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Note that a difference in sample sizes do not make this directly comparable to the first model.</span>.  Let's see about nonlinear effects.
 
-\subsection{\small{GAM}}
+### <a name='GAMMulti'>GAM</a>
 As far as the generalized additive model goes, we can approach things in a similar manner as before.  We will ignore the results of the linear model for now and look for nonlinear effects for each covariate.
 
-\marginnote{The default smoother for s() is the argument bs='tp', a thin plate regression spline.}
-<<mod_gam2, size='footnotesize', message=FALSE, warning=FALSE, cache=TRUE>>=
+<span class="marginnote">The default smoother for s() is the argument bs='tp', a thin plate regression spline.</span>
+```{r mod_gam2}
 mod_gam2 <- gam(Overall ~ s(Income) + s(Edu) + s(Health), data=d)
 summary(mod_gam2)
-@
+```
+
+
 
 There are again a couple things to take note of.  First, statistically speaking, we come to the same conclusion as the linear model regarding the individual effects. One should take particular note of the effect of Health index.  The effective degrees of freedom with value 1 suggests that it has essentially been reduced to a simple linear effect.  The following will update the model to explicitly model the effect as such, but as one can see, the results are identical.
 
-
-<<mod_gam2_update, size='footnotesize', message=FALSE, warning=FALSE, cache=TRUE>>=
+```{r mod_gam2_update}
 mod_gam2B = update(mod_gam2, .~.-s(Health) + Health)
 summary(mod_gam2B)
-@
+```
 
 We can also note that this model accounts for much of the variance in Overall science scores, with an adjusted R-squared of .86.  In short, it looks like the living standards and educational resources of a country are associated with overall science scores, even if we don't really need the Health index in the model.
 
 
-\subsection{\small{Graphical Display}}
-Now we examine the effects of interest visually. In the following code, aside from the basic plot we have changed the default options to put all the plots on one page, added the partial residuals\sidenote{See e.g. John Fox's texts and chapters regarding regression diagnostics, and his \textcolor{red}{crplots} function in the \textcolor{blue}{\emph{car}} package.}, and changed the symbol and its respective size, among other options.
+### <a name='graphicalDispMulti'>Graphical Display</a>
 
-<<mod_gam2_plot, size='footnotesize', tidy=FALSE, message=FALSE, eval=FALSE, cache=TRUE>>=
-plot(mod_gam2, pages=1, residuals=T, pch=19, cex=0.25, 
-     scheme=1, col='#FF8000', shade=T,shade.col='gray90')
-@
+Now we examine the effects of interest visually. In the following code, aside from the basic plot we have changed the default options to put all the plots on one page, added the partial residuals<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See e.g. John Fox's texts and chapters regarding regression diagnostics, and his \textcolor{red}{crplots} function in the \textcolor{blue}{\emph{car}} package.</span>, and changed the symbol and its respective size, among other options.
 
-\marginnote{
-\begin{flushleft}
-  \includegraphics[scale=.25]{figures/multiple_predictors_effects}
-\end{flushleft}
-}
+```{r mod_gam2_plot, echo=F}
+# plot(mod_gam2, pages=1, residuals=T, pch=19, cex=0.25, 
+#      scheme=1, line.col='#FF5503', shade=T,shade.col='gray90')
+par(mfrow=c(2,2))
+library(visreg)
+visreg(mod_gam2, line=list(col="#1e90ff", lwd=2), points=list(cex=.25, col='#ff5503'), fill=list(col='gray90'), ask=F, bty='n')
+```
+
 Here we can see the effects of interest, and again one might again note the penalized-to-linear effect of Health.  We again see the tapering off of Income's effect at its highest level, and in addition, a kind of sweet spot for a positive effect of Education in the mid-range values, with a slight positive effect overall.  Health, as noted, has been reduced to a linear, surprisingly negative effect, but again this is non-significant.  One will also note the y-axis scale.  The scale is on that of the linear predictor, but due to identifiability constraints, the smooths must sum to zero, and thus are presented in a mean-centered fashion.  
 
 Previously, we had only one predictor and so we could let ggplot do the work to produce a plot on the response scale, although we could have added the intercept back in.
-\marginnote{
-\begin{flushleft}
-  \includegraphics[scale=.40]{figures/income_on_response}
-\end{flushleft}
-}
+
 Here we'll need to do a little more. The following will produce a plot for Income on the scale of the response, with the other predictors held at their mean. Seen at right.  
 
 
-
-<<plot_mod_gam2_response, size='footnotesize', message=FALSE, eval=FALSE, tidy=FALSE, cache=TRUE>>=
+```{r plot_mod_gam2_response, echo=1:5}
 # Note that mod_gam2$model is the data that was used in the modeling process, 
 # so it will have NAs removed.
 testdata = data.frame(Income=seq(.4,1, length=100), 
                       Edu=mean(mod_gam2$model$Edu), 
                       Health=mean(mod_gam2$model$Health))
 fits = predict(mod_gam2, newdata=testdata, type='response', se=T)
-predicts = data.frame(testdata, fits)
+predicts = data.frame(testdata, fits) %>% 
+  mutate(lower = fit - 1.96*se.fit,
+         upper = fit + 1.96*se.fit)
 
-ggplot(aes(x=Income,y=fit), data=predicts) + 
-  geom_smooth(aes(ymin = fit - 1.96*se.fit, ymax=fit + 1.96*se.fit),
-              fill='gray80', size=1,stat='identity') +
-  ggtheme
-@
+# an example that will render;  using ribbon because plotly can't do stat/geom_smooth
+g = ggplot(aes(x=Income,y=fit), data=predicts) +
+  geom_point()
+  # geom_ribbon(aes(ymin = lower, ymax=upper),
+  #             fill='gray90') +
+  # geom_line(color='#1e90ff')
+ggplotly(g)  ##PLOTLY CURRENTLY BROKEN FOR THIS AND REMAINING PLOTS
+
+# g = ggplot(predicts) + 
+#   geom_ribbon(aes(ymin=lower, ymax=upper, x=Income), alpha=.1) +
+#   geom_line(aes(x=Income, y=fit), color='#1e90ff') 
+```
+
 
 
 This gives us a sense for one predictor, but let's take a gander at Income and Education at the same time.  Previously, while using the function \texttt{\textcolor{red}{plot}}, it actually is \texttt{\textcolor{red}{plot.gam}}, or the basic plot function for a GAM class object.
 There is another plotting function, \texttt{\textcolor{red}{vis.gam}}, that will give us a bit more to play with.  The following will produce a contour plot (directly to the right) with Income on the x axis, Education on the y, with values on the response scale given by the contours, with lighter color indicating higher values.  
-\marginnote{
-\begin{flushleft}
-  \includegraphics[scale=.25]{figures/gam2_contour_IncomeEdu}
-\end{flushleft} 
-}
 
-<<contour, size='footnotesize', cache=TRUE, message=FALSE, eval=FALSE>>=
-vis.gam(mod_gam2, type='response', plot.type='contour')
-@
 
-First and foremost the figure to the right reflects the individual plots (e.g. one can see the decrease in scores at the highest income levels), and we can see that middling on Education and high on Income generally produces the highest scores.  Conversely, being low on both the Education and Income indices are associated with poor Overall science scores. However, while interesting, these respective smooths were created separately of one another, and there is another way we might examine how these two effects work together in predicting the response.  
-\bigskip{}
-\marginnote{
-\begin{flushleft}
-  \includegraphics[scale=.25]{figures/gam3_contour_IncomeEdu}
-\end{flushleft} }
+
+```{r contour, echo=1:2, fig.show='hide'}
+# vis.gam(mod_gam2, type='response', plot.type='contour')
+# visreg2d(mod_gam2, xvar='Income', yvar='Edu', scale='response')
+tt = visreg2d(mod_gam2, xvar='Income', yvar='Edu', scale='response')[1:3] # for some reason 2d doesn't have a plot= argument so is suppressed with 'hide'
+names(tt) = c('Income', 'Edu', 'Overall')
+tt$Overall = t(tt$Overall)
+# because of a lack of  sense, x is y in plotting
+
+colfun = rev(colorRampPalette(RColorBrewer::brewer.pal(9, 'RdBu'))(100))
+with(tt, plot_ly(x=Income, y=Edu,  z=Overall, type='heatmap', colors=colfun, hoverinfo='none'))
+```
+
+
+First and foremost the figure reflects the individual plots (e.g. one can see the decrease in scores at the highest income levels), and we can see that middling on Education and high on Income generally produces the highest scores.  Conversely, being low on both the Education and Income indices are associated with poor Overall science scores. However, while interesting, these respective smooths were created separately of one another, and there is another way we might examine how these two effects work together in predicting the response.  
+
 
 Let's take a look at another approach, continuing the focus on visual display. It may not be obvious at all, but one can utilize smooths of more than one variable, in effect, a smooth of the smooths of the variables that go into it.  Let's create a new model to play around with this feature. After fitting the model, an example of the plot code is given producing the middle figure, but I also provide a different perspective as well as contour plot for comparison  with the graph based on separate smooths.
 
-\marginnote{
-\begin{flushleft}
-  \includegraphics[scale=.25]{figures/2dgam_phi30_theta_30}
-\end{flushleft} }
-\marginnote{
-\begin{flushleft}
-  \includegraphics[scale=.25]{figures/2dgam_phi30_theta_180}
-\end{flushleft} 
-}
-<<mod_gam3, size='footnotesize', message=FALSE, warning=FALSE, cache=TRUE>>=
+
+```{r mod_gam3}
 mod_gam3 <- gam(Overall ~ te(Income,Edu), data=d)
 summary(mod_gam3)
-@
-
-<<mod_gam3_plot, size='footnotesize', message=FALSE, eval=FALSE, tidy=FALSE, cache=TRUE>>=
-vis.gam(mod_gam3, type='response', plot.type='persp', 
-        phi=30, theta=30,n.grid=500, border=NA)
-@
+```
 
 
-In the above we are using a type of smooth called a tensor product smooth, and by smoothing the marginal smooths of Income and Education, we see a bit clearer story.  As we might suspect, wealthy countries with more of an apparent educational infrastructure are going to score higher on the Overall science score.  However, wealth is not necessarily indicative of higher science scores (note the dark bottom right corner on the contour plot)\sidenote{This is likely due to Qatar.  Refer again to the figure on page \pageref{fig:countryscatter}.}, though without at least moderate wealth hopes are fairly dim for a decent score.
+```{r mod_gam3_plot, fig.show='hide'}
+# vis.gam(mod_gam3, type='response', plot.type='persp', 
+#         phi=30, theta=30,n.grid=500, border=NA)
+tt = visreg2d(mod_gam3, xvar='Income', yvar='Edu', scale='response')[1:3]
+names(tt) = c('Income', 'Edu', 'Overall')
+tt$Overall = t(tt$Overall)
+# because of a lack of  sense, x is y in plotting
+
+colfun = rev(colorRampPalette(RColorBrewer::brewer.pal(9, 'RdBu'))(100))
+kd <- with(MASS::geyser, MASS::kde2d(duration, waiting, n = 50))
+with(kd, plot_ly(x = x, y = y, z = z, type = "surface"))
+with(tt, plot_ly(x=Income, y=Edu,  z = Overall, type='surface')) #, colors=colfun, hoverinfo='none'
+```
+
+
+In the above we are using a type of smooth called a tensor product smooth, and by smoothing the marginal smooths of Income and Education, we see a bit clearer story.  As we might suspect, wealthy countries with more of an apparent educational infrastructure are going to score higher on the Overall science score.  However, wealth is not necessarily indicative of higher science scores (note the dark bottom right corner on the contour plot)<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">This is likely due to Qatar.  Refer again to the figure on page \pageref{fig:countryscatter}.</span>, though without at least moderate wealth hopes are fairly dim for a decent score.
 
 One can also, for example, examine interactions between a smooth and a linear term $f(x)z$, and in a similar vein of thought look at smooths at different levels of a grouping factor. We'll leave that for some other time.
 
-\subsection{\small{Model Comparison}}
+### <a name='modComparisonMulti'>Model Comparison</a>
 As before, we can examine indices such as GCV or perhaps adjusted R-square, which both suggest our GAM performs considerably better. Statistically we can compare the two models with the anova function as before.  
 
-<<mod_lm2_mod_gam2_anova, size='footnotesize', message=FALSE, cache=TRUE>>=
+```{r mod_lm2_mod_gam2_anova}
 anova(mod_lm2, mod_gam2, test="Chisq")
-@
+```
+
 
 Not that we couldn't have assumed as such already, but now we have additional statistical evidence to suggest that incorporating nonlinear effects improves the model.

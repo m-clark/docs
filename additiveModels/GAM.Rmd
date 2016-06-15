@@ -17,7 +17,7 @@ output:
     # code_folding: show
 bibliography: refs.bib
 nocite: | 
-  
+  @wood_generalized_2006,@venables_modern_2002
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache = T, message = F, warning = F, R.options=list(width=120), 

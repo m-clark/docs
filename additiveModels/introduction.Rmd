@@ -21,8 +21,7 @@ output:
 always_allow_html: yes
 bibliography: BayesBasics.bib
 nocite: | 
-  @kruschke_doing_2010, @gelman_arm, @mcgrayne_theory_2012, @gelmanPardoe2006,
-  @gelmanHwangVehtari, @gelmanVehtariWAIC, @mcelreath2016
+
 ---
 ```{r setupIntro, include=FALSE}
 knitr::opts_chunk$set(cache = T, message = F, warning = F, R.options=list(width=120), 

@@ -18,3 +18,12 @@ compareLMGAM	modcomp
 mod_lm_mod_gam1_anova	
 scatterwrap	dmelt	g	.GAM_cache/html/scatterwrap_e7f72bc5394257e2205944de66cd020e_meta
 scatterwrapSmooth	g	.GAM_cache/html/scatterwrapSmooth_00c98b330f19545674165b374c0889d2_meta
+mod_lm2	mod_lm2
+mod_gam2	mod_gam2
+mod_gam2_update	mod_gam2B
+mod_gam2_plot	
+plot_mod_gam2_response	fits	g	predicts	testdata	.GAM_cache/html/plot_mod_gam2_response_2fd40bd48a6ecd7b342f671ed07dedc6_meta
+contour	colfun	tt	.GAM_cache/html/contour_d49727371200e49918aa161acf3b7ea0_meta
+mod_gam3	mod_gam3
+mod_gam3_plot	colfun	kd	tt	.GAM_cache/html/mod_gam3_plot_10c2e968dc988bbb8b057d1059f91a4c_meta
+mod_lm2_mod_gam2_anova	
