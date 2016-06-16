@@ -2,13 +2,11 @@ base
 magrittr
 dplyr
 pander
-lazerhawk
 ggplot2
 plotly
+lazerhawk
 MASS
 reshape2
-psych
-car
 tidyr
 nlme
 mgcv

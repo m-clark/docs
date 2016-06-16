@@ -1,29 +1,25 @@
-unnamed-chunk-2	
-unnamed-chunk-3	
 setupIntro	
+unnamed-chunk-3	
 fitPlotsDataSetup	dxy	fitat3	fitlm	fitx2	marker	neighborfit	neighborhood	neighbormod	x	y
-loessgraph1	
 mcycleDataSetup	gamfit	ksfit	lowfit	mcycle2	mcycle3	nsfit	polyfit	ssfit
 initial_inspection_of_pisa	d
-unnamed-chunk-4	
-unnamed-chunk-5	g	.GAM_cache/html/unnamed-chunk-5_8ca55e3c99996d7ddce3b3bcf989ba7a_meta
+scatterwrap	dmelt	scatterwrap	.GAM_cache/html/scatterwrap_7252dd76e500a591f430393310309a06_meta
+scatterwrapSmooth	scatterwrapSmooth	.GAM_cache/html/scatterwrapSmooth_fd9ea2d6b11e6929dbe7a22f8058d301_meta
 mod_lm	mod_lm
-polynomialBasis	dpoly	g	.GAM_cache/html/polynomialBasis_e197c6605a6a00e5df0c6a1726466860_meta
-csbyhand	g	mod.1	rk	spl.X	X	xk	xp	Xp	.GAM_cache/html/csbyhand_67a057175af3fbe8a8b9069f85b338de_meta
+polynomialBasis	dpoly	polynomialBasis	.GAM_cache/html/polynomialBasis_f73824703d06cfd0b110de9e4bc94c1a_meta
+csbyhand	csbyhand	mod.1	rk	spl.X	X	xk	xp	Xp	.GAM_cache/html/csbyhand_0c9a8b8d8cb1f50f89cf730903cc040c_meta
 mod_gam1	mod_gam1
-unnamed-chunk-6	
+unnamed-chunk-4	
 plot_mod_gam1	
 mod_lm_fit	
 compareLMGAM	modcomp
 mod_lm_mod_gam1_anova	
-scatterwrap	dmelt	g	.GAM_cache/html/scatterwrap_e7f72bc5394257e2205944de66cd020e_meta
-scatterwrapSmooth	g	.GAM_cache/html/scatterwrapSmooth_00c98b330f19545674165b374c0889d2_meta
 mod_lm2	mod_lm2
 mod_gam2	mod_gam2
 mod_gam2_update	mod_gam2B
 mod_gam2_plot	
-plot_mod_gam2_response	fits	g	predicts	testdata	.GAM_cache/html/plot_mod_gam2_response_2fd40bd48a6ecd7b342f671ed07dedc6_meta
-contour	colfun	tt	.GAM_cache/html/contour_d49727371200e49918aa161acf3b7ea0_meta
+plot_mod_gam2_response	fits	plot_mod_gam2_response	predicts	testdata	.GAM_cache/html/plot_mod_gam2_response_fa73672759bb4a7816ff346c5e51ba8c_meta
+contour	colfun	tt	.GAM_cache/html/contour_2bd54f0fbee7bef058b7f6db178b28ee_meta
 mod_gam3	mod_gam3
-mod_gam3_plot	colfun	kd	tt	.GAM_cache/html/mod_gam3_plot_10c2e968dc988bbb8b057d1059f91a4c_meta
+mod_gam3_plot	colfun	tt	.GAM_cache/html/mod_gam3_plot_1d1727e0ace4ebe2ddec767ad59d172c_meta
 mod_lm2_mod_gam2_anova	

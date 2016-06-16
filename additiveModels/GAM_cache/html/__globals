@@ -1,29 +1,25 @@
-unnamed-chunk-2	~	lm	mydata
-unnamed-chunk-3	~	lm	mydata
 setupIntro	$	::	F	library	list	T
+unnamed-chunk-3	~	lm	mydata
 fitPlotsDataSetup	$	%>%	^	~	==	arrange	data.frame	fitted	library	lm	predict	rgamma	rnorm	round	set.seed	sort	which
-loessgraph1	
 mcycleDataSetup	$	$<-	::	~	accel	attach	c	data.frame	detach	factor	fitted	ksmooth	library	lm	lowess	mcycle	melt	smooth.spline	times
 initial_inspection_of_pisa	::	read.csv
-unnamed-chunk-4	
-unnamed-chunk-5	%>%	~	aes	Country	dmelt	element_rect	F	facet_wrap	geom_point	geom_smooth	geom_text	ggplot	ggplotly	labs	layout	Overall	theme	theme_trueMinimal	Value
+scatterwrap	%>%	::	~	aes	Country	d	Evidence	Explain	facet_wrap	gather	geom_point	geom_text	ggplot	ggplotly	Issues	labs	layout	library	Overall	theme_trueMinimal	Value	Variable
+scatterwrapSmooth	%>%	~	aes	Country	dmelt	element_rect	F	facet_wrap	geom_point	geom_smooth	geom_text	ggplot	ggplotly	labs	layout	Overall	theme	theme_trueMinimal	Value
 mod_lm	~	d	gam	library	summary
-polynomialBasis	$	$<-	%>%	^	~	aes	c	d	expression	F	facet_grid	factor	geom_line	geom_smooth	ggplot	ggplotly	Income	label_parsed	layout	levels<-	nrow	Overall	rbind	rep	theme_trueMinimal	ylab
+polynomialBasis	$	$<-	%>%	^	~	aes	c	d	expression	F	facet_grid	factor	geom_line	geom_smooth	ggplot	ggplotly	Income	layout	levels<-	nrow	Overall	rbind	rep	theme_trueMinimal	ylab
 csbyhand	$	%>%	::	[<-	^	~	abs	aes	coef	d	data.frame	F	geom_line	geom_point	geom_smooth	ggplot	ggplotly	Income	layout	length	lm	matrix	outer	Overall	seq	theme_trueMinimal	xlim
 mod_gam1	~	d	gam	summary
-unnamed-chunk-6	
+unnamed-chunk-4	
 plot_mod_gam1	mod_gam1	par	plot
 mod_lm_fit	$	AIC	mod_lm	summary
 compareLMGAM	$	AIC	c	colnames<-	data.frame	format	mod_gam1	mod_lm	pander	rbind	round	rownames<-	summary
 mod_lm_mod_gam1_anova	anova	mod_gam1	mod_lm
-scatterwrap	%>%	::	~	aes	Country	d	Evidence	Explain	facet_wrap	gather	geom_point	geom_text	ggplot	ggplotly	Issues	labs	layout	library	Overall	theme_trueMinimal	Value	Variable
-scatterwrapSmooth	%>%	~	aes	Country	dmelt	element_rect	F	facet_wrap	geom_point	geom_smooth	geom_text	ggplot	ggplotly	labs	layout	Overall	theme	theme_trueMinimal	Value
 mod_lm2	~	d	gam	summary
 mod_gam2	~	d	gam	summary
 mod_gam2_update	~	mod_gam2	summary	update
 mod_gam2_plot	c	F	library	list	mod_gam2	par	visreg
-plot_mod_gam2_response	$	%>%	aes	data.frame	fit	geom_point	ggplot	ggplotly	Income	mean	mod_gam2	mutate	predict	se.fit	seq	T
-contour	$	$<-	::	c	colorRampPalette	Edu	Income	mod_gam2	names<-	Overall	plot_ly	rev	t	visreg2d	with
+plot_mod_gam2_response	$	%>%	aes	data.frame	fit	geom_line	geom_ribbon	ggplot	ggplotly	Income	layout	lower	mean	mod_gam2	mutate	predict	se.fit	seq	T	theme_trueMinimal	upper
+contour	$	$<-	%>%	::	c	colorRampPalette	Edu	Income	layout	mod_gam2	names<-	Overall	plot_ly	rev	t	visreg2d	with
 mod_gam3	~	d	gam	summary
-mod_gam3_plot	$	$<-	::	c	colorRampPalette	duration	Edu	Income	mod_gam3	names<-	Overall	plot_ly	rev	t	visreg2d	waiting	with	x	y	z
+mod_gam3_plot	$	$<-	%>%	::	c	colorRampPalette	Edu	Income	layout	mod_gam3	names<-	Overall	plot_ly	rev	t	visreg2d	with
 mod_lm2_mod_gam2_anova	anova	mod_gam2	mod_lm2
