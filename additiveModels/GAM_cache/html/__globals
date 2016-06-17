@@ -9,7 +9,7 @@ mod_lm	~	d	gam	library	summary
 polynomialBasis	$	$<-	%>%	^	~	aes	c	d	expression	F	facet_grid	factor	geom_line	geom_smooth	ggplot	ggplotly	Income	layout	levels<-	nrow	Overall	rbind	rep	theme_trueMinimal	ylab
 csbyhand	$	%>%	::	[<-	^	~	abs	aes	coef	d	data.frame	F	geom_line	geom_point	geom_smooth	ggplot	ggplotly	Income	layout	length	lm	matrix	outer	Overall	seq	theme_trueMinimal	xlim
 mod_gam1	~	d	gam	summary
-unnamed-chunk-4	
+unnamed-chunk-4	~	lm	mydata
 plot_mod_gam1	mod_gam1	par	plot
 mod_lm_fit	$	AIC	mod_lm	summary
 compareLMGAM	$	AIC	c	colnames<-	data.frame	format	mod_gam1	mod_lm	pander	rbind	round	rownames<-	summary
@@ -23,3 +23,8 @@ contour	$	$<-	%>%	::	c	colorRampPalette	Edu	Income	layout	mod_gam2	names<-	Overa
 mod_gam3	~	d	gam	summary
 mod_gam3_plot	$	$<-	%>%	::	c	colorRampPalette	Edu	Income	layout	mod_gam3	names<-	Overall	plot_ly	rev	t	visreg2d	with
 mod_lm2_mod_gam2_anova	anova	mod_gam2	mod_lm2
+unnamed-chunk-5	~	lm	mydata
+gam_check	gam.check	mod_gam2	par
+mod_comparison	~	AIC	d	gam
+anova_nest	~	anova	d	gam
+unnamed-chunk-6	

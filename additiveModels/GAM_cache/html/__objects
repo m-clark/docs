@@ -23,3 +23,8 @@ contour	colfun	tt	.GAM_cache/html/contour_2bd54f0fbee7bef058b7f6db178b28ee_meta
 mod_gam3	mod_gam3
 mod_gam3_plot	colfun	tt	.GAM_cache/html/mod_gam3_plot_1d1727e0ace4ebe2ddec767ad59d172c_meta
 mod_lm2_mod_gam2_anova	
+unnamed-chunk-5	
+gam_check	
+mod_comparison	mod_1d	mod_2d
+anova_nest	mod_A	mod_B
+unnamed-chunk-6	

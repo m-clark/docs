@@ -17,7 +17,10 @@ output:
     # code_folding: show
 bibliography: refs.bib
 nocite: | 
-  @wood_generalized_2006,@venables_modern_2002
+  @wood_generalized_2006, @venables_modern_2002, @rasmussen_gaussian_2006, @hardin_generalized_2012, 
+  @rigby_generalized_2005, @hastie_generalized_1990, @fox_multiple_2000, @fox_nonparametric_2000,
+  @breiman_statistical_2001, @bybee_pisa_2009, @hastie_elements_2009, @ruppert_semiparametric_2003,
+  @wasserman_all_2006, @fahrmeir2013regression
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache = T, message = F, warning = F, R.options=list(width=120), 
@@ -54,5 +57,15 @@ R Info: **`r sessionInfo()$R.version$version.string` `r sessionInfo()$R.version$
 ```{r child='application.Rmd'}
 ```
 
+```{r child='issues.Rmd'}
+```
+
+```{r child='approaches.Rmd'}
+```
+
+
+# Conclusion
+
+Generalized additive models are a conceptually straightforward tool that allows one to incorporate nonlinear predictor effects into their otherwise linear models. In addition, they allow one to keep within the linear and generalized linear frameworks with which one is already familiar, while providing new avenues of model exploration and possibly improved results.  As was demonstrated, it is easy enough with just a modicum of familiarity to pull them off within the R environment, and as such it is hoped that this document provides a means to do so for the uninitiated.  
 
 # References
