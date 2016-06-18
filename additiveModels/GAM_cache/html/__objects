@@ -28,3 +28,9 @@ gam_check
 mod_comparison	mod_1d	mod_2d
 anova_nest	mod_A	mod_B
 unnamed-chunk-6	
+unnamed-chunk-7	
+unnamed-chunk-8	
+Penalized_Estimation_Example	d	mat.sqrt	prs.fit	rk	size	spl.S	spl.X	wear	x
+Penalized_Estimation_Example_Example1	knots	mod.1	X	xp	Xp
+Penalized_Estimation_Example_Example12	d2	d3	i	knots	mod.2	Xp
+unnamed-chunk-9	

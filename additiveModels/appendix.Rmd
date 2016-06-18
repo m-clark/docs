@@ -1,0 +1,179 @@
+---
+title: <span style="color:#0085A1; font-size:5rem">Generalized Additive Models</span>
+author: |
+  | <a href="http://mclark--.github.io/"><span style="font-size:2rem">Michael Clark</span></a>
+  | <span style="color:#00274c">Statistician Lead
+  | Consulting for Statistics, Computing and Analytics Research
+  | Advanced Research Computing </span>
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    css: tufte-css-master/tufte.css
+    highlight: pygments
+    keep_md: no
+    theme: cosmo
+    toc: yes
+    toc_float: yes
+    # code_folding: show
+  pdf_document:
+    highlight: pygments
+    toc: yes
+always_allow_html: yes
+---
+
+#<a name='appendix'>Appendix</a>
+
+##<a name='packages'>R packages</a>
+<span class="newthough">The following is</span> a non-exhaustive list of R packages which contain GAM functionality. Each is linked to the CRAN page for the package.  Note also that several build upon the <span class="pack">mgcv</span> package used for this document.
+
+[brms](http://cran.r-project.org/web/packages/brms/) Allows for Bayesian GAMs via the Stan modeling language (very new implementation).
+
+[CausalGAM](http://cran.r-project.org/web/packages/CausalGAM/) This package implements various estimators for average treatment effects. 
+
+[COZIGAM](http://cran.r-project.org/web/packages/COZIGAM/) Constrained and Unconstrained Zero-Inflated Generalized Additive Models.
+
+[CoxBoost](http://cran.r-project.org/web/packages/CoxBoost/) This package provides routines for fitting Cox models. See also <span class="func">cph</span> in rms package for nonlinear approaches in the survival context.
+
+[gam](http://cran.r-project.org/web/packages/gam/) Functions for fitting and working with generalized additive models.  
+
+[GAMBoost](http://cran.r-project.org/web/packages/GAMBoost/): This package provides routines for fitting generalized linear and and generalized additive models by likelihood based boosting.
+
+[gamboostLSS](http://cran.r-project.org/web/packages/gamboostLSS/): Boosting models for fitting generalized additive models for location, shape and scale (gamLSS models). 
+
+[GAMens](http://cran.r-project.org/web/packages/GAMens/): This package implements the GAMbag, GAMrsm and GAMens ensemble classifiers for binary classification.
+
+[gamlss](http://cran.r-project.org/web/packages/gamlss/): Generalized additive models for location, shape, and scale. 
+
+[gamm4](http://cran.r-project.org/web/packages/gamm4/): Fit generalized additive mixed models via a version of mgcv's gamm function.  
+
+[gammSlice](http://cran.r-project.org/web/packages/gammSlice/): Bayesian fitting and inference for generalized additive mixed models.
+
+[GMMBoost](http://cran.r-project.org/web/packages/GMMBoost/): Likelihood-based Boosting for Generalized mixed models.
+
+[gss](http://cran.r-project.org/web/packages/gss/):  A comprehensive package for structural multivariate function estimation using smoothing splines.
+
+[mboost](http://cran.r-project.org/web/packages/mboost/): Model-Based Boosting. 
+
+[mgcv](http://cran.r-project.org/web/packages/mgcv/): Routines for GAMs and other generalized ridge regression with multiple smoothing parameter selection by GCV, REML or UBRE/AIC. Also GAMMs. 
+
+[VGAM](http://cran.r-project.org/web/packages/VGAM/): Vector generalized linear and additive models, and associated models.
+
+
+
+##<a name='Penalized_Estimation_Example'>Penalized Estimation Example</a>
+
+Initial data set up and functions.
+
+```{r Penalized_Estimation_Example}
+############################
+### Wood by-hand example ###
+############################
+
+
+size = c(1.42,1.58,1.78,1.99,1.99,1.99,2.13,2.13,2.13,
+         2.32,2.32,2.32,2.32,2.32,2.43,2.43,2.78,2.98,2.98)
+wear = c(4.0,4.2,2.5,2.6,2.8,2.4,3.2,2.4,2.6,4.8,2.9,
+         3.8,3.0,2.7,3.1,3.3,3.0,2.8,1.7)
+x= size-min(size); x = x/max(x)
+d = data.frame(wear, x)
+
+#cubic spline function
+rk <- function(x,z) {
+  ((z-0.5)^2 - 1/12)*((x-0.5)^2 - 1/12)/4-
+    ((abs(x-z)-0.5)^4-(abs(x-z)-0.5)^2/2 + 7/240) / 24
+}
+
+spl.X <- function(x,knots){
+  q <- length(knots) + 2           # number of parameters
+  n <- length(x)                   # number of observations
+  X <- matrix(1,n,q)               # initialized model matrix
+  X[,2] <- x                       # set second column to x
+  X[,3:q] <- outer(x,knots,FUN=rk) # remaining to cubic spline
+  X
+}
+
+spl.S <- function(knots) {
+  q = length(knots) + 2
+  S = matrix(0,q,q)          # initialize matrix
+  S[3:q,3:q] = outer(knots,knots,FUN=rk) # fill in non-zero part
+  S
+}
+
+#matrix square root function
+mat.sqrt <- function(S){
+  d = eigen(S, symmetric=T)
+  rS = d$vectors%*%diag(d$values^.5)%*%t(d$vectors)
+  rS
+}
+
+#the fitting function
+prs.fit <- function(y,x,knots,lambda){
+  q = length(knots) + 2      # dimension of basis
+  n = length(x)              # number of observations
+  Xa = rbind(spl.X(x,knots), mat.sqrt(spl.S(knots))*sqrt(lambda))  # augmented model matrix
+  y[(n+1):(n+q)] = 0         #augment the data vector
+  lm(y ~ Xa-1)               # fit and return penalized regression spline
+}
+```
+
+Example 1.
+
+```{r Penalized_Estimation_Example_Example1, dev.args = list(bg = 'transparent')}
+knots = 1:4/5
+X = spl.X(x,knots)           # generate model matrix
+mod.1 = lm(wear~X-1)         # fit model
+xp <- 0:100/100              # x values for prediction
+Xp <- spl.X(xp, knots)       # prediction matrix
+
+# ggplot
+library(ggplot2)
+ggplot(aes(x=x, y=wear), data=data.frame(x,wear))+
+  geom_point(color="#FF8000") +
+  geom_line(aes(x=xp, y=Xp%*%coef(mod.1)), data=data.frame(xp,Xp), color="#2957FF") +
+  theme_trueMinimal() +
+  theme(plot.background=element_blank(),
+        panel.background=element_blank())
+```
+
+
+Example 2.
+
+
+```{r Penalized_Estimation_Example_Example12, dev.args = list(bg = 'transparent')}
+knots = 1:7/8
+
+d2 = data.frame(x=xp)
+
+for (i in c(.1,.01,.001,.0001,.00001,.000001)){
+  mod.2 = prs.fit(wear, x, knots,i)   #fit penalized regression 
+                                      #spline choosing lambda
+  Xp = spl.X(xp,knots) #matrix to map parameters to fitted values at xp
+  d2[,paste('lambda = ',i, sep="")] = Xp%*%coef(mod.2)
+}
+
+### ggplot
+library(ggplot2); library(tidyr)
+d3 = gather(d2, key=variable, value=value, factor_key=T, -x)
+
+ggplot(aes(x=x, y=wear), data=d) +
+  geom_point(col='#FF8000') +
+  geom_line(aes(x=x,y=value), col="#2957FF", data=d3) +
+  facet_wrap(~variable) +
+  theme_trueMinimal() +
+  theme(plot.background=element_blank(),
+        panel.background=element_blank())
+```
+
+
+
+## R Session Info
+
+```{r echo=FALSE, eval=F}
+toLatex(sessionInfo(), locale = FALSE)
+```
+
+
+  \item R version 3.3.0 (2016-05-03), \verb|x86_64-w64-mingw32|
+  \item Base packages: base,
+    datasets, graphics, grDevices,
+    methods, stats, utils

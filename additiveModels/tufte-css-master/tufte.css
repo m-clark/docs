@@ -303,7 +303,7 @@ label.margin-toggle:not(.sidenote-number) { display: none; }
 
 .func {
   color: #C93312;  /*darkred*/
-  font-weight: 600;
+  font-weight: 500;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
