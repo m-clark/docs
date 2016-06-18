@@ -14,13 +14,13 @@ output:
     theme: cosmo
     toc: yes
     toc_float: yes
-    # code_folding: show
-  pdf_document:
-    highlight: pygments
-    toc: yes
-always_allow_html: yes
+bibliography: refs.bib
+nocite: | 
+  @wood_generalized_2006, @venables_modern_2002, @rasmussen_gaussian_2006, @hardin_generalized_2012, 
+  @rigby_generalized_2005, @hastie_generalized_1990, @fox_multiple_2000, @fox_nonparametric_2000,
+  @breiman_statistical_2001, @bybee_pisa_2009, @hastie_elements_2009, @ruppert_semiparametric_2003,
+  @wasserman_all_2006, @fahrmeir2013regression, @friedman2000additive
 ---
-
 
 #<a name='OtherIssues'>Other Issues</a>
 
@@ -38,7 +38,7 @@ Given a matrix of coefficients $S$, we can more formally note a penalized likeli
 
 $$l_p(\beta)=\displaystyle l(\beta) - \frac{1}{2}\sum_j\lambda_j \beta^\mathrm{T} S_j\beta$$
 
-where $l(\beta)$ is the usual GLM likelihood function, and $\lambda_j$ are the smoothing parameters.  The part of the function including $\lambda$ penalizes curvature in the function, where $\lambda$  establishes a trade-off between the goodness of fit and the smoothness, and such an approach will allow for less overfitting<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">$\lambda\rightarrow\infty$ would result in a straight line estimate for $f_j$, while $\lambda = 0$ would allow any $f$ that interpolates the data (p. 128, @wood_generalized_2006)</span>.  Technically we could specify the smoothing parameters explicitly, and the \hyperref[code:Penalized_Estimation_Example]{appendix} has some 'by-hand' code taken directly from @wood_generalized_2006 with only slight modifications, where the smoothing parameters are chosen and compared<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">And we would have to choose in order for the penalized maximum likelihood to work.</span>.
+where $l(\beta)$ is the usual GLM likelihood function, and $\lambda_j$ are the smoothing parameters.  The part of the function including $\lambda$ penalizes curvature in the function, where $\lambda$  establishes a trade-off between the goodness of fit and the smoothness, and such an approach will allow for less overfitting<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">$\lambda\rightarrow\infty$ would result in a straight line estimate for $f_j$, while $\lambda = 0$ would allow any $f$ that interpolates the data. See p. 128, @wood_generalized_2006.</span>.  Technically we could specify the smoothing parameters explicitly, and the [Appendix](#Penalized_Estimation_Example) has some 'by-hand' code taken directly from @wood_generalized_2006 with only slight modifications, where the smoothing parameters are chosen and compared<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">And we would have to choose in order for the penalized maximum likelihood to work.</span>.
 
 Smoothing parameters however are in fact estimated, and this brings us back to the cross-validation procedure mentioned before.  Smoothing parameters are selected which minimize the GCV score by default, though one has other options.  Note that there are other approaches to estimation such as backfitting, generalized smoothing splines and Bayesian.
 
@@ -68,26 +68,26 @@ A number of smooths are available with the <span class="pack">mgcv</span> packag
 
 
 ##<a name='diagnostics'>Diagnostics \& Choice of Basis Dimension</a>
+
 We have some built-in abilities to examine whether there are any particular issues, and we can try it with our second GAM model.
 
-```{r gam_check, echo=3, eval=1:2}
+```{r gam_check, echo=1, eval=2:3}
+gam.check(mod_gam2)
 par(bg='transparent')
 gam.check(mod_gam2, bty='n')
-gam.check(mod_gam2)
 ```
 
-The plots are of the sort we're used to from a typical regression setting, though it's perhaps a bit difficult to make any grand conclusion based on such a small data set. <span class="marginnote">One can inspect the quantile-quantile plot directly with the <span class="func">qq.gam</span></span> function. The printed output on the other hand contains unfamiliar information, but is largely concerned with over-smoothing, and so has tests of whether the basis dimension for a smooth is too low.  The p-values are based on simulation, so I bumped up the number with the additional argument. Guidelines are given in the output itself, and at least in this case it does not look like we have an issue.  However, if there were a potential problem, it is suggested to double $k$<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">$k$ can be set as an argument to `s(var1, k=?)`.</span> and refit, and if the effective degrees of freedom increases quite a bit you would probably want to go with the updated model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">I actually did this for Health, which is the only one of the predictors that could be questioned, and there was no change at all; it still reduced to a linear effect.</span>.  Given the penalization process, the exact choice of $k$ isn't too big of a deal, but the defaults are arbitrary.  You want to set it large enough to get at the true effect as best as possible, but in some cases computational efficiency will also be of concern.  The help on the function <span class="func">choose.k</span> provides another approach to examining $k$ based on the residuals from the model under consideration, and provides other useful information.
+The plots are of the sort we're used to from a typical regression setting, though it's perhaps a bit difficult to make any grand conclusion based on such a small data set. <span class="marginnote">One can inspect the quantile-quantile plot directly with the <span class="func">qq.gam</span>.</span> function. The printed output on the other hand contains unfamiliar information, but is largely concerned with over-smoothing, and so has tests of whether the basis dimension for a smooth is too low.  The p-values are based on simulation, so I bumped up the number with the additional argument. Guidelines are given in the output itself, and at least in this case it does not look like we have an issue.  However, if there were a potential problem, it is suggested to double $k$<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">$k$ can be set as an argument to `s(var1, k=?)`.</span> and refit, and if the effective degrees of freedom increases quite a bit you would probably want to go with the updated model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">I actually did this for Health, which is the only one of the predictors that could be questioned, and there was no change at all; it still reduced to a linear effect.</span>.  Given the penalization process, the exact choice of $k$ isn't too big of a deal, but the defaults are arbitrary.  You want to set it large enough to get at the true effect as best as possible, but in some cases computational efficiency will also be of concern.  The help on the function <span class="func">choose.k</span> provides another approach to examining $k$ based on the residuals from the model under consideration, and provides other useful information.
 
 
 ##<a name='prediction'>Prediction</a>
 
-A previous example used the predict function on the data used to fit the model to obtain fitted values on the response scale.  Typically we'd use this on new data.  I do not cover it, because the functionality is the same as the <span class="func">predict.glm</span> function in base R, and one can just refer to that.  It is worth noting that there is an option, `type='lpmatrix'`, which will return the actual model matrix by which the coefficients must be pre-multiplied to get the values of the linear predictor at the supplied covariate values.  This can be particularly useful towards opening the \hyperref[section:blackbox]{black box} as one learns the technique.
+A previous example used the predict function on the data used to fit the model to obtain fitted values on the response scale.  Typically we'd use this on new data.  I do not cover it, because the functionality is the same as the <span class="func">predict.glm</span> function in base R, and one can just refer to that.  It is worth noting that there is an option, `type='lpmatrix'`, which will return the actual model matrix by which the coefficients must be pre-multiplied to get the values of the linear predictor at the supplied covariate values.  This can be particularly useful towards opening the [black box](#blackbox) as one learns the technique.
 
 
 ##<a name='modComparisonRevisited'>Model Comparison Revisited</a>
 
 We have talked about automated smoothing parameter and term selection, and in general potential models are selected based on estimation of the smoothing parameter.  Using an extra penalty to allow coefficients to tend toward zero with the argument `select=TRUE` is an automatic way to go about it, where some terms could effectively drop out. Otherwise we could compare models GCV/AIC scores<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">GCV scores are not useful for comparing fits of different families; AIC is still ok though.</span>, and in general either of these would be viable approaches. Consider the following comparison:
-
 
 ```{r mod_comparison}
 mod_1d = gam(Overall ~ s(Income) + s(Edu), data=d)
@@ -106,5 +106,4 @@ anova(mod_A,mod_B, test="Chi")
 
 Again though, we could have just used the summary output from the second model.
 
-Instances where such an approach does not appear to be appropriate within the context of the <span class="mgcv"></span> package are when terms are able to be penalized to zero; in such a case p-values will be much too low. In addition, when comparing GAMs, sometimes the nesting of models would not be so clear when there are multiple smooths involved, and additional steps may need to be taken to make sure they are nested. We must make sure that each smooth term in the null model has no more effective degrees of freedom than the same term in the alternative, otherwise it's possible that the model with more terms can have lower effective degrees of freedom but better fit, rendering the test nonsensical.  @wood_generalized_2006 suggests that if such model comparison is the ultimate goal an unpenalized approach<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">This can be achieved with the argument `s(..., fx=T)`, although now one has to worry more about the k value used, as very high k will lead to low power.</span> would be best to have much confidence in the p-values<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">One might also examine the <span class="gss"></span> package for anova based approach to generalized smoothing splines.</span>.
-
+Instances where such an approach does not appear to be appropriate within the context of the <span class="mgcv"></span> package are when terms are able to be penalized to zero; in such a case p-values will be much too low. In addition, when comparing GAMs, sometimes the nesting of models would not be so clear when there are multiple smooths involved, and additional steps may need to be taken to make sure they are nested. We must make sure that each smooth term in the null model has no more effective degrees of freedom than the same term in the alternative, otherwise it's possible that the model with more terms can have lower effective degrees of freedom but better fit, rendering the test nonsensical.  @wood_generalized_2006 suggests that if such model comparison is the ultimate goal an unpenalized approach<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">This can be achieved with the argument `s(..., fx=T)`, although now one has to worry more about the k value used, as very high k will lead to low power.</span> would be best to have much confidence in the p-values<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">One might also examine the <span class="gss"></span> package for ANOVA based approach to generalized smoothing splines.</span>.

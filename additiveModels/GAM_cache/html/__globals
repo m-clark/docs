@@ -27,10 +27,12 @@ unnamed-chunk-5	~	lm	mydata
 gam_check	gam.check	mod_gam2	par
 mod_comparison	~	AIC	d	gam
 anova_nest	~	anova	d	gam
-unnamed-chunk-6	~	lm	mydata
+unnamed-chunk-6	
 unnamed-chunk-7	
 unnamed-chunk-8	::	sessionInfo	toLatex
 Penalized_Estimation_Example	$	[<-	^	~	abs	c	data.frame	diag	eigen	length	lm	matrix	max	min	outer	rbind	sqrt	t	T
 Penalized_Estimation_Example_Example1	~	aes	coef	data.frame	element_blank	geom_line	geom_point	ggplot	library	lm	spl.X	theme	theme_trueMinimal	wear	x
 Penalized_Estimation_Example_Example12	[<-	~	aes	c	coef	d	data.frame	element_blank	facet_wrap	for	gather	geom_line	geom_point	ggplot	library	paste	prs.fit	spl.X	T	theme	theme_trueMinimal	value	variable	wear	x	xp
 unnamed-chunk-9	sessionInfo	toLatex
+examplelmcode	~	lm	mydata
+pvalue	

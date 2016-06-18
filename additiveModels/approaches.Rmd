@@ -14,11 +14,12 @@ output:
     theme: cosmo
     toc: yes
     toc_float: yes
-    # code_folding: show
-  pdf_document:
-    highlight: pygments
-    toc: yes
-always_allow_html: yes
+bibliography: refs.bib
+nocite: | 
+  @wood_generalized_2006, @venables_modern_2002, @rasmussen_gaussian_2006, @hardin_generalized_2012, 
+  @rigby_generalized_2005, @hastie_generalized_1990, @fox_multiple_2000, @fox_nonparametric_2000,
+  @breiman_statistical_2001, @bybee_pisa_2009, @hastie_elements_2009, @ruppert_semiparametric_2003,
+  @wasserman_all_2006, @fahrmeir2013regression, @friedman2000additive
 ---
 
 #<a name='OtherApproaches'>Other Approaches</a>
@@ -46,13 +47,13 @@ There are still cases where one might focus on response transformation, just not
 
 ###<a name='blackbox'>The Black Box</a>
 
-@venables_modern_2002[Section 11.5] make an interesting classification of nonlinear models into those that are less flexible but under full user control (fully parametric)<span class="marginnote">One could probably make the case that most modeling is 'black box' for a great many researchers.</span>, and those that are <span class="emph">black box</span> techniques that are highly flexible and fully automatic: stuff goes in, stuff comes out, but we're not privy to the specifics<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">For an excellent discussion of these different approaches to understanding data see @breiman_statistical_2001 and associated commentary. For some general packages outside of R that incorporate a more algorithmic approach to modeling, you might check out the <span class="pack">scikit-learn</span> module for Python.</span>.  
+@venables_modern_2002[, Section 11.5] make an interesting delineation of nonlinear models into those that are less flexible but under full user control (fully parametric)<span class="marginnote">One could probably make the case that most modeling is 'black box' for a great many researchers.</span>, and those that are <span class="emph">black box</span> techniques that are highly flexible and fully automatic: stuff goes in, stuff comes out, but we're not privy to the specifics<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">For an excellent discussion of these different approaches to understanding data see @breiman_statistical_2001 and associated commentary. For some general packages outside of R that incorporate a more algorithmic approach to modeling, you might check out the <span class="pack">scikit-learn</span> module for Python.</span>.  
 
 Two examples of the latter that they provide are <span class="emph">projection pursuit</span> and <span class="emph">neural net</span> models, though a great many would fall into such a heading.  Projection pursuit models are well suited to high dimensional data where dimension reduction is a concern.  One may think of an example where one uses a technique such as principal components analysis on the predictor set and then examines smooth functions of $M$ principal components. 
 
 In the case of neural net models, which have found a resurgence of interest of late, one can imagine a model where the input units (predictor variables) are  weighted and summed to create hidden layer units, which are then transformed and put through the same process to create outputs (see a simple example to the right).
 
-<span class="marginnote"><img src='vis/nnet.png'> <br> <span style="text-align:center; disply:block; width:100px">A Neural Net Model</span><br><br></span>
+<span class="marginnote"><img src='vis/nnet.png'> <br> <span style="text-align:center; display:block; width:300px">A Neural Net Model</span><br><br></span>
 
 One can see projection pursuit models as an example where a smooth function is taken of the components which make up the hidden layer.  Neural networks are highly flexible in that there can be any number of inputs, hidden layers, and outputs.  However, such models are very explicit in the black box approach.
 
@@ -61,15 +62,14 @@ Projection pursuit and neural net models are usually found among data mining/mac
 
 ##<a name='extensions'>Extensions</a>
 
-
 ###<a name='otherGams'>Other GAMs</a>
 
-Note that just as generalized additive models are an extension of the generalized linear model, there are generalizations of the basic GAM beyond the settings described.  In particular, random effects can be dealt with in this context as they can with linear and generalized linear models, and there is an interesting connection between smooths and random effects in general <label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">@wood_generalized_2006 has a whole chapter devoted to the subject. I have a document on [mixed models](http://m-clark.github.io/projects/docs/mixedModels/mixedModelML.html) that goes into it some also.</span>.  Generalized additive models for location, scale, and shape (GAMLSS) allow for distributions beyond the exponential family<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See @rigby_generalized_2005 and the <span class="pack">gamlss</span> package, though <span class="pack">mgcv</span> has several options in this regard as well</span>.  In addition there are boosted, ensemble and other machine learning approaches that apply GAMs as well<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See the <span class="pack">GAMens</span> package for example. Also, [boosted models](http://projecteuclid.org/euclid.aos/1016218223) *are* GAMs</span>.  In short, there's plenty to continue to explore once one gets the hang of generalized additive models.
+Note that just as generalized additive models are an extension of the generalized linear model, there are generalizations of the basic GAM beyond the settings described.  In particular, random effects can be dealt with in this context as they can with linear and generalized linear models, and there is an interesting connection between smooths and random effects in general <label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">@wood_generalized_2006 has a whole chapter devoted to the subject. I have a document on [mixed models](http://m-clark.github.io/projects/docs/mixedModels/mixedModelML.html) that goes into it some also.</span>.  Generalized additive models for location, scale, and shape (GAMLSS) allow for distributions beyond the exponential family<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See @rigby_generalized_2005 and the <span class="pack">gamlss</span> package, though <span class="pack">mgcv</span> has several options in this regard as well</span>.  In addition there are boosted, ensemble and other machine learning approaches that apply GAMs as well<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See the <span class="pack">GAMens</span> package for example. Also, [boosted models](http://projecteuclid.org/euclid.aos/1016218223) *are* GAMs.</span>.  In short, there's plenty to continue to explore once one gets the hang of generalized additive models.
 
 
 ###<a name='rk'>Reproducing Kernel Hilbert Space</a>
 
-Generalized smoothing splines are built on the theory of <span class="emph">reproducing kernel Hilbert spaces</span>.  I won't pretend to be able to get into it here, but the idea is that the some forms addditive models can be represented of the inner product form used in RKHS approaches<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">You might note that the function used in the spline example was called *rk*</span>.  This actually lends itself to a tie between GAMs and e.g. support vector machines and similar methods.  I have an example of RKHS regression [here](https://github.com/m-clark/Miscellaneous-R-Code/blob/master/ModelFitting/RKHSReg/RKHSReg.md).
+Generalized smoothing splines are built on the theory of <span class="emph">reproducing kernel Hilbert spaces</span>.  I won't pretend to be able to get into it here, but the idea is that the some forms additive models can be represented of the inner product form used in RKHS approaches<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">You might note that the function used in the spline example in the appendix is called *rk*.</span>.  This actually lends itself to a tie between GAMs and e.g. support vector machines and similar methods.  I have an example of RKHS regression [here](https://github.com/m-clark/Miscellaneous-R-Code/blob/master/ModelFitting/RKHSReg/RKHSReg.md).
 
 ###<a name='gp'>Gaussian Processes</a>
 
@@ -79,8 +79,6 @@ We can also approach modeling by using generalizations of the Gaussian distribut
 
 $$f\sim \mathcal{GP}(m,k)$$
 
-
 In the Bayesian context we can define a prior distribution over functions and make draws from a posterior predictive distribution of $f$.  The reader is encouraged to consult @rasmussen_gaussian_2006 for the necessary detail. The [text](http://www.gaussianprocess.org/gpml/) is free for download, and Rasmussen also provides a nice and brief [intro](http://link.springer.com/chapter/10.1007/978-3-540-28650-9_4).  I also have some R code for [demonstration](https://github.com/mclark--/Miscellaneous-R-Code/blob/master/ModelFitting/gp Examples/) based on his Matlab code, as well as Bayesian examples in Stan. 
 
-
-Suffice it to say in this context, it turns out that generalized additive models with a tensor product or cubic spline smooth are maximum a posteriori (MAP) estimates of gaussian processes with specific covariance functions and a zero mean function. In that sense one might segue nicely to gaussian processes if familiar with additive models<span class="marginnote">The mgcv package allows one to use a spline form of gaussian process.</span>.  
+Suffice it to say in this context, it turns out that generalized additive models with a tensor product or cubic spline smooth are maximum a posteriori (MAP) estimates of gaussian processes with specific covariance functions and a zero mean function. In that sense one might segue nicely to gaussian processes if familiar with additive models.  The mgcv package also allows one to use a spline form of gaussian process.  

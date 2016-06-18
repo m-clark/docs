@@ -3,11 +3,11 @@ unnamed-chunk-3
 fitPlotsDataSetup	dxy	fitat3	fitlm	fitx2	marker	neighborfit	neighborhood	neighbormod	x	y
 mcycleDataSetup	gamfit	ksfit	lowfit	mcycle2	mcycle3	nsfit	polyfit	ssfit
 initial_inspection_of_pisa	d
-scatterwrap	dmelt	scatterwrap	.GAM_cache/html/scatterwrap_7252dd76e500a591f430393310309a06_meta
-scatterwrapSmooth	scatterwrapSmooth	.GAM_cache/html/scatterwrapSmooth_fd9ea2d6b11e6929dbe7a22f8058d301_meta
+scatterwrap	dmelt	scatterwrap	.GAM_cache/html/scatterwrap_f60446c9c547cb33ff78ee4c3da87a61_meta
+scatterwrapSmooth	scatterwrapSmooth	.GAM_cache/html/scatterwrapSmooth_88e3c13f696f085840d4b57533848e97_meta
 mod_lm	mod_lm
-polynomialBasis	dpoly	polynomialBasis	.GAM_cache/html/polynomialBasis_f73824703d06cfd0b110de9e4bc94c1a_meta
-csbyhand	csbyhand	mod.1	rk	spl.X	X	xk	xp	Xp	.GAM_cache/html/csbyhand_0c9a8b8d8cb1f50f89cf730903cc040c_meta
+polynomialBasis	dpoly	polynomialBasis	.GAM_cache/html/polynomialBasis_ff1f14dae3e0283f36add50048797a3b_meta
+csbyhand	csbyhand	mod.1	rk	spl.X	X	xk	xp	Xp	.GAM_cache/html/csbyhand_aaa8590d27357fe9e238c7f3dd6649eb_meta
 mod_gam1	mod_gam1
 unnamed-chunk-4	
 plot_mod_gam1	
@@ -18,10 +18,10 @@ mod_lm2	mod_lm2
 mod_gam2	mod_gam2
 mod_gam2_update	mod_gam2B
 mod_gam2_plot	
-plot_mod_gam2_response	fits	plot_mod_gam2_response	predicts	testdata	.GAM_cache/html/plot_mod_gam2_response_fa73672759bb4a7816ff346c5e51ba8c_meta
-contour	colfun	tt	.GAM_cache/html/contour_2bd54f0fbee7bef058b7f6db178b28ee_meta
+plot_mod_gam2_response	fits	plot_mod_gam2_response	predicts	testdata	.GAM_cache/html/plot_mod_gam2_response_e8b8c17aeaca797d276fa2fc0d85b5a2_meta
+contour	colfun	tt	.GAM_cache/html/contour_11825ffa4c3856c60965f113ccb6cfe3_meta
 mod_gam3	mod_gam3
-mod_gam3_plot	colfun	tt	.GAM_cache/html/mod_gam3_plot_1d1727e0ace4ebe2ddec767ad59d172c_meta
+mod_gam3_plot	colfun	tt	.GAM_cache/html/mod_gam3_plot_475690dd1af657dea25e8e5ca848c27f_meta
 mod_lm2_mod_gam2_anova	
 unnamed-chunk-5	
 gam_check	
@@ -34,3 +34,5 @@ Penalized_Estimation_Example	d	mat.sqrt	prs.fit	rk	size	spl.S	spl.X	wear	x
 Penalized_Estimation_Example_Example1	knots	mod.1	X	xp	Xp
 Penalized_Estimation_Example_Example12	d2	d3	i	knots	mod.2	Xp
 unnamed-chunk-9	
+examplelmcode	
+pvalue	

@@ -14,17 +14,17 @@ output:
     theme: cosmo
     toc: yes
     toc_float: yes
-    # code_folding: show
-  pdf_document:
-    highlight: pygments
-    toc: yes
-always_allow_html: yes
+bibliography: refs.bib
+nocite: | 
+  @wood_generalized_2006, @venables_modern_2002, @rasmussen_gaussian_2006, @hardin_generalized_2012, 
+  @rigby_generalized_2005, @hastie_generalized_1990, @fox_multiple_2000, @fox_nonparametric_2000,
+  @breiman_statistical_2001, @bybee_pisa_2009, @hastie_elements_2009, @ruppert_semiparametric_2003,
+  @wasserman_all_2006, @fahrmeir2013regression, @friedman2000additive
 ---
-
 #<a name='appendix'>Appendix</a>
 
 ##<a name='packages'>R packages</a>
-<span class="newthough">The following is</span> a non-exhaustive list of R packages which contain GAM functionality. Each is linked to the CRAN page for the package.  Note also that several build upon the <span class="pack">mgcv</span> package used for this document.
+<span class="newthought">The following is</span> a non-exhaustive list of R packages which contain GAM functionality. Each is linked to the CRAN page for the package.  Note also that several build upon the <span class="pack">mgcv</span> package used for this document.
 
 [brms](http://cran.r-project.org/web/packages/brms/) Allows for Bayesian GAMs via the Stan modeling language (very new implementation).
 
@@ -164,16 +164,3 @@ ggplot(aes(x=x, y=wear), data=d) +
         panel.background=element_blank())
 ```
 
-
-
-## R Session Info
-
-```{r echo=FALSE, eval=F}
-toLatex(sessionInfo(), locale = FALSE)
-```
-
-
-  \item R version 3.3.0 (2016-05-03), \verb|x86_64-w64-mingw32|
-  \item Base packages: base,
-    datasets, graphics, grDevices,
-    methods, stats, utils

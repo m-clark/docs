@@ -5,6 +5,18 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 # To do:
 
-Go over and update content.
+- Go over and update content as necessary. (through intro)
 
-Add basis function content.
+- Add basis function content.
+
+- Refresh cache.
+
+- Change result background color?
+
+- Check for errors, spelling etc.
+
+  - fix un data link
+
+- Clean up viz.
+
+ - orange-blue OR blue-orange
