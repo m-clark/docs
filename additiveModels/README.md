@@ -5,9 +5,14 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 # To do:
 
-- Go over and update content as necessary. (through intro)
+- Go over and update content as necessary. (through single predictor linear fit)
 
 - Add basis function content.
+
+- Add by, fs
+
+- Add misc (spatial, random etc.)
+
 
 - Refresh cache.
 
@@ -19,4 +24,3 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 - Clean up viz.
 
- - orange-blue OR blue-orange
