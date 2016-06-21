@@ -127,11 +127,15 @@ One can verify this by running the same model via the <span class="func">glm</sp
 
 ### <a name='GAMSingle'>GAM</a>
 
-Let's now try some nonlinear approaches, keeping in mind that $\mu=f(x)$.  As a point of comparison, we can start by trying a standard polynomial regression, and it might do well enough<span class="marginnote">This example is pretty much straight from @wood_generalized_2006 with little modification.</span>.  To begin we must consider a basis for use, i.e. a set of basis functions $b_j$ that will be combined to produce $f(x)$:
+Let's now try some nonlinear approaches, keeping in mind that $\mu=f(x)$.  As a point of comparison, we can start by trying a standard polynomial regression, and it might do well enough<span class="marginnote">This example is pretty much straight from @wood_generalized_2006 with little modification.</span>.  To begin we must consider a <span class="emph">basis</span> for use, a space that $f$ is an element of. Doing so leads to choosing  a set of <span class="emph">basis functions</span> $b_j$, with parameters $\beta_j$ that will be combined to produce $f(x)$:
 
 $$f(x)=\displaystyle\sum\limits_{j=1}^q b_{j}(x)\beta_{j}$$
 
-To better explain by example, if we had a cubic polynomial the basis is: $b_1(x) = 1$, $b_2(x)=x$, $b_3(x)=x^2$, $b_4(x)=x^3$, which, when combined give us our $f(x)$.  For those familiar with the mechanics of linear modeling, this is just our 'model matrix', which we can save out with many modelling functions in R, or using the <span class="func">model.matrix</span> function. The following visualization allows us to see the effects in action. It is based on the results extracted from running such a model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See <span class="func">poly</span> for how to fit a polynomial in R.</span> and obtaining the coefficients (e.g. the first plot represents the intercept of 470.44, the second plot, our $b_2$ coefficient of 289.5 multiplied by Income and so forth).  The bottom plot shows the final fit $f(x)$, i.e. the linear combination of the basis functions.
+To better explain by example, if we had a cubic polynomial the basis is: $b_1(x) = 1$, $b_2(x)=x$, $b_3(x)=x^2$, $b_4(x)=x^3$, which leads to a standard linear model:
+
+$$y = \beta_1 + \beta_2x + \beta_3x^2 + \beta_4x^3$$
+
+When combined into the linear predictor, this gives us our $f(x)$.  For those familiar with the mechanics of linear modeling, this is just our 'model matrix', which we can save out with many modelling functions in R, or using the <span class="func">model.matrix</span> function. The following visualization allows us to see the effects in action. It is based on the results extracted from running such a model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See <span class="func">poly</span> for how to fit a polynomial in R.</span> and obtaining the coefficients (e.g. the first plot represents the intercept of 470.44, the second plot, our $b_2$ coefficient of 289.5 multiplied by Income and so forth).  The bottom plot shows the final fit $f(x)$, i.e. the linear combination of the basis functions.
 
 ```{r polynomialBasis, echo=F}
 dpoly = rbind(d,d,d,d,d)
@@ -180,7 +184,7 @@ ggplotly(polynomialBasis, width='75%') %>%
 
 At this point we have done nothing we couldn't do in our regular regression approach, but the take home message is that as we move to GAMs we are going about things in much the same fashion; we are simply changing the nature of the basis, and have a great deal more flexibility in choosing the form.
 
-In the next figure I show the fit using a 'by-hand' cubic spline basis (see the [Appendix](#appendix) and p.126-7 in @wood_generalized_2006).  
+In the next figure I show the fit using a 'by-hand' cubic spline basis (see the [Appendix](#Penalized_Estimation_Example) and p.126-7 in @wood_generalized_2006).  
 
 ```{r csbyhand, echo=FALSE}
 rk <- function(x,z) {
@@ -219,12 +223,83 @@ ggplotly(csbyhand, width='75%') %>%
 
 A cubic spline is essentially a connection of multiple cubic polynomial regressions.  We choose points of the variable at which to create sections, and these points are referred to as <span class="emph">knots</span>.  Separate cubic polynomials are fit at each section, and then joined at the knots to create a continuous curve.  The graph represents a cubic spline with 8 knots<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Ten including the endpoints.</span> between the first and third quartiles. The red line uses the GAM functionality within ggplot2's <span class="func">geom\_smooth</span> as a point of comparison.
 
+We can take the same approach as with the polynomial example, and plot the basis functions. First let's look at the model matrix.
+
+```{r csbs, echo=FALSE}
+Income = select(d, Overall, Income) %>% na.omit()  %>% select(Income) %>% .[,1]
+Overall = select(d, Overall, Income) %>% na.omit() %>% select(Overall) %>% .[,1]
+knots = seq(.4, 1, length=10); knots = knots[-length(knots)]  # don't need the last value
+l = 1
+bs = sapply(1:length(knots), function(k) ifelse(Income >= knots[k], (Income-knots[k])^l, 0))
+
+head(bs)
+```
+
+Note that we have many more columns than we normally would fit with a polynomial regression.  We'll see how this complexity is deal with later.  The first column represents our intercept as it does in every other standard model matrix. The second represents the linear form of Income, though it is scaled differently (i.e. the correlation is perfect).  If we plot this against Income, it doesn't look like much.
+
+```{r csbsPlot, echo=FALSE}
+library(tidyr)
+bs = data.frame(int=1, bs)
+d2 = data.frame(Income, bs) %>% 
+  gather(key=bs, value=bsfunc, -Income)
+
+
+# plot_ly(data=d2, x=Income, y=Overall, width='auto', mode='markers', showlegend=F,
+#         marker=list(color='black', opacity=.2)) %>% 
+#   add_trace(data=arrange(d2,Income), x=Income, y=bsfunc, group=bs) %>% 
+#   theme_plotly()
+plot_ly(d2) %>%  add_trace(data=arrange(d2,Income), x=Income, y=bsfunc, group=bs) %>% 
+  theme_plotly()
+```
+
+However, if we plot Income against the basis multiplied by the estimated coefficients of the model, the data story begins to reveal itself.
+
+```{r csbsScaledPlot, echo=c(2:4,6:7), eval=-1}
+# bs = as.matrix(data.frame(int=1, bs))
+lmMod = lm(Overall~.-1, bs)
+bscoefs = coef(lmMod)
+bsScaled = sweep(bs, 2, bscoefs,`*`)
+colnames(bsScaled) = c('int', paste0('X', 1:9))
+head(bsScaled)
+bscoefs
+
+d3 = data.frame(Income, bsScaled) %>% 
+  gather(key=bs, value=bsfunc, -Income) %>% 
+  arrange(Income)
+# %>% 
+#   dplyr::filter(bsfunc >= min(Overall) & bsfunc <= max(Overall))
+
+mapply(function(knots, knotf, basis) filter(d3, bs==basis & Income >= knots & Income < knotf), knots, c(knots[-1], 1), unique(d3$bs)[-1], SIMPLIFY=F)
+
+plot_ly(data=d2, x=Income, y=Overall, width='auto', mode='markers', showlegend=F,
+        marker=list(color='black', opacity=.2)) %>% 
+  add_trace(data=arrange(d3,Income), x=Income, y=bsfunc, group=bs) %>% 
+  theme_plotly()
+plot_ly(data=filter(d3, bs=='int' & Income<knots[2]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X1' & Income>=knots[1] &Income<knots[2]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X1' & Income>=knots[2] &Income<knots[3]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X2' & Income>=knots[3] & Income<knots[4]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X3' & Income>=knots[4] & Income<knots[5]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X4' & Income>=knots[5] & Income<knots[6]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X5' & Income>=knots[6] & Income<knots[7]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X6' & Income>=knots[7] & Income<knots[8]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X7' & Income>=knots[8] & Income<knots[9]), x=Income, y=bsfunc, mode='line') %>% 
+    add_trace(data=filter(d3, bs=='X7' & Income>=knots[9]), x=Income, y=bsfunc, mode='line') %>% 
+  theme_plotly()
+```
+
+Each trend line represents the fit between knots
+
+
+#### Fitting the mdoel
+
 Let's now fit an actual generalized additive model using the same cubic spline as our smoothing function. We again use the <span class="func">gam</span> function as before for basic model fitting, but now we are using a function <span class="func">s</span> within the formula to denote the smooth terms.  Within that function we also specify the type of smooth, though a default is available.  I chose 'cr', denoting cubic regression splines, to keep consistent with our previous example.
 
 ```{r mod_gam1}
 mod_gam1 <- gam(Overall ~ s(Income, bs="cr"), data=d)
 summary(mod_gam1)
 ```
+
 
 The first thing to note is, that aside from the smooth part, our model code is similar to what we're used to with core R functions such as lm and glm.  In the summary, we first see the distribution assumed as well as the link function used, in this case normal and identity, respectively, which to iterate, had we had no smoothing would result in a standard regression model.  After that we see that the output is separated into <span class="emph">parametric</span> and <span class="emph">smooth</span>, or nonparametric parts.  In this case, the only parametric component is the intercept, but it's good to remember that you are not bound to smooth every effect of interest, and indeed, as we will discuss in more detail later, part of the process may involve refitting the model with terms that were found to be linear for the most part anyway.  The smooth component of our model regarding a country's income's relationship with overall science score is statistically significant, but there are a couple of things in the model summary that would be unfamiliar.  
 
