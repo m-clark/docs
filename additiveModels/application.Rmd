@@ -135,7 +135,7 @@ To better explain by example, if we had a cubic polynomial the basis is: $b_1(x)
 
 $$y = \beta_1 + \beta_2x + \beta_3x^2 + \beta_4x^3$$
 
-When combined into the linear predictor, this gives us our $f(x)$.  For those familiar with the mechanics of linear modeling, this is just our 'model matrix', which we can save out with many modelling functions in R, or using the <span class="func">model.matrix</span> function. The following visualization allows us to see the effects in action. It is based on the results extracted from running such a model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See <span class="func">poly</span> for how to fit a polynomial in R.</span> and obtaining the coefficients (e.g. the first plot represents the intercept of 470.44, the second plot, our $b_2$ coefficient of 289.5 multiplied by Income and so forth).  The bottom plot shows the final fit $f(x)$, i.e. the linear combination of the basis functions.
+When combined into the linear predictor, this gives us our $f(x)$.  For those familiar with the mechanics of linear modeling, this is just our 'model matrix', which we can save out with many modelling functions in R, or using the <span class="func">model.matrix</span> function. The following visualization allows us to see the effects in action. It is based on the results extracted from running such a model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See <span class="func">poly</span> for how to fit a polynomial in R.</span> and obtaining the coefficients (e.g. the first plot represents the intercept of 470.44, the second plot, our $b_2$ coefficient of 289.5 multiplied by Income and so forth).  The bottom plot shows the final fit $f(x)$, i.e. the linear combination of the basis functions. 
 
 ```{r polynomialBasis, echo=F}
 dpoly = rbind(d,d,d,d,d)
@@ -223,72 +223,6 @@ ggplotly(csbyhand, width='75%') %>%
 
 A cubic spline is essentially a connection of multiple cubic polynomial regressions.  We choose points of the variable at which to create sections, and these points are referred to as <span class="emph">knots</span>.  Separate cubic polynomials are fit at each section, and then joined at the knots to create a continuous curve.  The graph represents a cubic spline with 8 knots<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Ten including the endpoints.</span> between the first and third quartiles. The red line uses the GAM functionality within ggplot2's <span class="func">geom\_smooth</span> as a point of comparison.
 
-We can take the same approach as with the polynomial example, and plot the basis functions. First let's look at the model matrix.
-
-```{r csbs, echo=FALSE}
-Income = select(d, Overall, Income) %>% na.omit()  %>% select(Income) %>% .[,1]
-Overall = select(d, Overall, Income) %>% na.omit() %>% select(Overall) %>% .[,1]
-knots = seq(.4, 1, length=10); knots = knots[-length(knots)]  # don't need the last value
-l = 1
-bs = sapply(1:length(knots), function(k) ifelse(Income >= knots[k], (Income-knots[k])^l, 0))
-
-head(bs)
-```
-
-Note that we have many more columns than we normally would fit with a polynomial regression.  We'll see how this complexity is deal with later.  The first column represents our intercept as it does in every other standard model matrix. The second represents the linear form of Income, though it is scaled differently (i.e. the correlation is perfect).  If we plot this against Income, it doesn't look like much.
-
-```{r csbsPlot, echo=FALSE}
-library(tidyr)
-bs = data.frame(int=1, bs)
-d2 = data.frame(Income, bs) %>% 
-  gather(key=bs, value=bsfunc, -Income)
-
-
-# plot_ly(data=d2, x=Income, y=Overall, width='auto', mode='markers', showlegend=F,
-#         marker=list(color='black', opacity=.2)) %>% 
-#   add_trace(data=arrange(d2,Income), x=Income, y=bsfunc, group=bs) %>% 
-#   theme_plotly()
-plot_ly(d2) %>%  add_trace(data=arrange(d2,Income), x=Income, y=bsfunc, group=bs) %>% 
-  theme_plotly()
-```
-
-However, if we plot Income against the basis multiplied by the estimated coefficients of the model, the data story begins to reveal itself.
-
-```{r csbsScaledPlot, echo=c(2:4,6:7), eval=-1}
-# bs = as.matrix(data.frame(int=1, bs))
-lmMod = lm(Overall~.-1, bs)
-bscoefs = coef(lmMod)
-bsScaled = sweep(bs, 2, bscoefs,`*`)
-colnames(bsScaled) = c('int', paste0('X', 1:9))
-head(bsScaled)
-bscoefs
-
-d3 = data.frame(Income, bsScaled) %>% 
-  gather(key=bs, value=bsfunc, -Income) %>% 
-  arrange(Income)
-# %>% 
-#   dplyr::filter(bsfunc >= min(Overall) & bsfunc <= max(Overall))
-
-mapply(function(knots, knotf, basis) filter(d3, bs==basis & Income >= knots & Income < knotf), knots, c(knots[-1], 1), unique(d3$bs)[-1], SIMPLIFY=F)
-
-plot_ly(data=d2, x=Income, y=Overall, width='auto', mode='markers', showlegend=F,
-        marker=list(color='black', opacity=.2)) %>% 
-  add_trace(data=arrange(d3,Income), x=Income, y=bsfunc, group=bs) %>% 
-  theme_plotly()
-plot_ly(data=filter(d3, bs=='int' & Income<knots[2]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X1' & Income>=knots[1] &Income<knots[2]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X1' & Income>=knots[2] &Income<knots[3]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X2' & Income>=knots[3] & Income<knots[4]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X3' & Income>=knots[4] & Income<knots[5]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X4' & Income>=knots[5] & Income<knots[6]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X5' & Income>=knots[6] & Income<knots[7]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X6' & Income>=knots[7] & Income<knots[8]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X7' & Income>=knots[8] & Income<knots[9]), x=Income, y=bsfunc, mode='line') %>% 
-    add_trace(data=filter(d3, bs=='X7' & Income>=knots[9]), x=Income, y=bsfunc, mode='line') %>% 
-  theme_plotly()
-```
-
-Each trend line represents the fit between knots
 
 
 #### Fitting the mdoel

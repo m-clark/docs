@@ -7,7 +7,7 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 - Go over and update content as necessary. (through single predictor linear fit)
 
-- Add basis function content.
+- Add basis function content (to appendix).
 
 - Add by, fs
 
