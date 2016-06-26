@@ -7,20 +7,13 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 - Go over and update content as necessary. (through single predictor linear fit)
 
-- Add basis function content (to appendix).
-
-- Add by, fs
-
-- Add misc (spatial, random etc.)
-
-
 - Refresh cache.
 
 - Change result background color?
 
 - Check for errors, spelling etc.
 
-  - fix un data link
+- Clean up viz
 
-- Clean up viz.
+- Clean up code
 

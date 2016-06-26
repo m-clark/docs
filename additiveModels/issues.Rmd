@@ -64,7 +64,7 @@ the diagonal elements of $F$ are where the effective degrees of freedom for each
 
 ##<a name='smoothFunc'>Choice of Smoothing Function</a>
 
-A number of smooths are available with the <span class="pack">mgcv</span> package, and one can learn more via the help file for <span class="func">smooth.terms</span>. In our models we have used cubic regression splines and thin plate regression splines (TPRS), the latter being the default for a GAM in this package.  As a brief summary, TPRS work well in general in terms of performance and otherwise has some particular advantages, and has a shrinkage alternative available.  One should still feel free to play around, particularly when dealing with multiple smooths, where the tensor product smooths would be better for covariates of different scales.
+A number of smooths are available with the <span class="pack">mgcv</span> package, and one can learn more via the help file for <span class="func">smooth.terms</span> ([link](http://www.inside-r.org/r-doc/mgcv/smooth.terms)). In our models we have used cubic regression splines and thin plate regression splines (TPRS), the latter being the default for a GAM in this package.  As a brief summary, TPRS work well in general in terms of performance and otherwise has some particular advantages, and has a shrinkage alternative available.  One should still feel free to play around, particularly when dealing with multiple smooths, where the tensor product smooths would be better for covariates of different scales.
 
 
 ##<a name='diagnostics'>Diagnostics \& Choice of Basis Dimension</a>
@@ -90,16 +90,16 @@ A previous example used the predict function on the data used to fit the model t
 We have talked about automated smoothing parameter and term selection, and in general potential models are selected based on estimation of the smoothing parameter.  Using an extra penalty to allow coefficients to tend toward zero with the argument `select=TRUE` is an automatic way to go about it, where some terms could effectively drop out. Otherwise we could compare models GCV/AIC scores<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">GCV scores are not useful for comparing fits of different families; AIC is still ok though.</span>, and in general either of these would be viable approaches. Consider the following comparison:
 
 ```{r mod_comparison}
-mod_1d = gam(Overall ~ s(Income) + s(Edu), data=d)
-mod_2d = gam(Overall ~ te(Income,Edu, bs="tp"), data=d)
+mod_1d = gam(Overall ~ s(Income) + s(Edu), data=pisa)
+mod_2d = gam(Overall ~ te(Income,Edu, bs="tp"), data=pisa)
 AIC(mod_1d, mod_2d)
 ```
 
 In some cases we might prefer to be explicit in comparing models with and without particular terms, and we can go about comparing models as we would with a typical GLM analysis of deviance.  We have demonstrated this previously using the <span class="func">anova.gam</span> function, where we compared linear fits to a model with an additional smooth function.  While we could construct a scenario that is identical to the GLM situation for a statistical comparison, it should be noted that in the usual situation the test is actually an approximation, though it should be close enough when it is appropriate in the first place.  The following provides an example that would nest the main effects of Income and Education within the product smooth, i.e. sets their basis dimension and smoothing function to the defaults employed by the te smooth.
 
 ```{r anova_nest}
-mod_A = gam(Overall ~ s(Income, bs="cr", k=5) + s(Edu, bs="cr", k=5), data=d)
-mod_B = gam(Overall ~ s(Income, bs="cr", k=5) + s(Edu, bs="cr", k=5) + te(Income, Edu), data=d)
+mod_A = gam(Overall ~ s(Income, bs="cr", k=5) + s(Edu, bs="cr", k=5), data=pisa)
+mod_B = gam(Overall ~ s(Income, bs="cr", k=5) + s(Edu, bs="cr", k=5) + te(Income, Edu), data=pisa)
 
 anova(mod_A,mod_B, test="Chi")
 ```

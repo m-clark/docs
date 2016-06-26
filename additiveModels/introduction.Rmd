@@ -22,7 +22,7 @@ nocite: |
   @wasserman_all_2006, @fahrmeir2013regression, @friedman2000additive
 ---
 ```{r setupIntro, include=FALSE}
-knitr::opts_chunk$set(cache = T, message = F, warning = F, R.options=list(width=120), 
+knitr::opts_chunk$set(cache = F, message = F, warning = F, R.options=list(width=120), 
                       fig.height=4, fig.width=4, fig.align = 'center', comment=NA, autodep=T)
 library(magrittr); library(dplyr); library(pander)
 ```
@@ -87,7 +87,7 @@ So what's the difference?  In short, we are using smooth functions of our predic
 
 In many data situations the relationship between some covariate(s) $X$ and response $y$ is not so straightforward. Consider the following plot. Attempting to fit a standard OLS regression results in the blue line, which doesn't capture the relationship very well. 
 
-```{r fitPlotsDataSetup, cache=TRUE, echo=F}
+```{r fitPlotsDataSetup, echo=F}
 library(dplyr); library(lazerhawk)
 set.seed(666)
 x = rgamma(1000, 2)
@@ -110,7 +110,7 @@ fitat3 = predict(neighbormod, newdat=data.frame(x=3,y=NA))
 
 <!-- <span class="marginnote"><span class="imgbigger"><img src="vis/lmfit.png" style="display:block; margin: 0 auto;"></span><span> -->
 
-```{r linearFitPlot, cache=F, echo=F}
+```{r linearFitPlot, echo=F}
 library(plotly)
 plot_ly(data=dxy, x=x, y=y, mode='markers', showlegend=F, width='75%',
                     marker=list(opacity=.1, color='#ff5503')) %>% 
@@ -127,7 +127,7 @@ plot_ly(data=dxy, x=x, y=y, mode='markers', showlegend=F, width='75%',
 $$</span>
 One common approach we could undertake is to add a transformation of the predictor $X$, and in this case we might consider a quadratic term such that our model looks something like that to the right.
 
-```{r quadraticFitPlot, cache=F, echo=F}
+```{r quadraticFitPlot, echo=F}
 plot_ly(data=dxy, x=x, y=y, mode='markers', showlegend=F, width='75%',
                     marker=list(opacity=.1, color='#ff5503')) %>% 
   add_trace(data=dxy, x=x, y=fitx2, name='quadratic fit', marker=list(color='#1e90ff')) %>% 
@@ -145,7 +145,7 @@ There are still other possible routes we could take. Many are probably familiar 
 
 Take a look at the following figure. For every (sorted) $x_0$ value, we choose a neighborhood around it and, for example, fit a simple regression.  As an example, let's look at $x_0$ = 3.0, and choose a neighborhood of 100 X values below and 100 values above.  
 
-```{r loessgraph1, echo=FALSE, cache=FALSE}
+```{r loessgraph1, echo=FALSE}
 # because plotly can't do calculations on the fly for some things
 minx = min(sort(x)[neighborhood])
 maxx = max(sort(x)[neighborhood])
@@ -165,13 +165,10 @@ plot_ly(x=c(minx,minx), y=c(0, maxy), mode='line', showlegend=F, width='75%',
          yaxis=list(title='y'))
 ```
 
-```{r}
-
-```
 
 Now, for just that range we fit a linear regression model and note the fitted value where $x_0=3.0$. 
 
-```{r loessgraph2, echo=FALSE, cache=FALSE}
+```{r loessgraph2, echo=FALSE}
 plot_ly(data=dxy[neighborhood,], x=x, y=y, mode='markers', showlegend=F, width='75%',
                     marker=list(opacity=.2, color='#ff5503')) %>% 
   add_trace(data=dxy[neighborhood,], x=x, y=neighborfit, name='lm fit',marker=list(color='#1e90ff')) %>% 
@@ -182,7 +179,7 @@ plot_ly(data=dxy[neighborhood,], x=x, y=y, mode='markers', showlegend=F, width='
 
 If we now do this for *every* $x_0$ value, we'll have fitted values based on a rolling neighborhood that is relative to each value being considered. Other options we could throw into this process, and usually do, would be to fit a polynomial regression for each neighborhood, and weight observations the closer they are to the value, with less weight given to more distant observations.
 
-```{r loessgraph3, echo=FALSE, cache=FALSE}
+```{r loessgraph3, echo=FALSE}
 plot_ly(data=dxy, x=x, y=y, mode='markers', showlegend=F, width='75%',
                     marker=list(opacity=.1, color='#ff5503')) %>% 
   add_trace(data=dxy, x=x, y=fitted(loess(y~x)), name='loess fit',marker=list(color='#1e90ff')) %>% 
@@ -215,7 +212,7 @@ mcycle3$variable =factor(mcycle3$variable, labels=c('Polynomial Regression (cubi
 ### <a name='gam2'>Generalized Additive Models</a>
 The next figure regards a data set giving a series of measurements of head acceleration in a simulated motorcycle accident<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">This is a version of that found in @venables_modern_2002.</a>.  Time is in milliseconds, acceleration in g.  Here we have data that are probably not going to be captured with simple transformations of the predictors. We can compare various approaches, and the first is a straightforward cubic polynomial regression, which unfortunately doesn't help us much. We could try higher orders, which would help, but in the end we will need something more flexible, and generalized additive models can help us in such cases.  
 
-```{r mcycleFigure, cache=F, echo=FALSE}
+```{r mcycleFigure, echo=FALSE}
 mcycleFigure = ggplot(aes(x=times,y=accel), data=mcycle3) + 
   geom_point(color='#ff5503', alpha=.25, size=1) + 
   geom_line(aes(y=value), color='#1e90ff', size=.75) +
