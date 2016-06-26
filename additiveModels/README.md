@@ -5,7 +5,9 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 # To do:
 
-- Go over and update content as necessary. (through single predictor linear fit)
+- Go over and update content as necessary. (through multiple predictor GAM)
+    
+    - add explanation of default mgcv plots
 
 - Refresh cache.
 
@@ -13,7 +15,7 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 - Check for errors, spelling etc.
 
-- Clean up viz
+- Clean up viz.
 
 - Clean up code
 
