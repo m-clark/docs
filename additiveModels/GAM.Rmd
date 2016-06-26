@@ -22,7 +22,7 @@ nocite: |
   @wasserman_all_2006, @fahrmeir2013regression, @friedman2000additive
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache = F, message = F, warning = F, R.options=list(width=120), 
+knitr::opts_chunk$set(cache = T, message = F, warning = F, R.options=list(width=120), 
                       fig.width=8, fig.align = 'center', comment=NA, autodep=T)
 library(magrittr); library(dplyr); library(pander); library(plotly); library(lazerhawk)
 ```
@@ -64,7 +64,7 @@ R Info: **`r sessionInfo()$R.version$version.string` `r sessionInfo()$R.version$
 
 #<a name='conclusion'>Conclusion</a>
 
-Generalized additive models are a conceptually straightforward tool that allows one to incorporate nonlinear predictor effects into their otherwise linear models. In addition, they allow one to keep within the linear and generalized linear frameworks with which one is already familiar, while providing new avenues of model exploration and possibly improved results.  As was demonstrated, it is easy enough with just a modicum of familiarity to pull them off within the R environment, and as such it is hoped that this document provides a means to do so for the uninitiated.
+Generalized additive models are a conceptually straightforward tool that allows one to incorporate nonlinear predictor effects into their otherwise linear models. In addition, they allow one to keep within the linear and generalized linear modeling frameworks with which one is already familiar, while providing new avenues of model exploration and possibly improved results.  As was demonstrated, it is easy enough with just a modicum of familiarity to pull them off within the R environment, and as such, it is hoped that this document provides the means to do so.
 
 ```{r child='appendix.Rmd'}
 ```

@@ -5,17 +5,7 @@ A brief introduction to generalized additive models and some thoughts on getting
 
 # To do:
 
-- Go over and update content as necessary. (through multiple predictor GAM)
-    
-    - add explanation of default mgcv plots
-
-- Refresh cache.
-
 - Change result background color?
-
-- Check for errors, spelling etc.
-
-- Clean up viz.
 
 - Clean up code
 

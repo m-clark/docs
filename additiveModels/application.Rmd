@@ -44,15 +44,15 @@ But even before we get too far, it would be good to know our options in the worl
 
 The first thing to do is get the data in and do some initial inspections.
 
-```{r initial_inspection_of_pisa, echo=1:3, eval=1:3}
+```{r initial_inspection_of_pisa, echo=1:2, eval=1:2}
 pisa = read.csv('data/pisasci2006.csv')
 psych::describe(pisa)[-1,1:9]  #univariate
 
-# png(file='vis/scattermatrix.png', bg='transparent')
+png(file='vis/scattermatrix.png', bg='transparent')
 car::scatterplotMatrix(pisa[,-c(1,3:5)],pch=19,cex=.5,reg.line=F, lwd=1,
                        spread=F,ellipse=T, col=c('gray60','#1e90ff','#FF5503'),
                        col.axis='gray50', cex.labels=.5)
-# dev.off()
+dev.off()
 library(GGally)
 ggpairs(pisa[,-c(1,3:5)], 
         lower=list(continuous=wrap('smooth',  alpha=.2, color=c('#ff5503'), method='loess')), 
@@ -64,7 +64,7 @@ ggpairs(pisa[,-c(1,3:5)],
 
 <img src="vis/scattermatrix.png" style="display:block; margin: 0 auto;  width='50%'">
 
-The scatterplot matrix has quite a bit of information to spend some time with- univariate and bivariate density, as well as loess curves.  For our purposes we will ignore the issue regarding the haves vs. have-nots on the science scale and save that for another day. Note the surprising negative correlation between interest and overall score for science, which might remind us of [Simpson's paradox](http://en.wikipedia.org/wiki/Simpson_paradox), namely, that what occurs for the individual may not be the same for the group. One will also note that while there is a positive correlation between Income and Overall science scores, it flattens out after an initial rise. Linear fits might be difficult to swallow for human development subscales in general, but let's take a closer look.
+The scatterplot matrix has quite a bit of information to spend some time with- univariate and bivariate density, as well as loess curves.  For our purposes we will ignore the issue regarding the haves vs. have-nots on the science scale and save that for another day. Note the surprising negative correlation between interest and overall score for science, which might remind us of [Simpson's paradox](http://en.wikipedia.org/wiki/Simpson_paradox), namely, that what occurs for the individual may not be the same for the group. One will also note that while there is a positive correlation between Income and Overall science scores, it flattens out after an initial rise. Linear fits might be difficult to swallow for human development sub-scales in general, but let's take a closer look.
 
 <a name='countryscatter'></a>
 
@@ -78,7 +78,7 @@ dmelt = gather(dplyr::select(pisa, -Evidence, -Explain, -Issues), key=Variable, 
 
 #leave the smooth off for now
 scatterwrap = ggplot(aes(x=Value,y=Overall), data=dmelt) +
-  geom_point(color='#FF8000',alpha=.75) +
+  geom_point(color='#FF5503',alpha=.75) +
   #geom_smooth(se=F) +
   geom_text(aes(label=Country), alpha=0, size=1,angle=30, hjust=-.2,   # making transparent so only plotly will show the country
             vjust=-.2) +
@@ -95,7 +95,7 @@ We can see again that linear fits aren't going to do so well for some, though it
 ```{r scatterwrapSmooth,  echo=F}
 scatterwrapSmooth = ggplot(aes(x=Value,y=Overall), data=dmelt) +
   geom_point(color='#FF8000',alpha=.75) +
-  geom_smooth(se=F, lwd=.5) +
+  geom_smooth(se=F, lwd=.5, color='#1e90ff') +
   geom_text(aes(label=Country), alpha=0, size=1,angle=30, hjust=-.2,   # making transparent so only plotly will show the country
             vjust=-.2) +
   facet_wrap(~Variable, scales='free_x') +
@@ -169,12 +169,12 @@ levels(dpoly$basis) = c('Intercept', 'x', "x^2", 'x^3', 'f(x)')
 ### polynomial with coefficients  
 
 polynomialBasis = ggplot(aes(x=Income, y=Income), data=dpoly) +
-  geom_line(aes(x=Income, y=470.44),data = dpoly[1:65,], color="#2957FF") + #indexing gets around basis == expression
-  geom_line(aes(x=Income, y=Income*289.5), data = dpoly[66:130,], color="#2957FF") +
-  geom_line(aes(x=Income, y=Income^2*(-84.6)),data = dpoly[131:195,], color="#2957FF") +
-  geom_line(aes(x=Income, y=Income^3*(-113.6)),data = dpoly[196:260,], color="#2957FF") +
+  geom_line(aes(x=Income, y=470.44),data = dpoly[1:65,], color="#1e90ff") + #indexing gets around basis == expression
+  geom_line(aes(x=Income, y=Income*289.5), data = dpoly[66:130,], color="#1e90ff") +
+  geom_line(aes(x=Income, y=Income^2*(-84.6)),data = dpoly[131:195,], color="#1e90ff") +
+  geom_line(aes(x=Income, y=Income^3*(-113.6)),data = dpoly[196:260,], color="#1e90ff") +
   ylab("") +
-  geom_smooth(aes(x=Income, y=Overall), se=F, method='lm', formula=y~poly(x,3), data = dpoly[261:325,], color="#2957FF", lwd=.5) +
+  geom_smooth(aes(x=Income, y=Overall), se=F, method='lm', formula=y~poly(x,3), data = dpoly[261:325,], color="#1e90ff", lwd=.5) +
   facet_grid(basis~., scales='free_y') +  # , labeller=label_parsed if using expressions
   theme_trueMinimal() 
 
@@ -211,9 +211,9 @@ xp <- 40:100/100
 Xp <- spl.X(xp, xk)
 
 csbyhand = ggplot(aes(x=Income, y=Overall), data=pisa)+
-  geom_point(color="#FF8000") +
+  geom_point(color="#FF5503", alpha=.75) +
   geom_smooth(se=F, method='gam', formula=y~s(x, bs='cs', k=8, xt=list(knots=xk)), color=scales::alpha('darkred',.5), lwd=.5) +
-  geom_line(aes(x=xp, y=Xp%*%coef(mod.1)), data=data.frame(xp,Xp), color="#2957FF", lwd=.5) +
+  geom_line(aes(x=xp, y=Xp%*%coef(mod.1)), data=data.frame(xp,Xp), color="#1e90ff", lwd=.5) +
   xlim(.4,1) +
   theme_trueMinimal()
 
@@ -250,9 +250,20 @@ The GCV, or <span class="emph">generalized cross validation</span> score can be 
 
 One can get  sense of the form of the fit by simply plotting the model object as follows:
 
-```{r plot_mod_gam1, echo=-1}
+```{r plot_mod_gam1, echo=2, eval=c(1,3:5), fig.width=8, fig.height=5}
 par(bg='transparent')
 plot(mod_gam1)
+plot(mod_gam1, bty='n', xaxt='n', yaxt='n', col.lab='gray50', shade.col=scales::alpha('black', .25), shade=T, col='red')
+axis(1, col='gray50', col.ticks='gray75', lty=1, labels=F)
+mtext(side = 1, text = axTicks(1), at = axTicks(1), col = "gray25", line = 1)
+axis(2, col='gray50', col.ticks='gray75', lty=1, labels=F)
+mtext(side = 2, text = axTicks(2), at = axTicks(2), col = "gray25", line = 1)
+# visreg(mod_gam1, #scale='response',
+#        line=list(col="#1e90ff", lwd=2), 
+#        points=list(cex=.25, col='#ff5503'), 
+#        fill=list(col=scales::alpha('black', .25)), ask=F, bty='n', alpha=.5, ylim=c(275,575),
+#        col.lab='gray50', col.ticks='gray75', col.axis='gray50')
+# axis(1, col='gray50', col.ticks='gray75')
 ```
 
 Note that this will only plot the smooth terms in the model<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">A better alternative is with the <span class="pack">visreg</span> package, which will plot all effects, and by default be nicer looking and easier to customize. You can simply feed the model to the <span class="func">visreg</span> function. It also has 2 and 3d capabilities like the corresponding <span class="pack">mgcv</span> functions.</span>. The intervals are Bayesian credible intervals based on the posterior predictive distribution. In this single predictor case one can also revisit the previous graph.  
@@ -326,66 +337,75 @@ We can also note that this model accounts for much of the variance in Overall sc
 
 ### <a name='graphicalDispMulti'>Graphical Display</a>
 
-Now we examine the effects of interest visually<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See e.g. John Fox's texts and chapters regarding regression diagnostics, and his <span class="func">crplots</span> function in the <span class="pack">car</span> package.</span>. 
+Now we examine the effects of interest visually via component plots<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See e.g. John Fox's texts and chapters regarding regression diagnostics, and his <span class="func">crplots</span> function in the <span class="pack">car</span> package.</span>. 
 
 ```{r mod_gam2_plot, echo=F, fig.align='center', fig.height=7, fig.width=8}
 # plot(mod_gam2, pages=1, residuals=T, pch=19, cex=0.25, 
 #      scheme=1, line.col='#FF5503', shade=T,shade.col='gray90')
 par(mfrow=c(2,2), bg='transparent')
 library(visreg)
-visreg(mod_gam2, scale='response',
+visreg(mod_gam2, #scale='response',
        line=list(col="#1e90ff", lwd=2), 
        points=list(cex=.25, col='#ff5503'), 
-       fill=list(col='gray90'), ask=F, bty='n', alpha=.5)
+       fill=list(col='gray90'), ask=F, bty='n', alpha=.5, ylim=c(275,575))
 ```
 
-Here we can see the effects of interest, and again one might again note the penalized-to-linear effect of Health.  As before, we see the tapering off of Income's effect at its highest level, and in addition, a kind of sweet spot for a positive effect of Education in the mid-range values, with a slight positive effect overall.  Health, as noted, has been reduced to a linear, surprisingly negative effect, but again this is not statistically significant. 
+Here we can see the effects of interest<span class="marginnote">One will notice that for the default gam plot in <span class="pack">mgcv</span>, the y-axis scale is on that of the linear predictor, but due to identifiability constraints, the smooths must sum to zero, and thus are presented in a mean-centered fashion.</span>, and again one might again note the penalized-to-linear effect of Health.  As before, we see the tapering off of Income's effect at its highest level, and in addition, a kind of sweet spot for a positive effect of Education in the mid-range values, with a slight positive effect overall.  Health, as noted, has been reduced to a linear, surprisingly negative effect, but again this is not statistically significant. 
 
-Previously, we had only one predictor and so we could let ggplot do the work to produce a plot on the response scale, although we could have added the intercept back in.
+The following code demonstrates how to create data necessary for the plot, specifically for incomes, with the other predictors held at their mean.
 
-Here we'll need to do a little more. The following will produce a plot for Income on the scale of the response, with the other predictors held at their mean. Seen at right.  
 
-```{r plot_mod_gam2_response, echo=1:5}
+```{r plot_mod_gam2_responseA, echo=1:7}
 # Note that mod_gam2$model is the data that was used in the modeling process, 
 # so it will have NAs removed.
-testdata = data.frame(Income=seq(.4,1, length=100), 
-                      Edu=mean(mod_gam2$model$Edu), 
-                      Health=mean(mod_gam2$model$Health))
+testdata = data.frame(Income = seq(.4, 1, length = 100),
+                      Edu = mean(mod_gam2$model$Edu),
+                      Health = mean(mod_gam2$model$Health))
 fits = predict(mod_gam2, newdata=testdata, type='response', se=T)
 predicts = data.frame(testdata, fits) %>% 
   mutate(lower = fit - 1.96*se.fit,
          upper = fit + 1.96*se.fit)
 
 plot_mod_gam2_response = ggplot(aes(x=Income,y=fit), data=predicts) +
-  geom_ribbon(aes(ymin = lower, ymax=upper),
-              fill='gray90') +
+  geom_ribbon(aes(ymin = lower, ymax=upper), fill='gray90') +
   geom_line(color='#1e90ff') +
   theme_trueMinimal()
 
-ggplotly(plot_mod_gam2_response, width='75%') %>% 
-  layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-
 ```
 
-This gives us a sense for one predictor, but let's take a gander at Income and Education at the same time.  Previously, while using the function <span class="func">plot</span>, it actually is <span class="func">plot.gam</span>, or the basic plot function for a GAM class object.
-There is another plotting function, <span class="func">vis.gam</span>, that will give us a bit more to play with.  It has a corresponding version from the visreg package which will look a bit better by default, <span class="func">visreg2d</span><label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">I'm actually using the data from such plots and <span class="pack">plotly</span> to produce a more web-oriented version.</span>. The following will produce a contour plot (directly to the right) with Income on the x axis, Education on the y, with values on the response scale given by the contours, with lighter color indicating higher values.  
+```{r plot_mod_gam2_responseB, echo=F}
+ggplotly(plot_mod_gam2_response, width='75%') %>% 
+  layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+```
 
-```{r contour, echo=1:2, fig.show='hide'}
-# vis.gam(mod_gam2, type='response', plot.type='contour')
-# visreg2d(mod_gam2, xvar='Income', yvar='Edu', scale='response')
+
+#### <a name='2d'>2d Smooths</a>
+
+This gives us a sense for one predictor, but let's take a gander at Income and Education at the same time.  Previously, we saw how to use the <span class="func">plot</span> method for a GAM class object. There is another plotting function, <span class="func">vis.gam</span>, that will give us a bit more to play with, and specifically to display 2d smooths.  It has a corresponding version from <span class="pack">visreg</span> which will look a bit better by default, <span class="func">visreg2d</span>. The following code will produce a contour plot with Income on the x axis, Education on the y, with values on the response scale given by the contours, with lighter color indicating higher values.  The actual plot provided instead depicts a heatmap<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">I'm actually using the data from such plots and <span class="pack">plotly</span> to produce a more web-oriented version.  For example, contour lines are unnecessary when you can get the values by hovering.</span>.
+
+```{r contour, echo=1:2, fig.show='hide', results='hold'}
+vis.gam(mod_gam2, type='response', plot.type='contour')
+visreg2d(mod_gam2, xvar='Income', yvar='Edu', scale='response')
 tt = visreg2d(mod_gam2, xvar='Income', yvar='Edu', scale='response')[1:3] # for some reason 2d doesn't have a plot= argument so is suppressed with 'hide'
 names(tt) = c('Income', 'Edu', 'Overall')
 tt$Overall = t(tt$Overall)
 # because of a lack of  sense, x is y in plotting
-
+```
+```{r contourheat, echo=FALSE}
 colfun = rev(colorRampPalette(RColorBrewer::brewer.pal(9, 'RdBu'))(100))
-with(tt, plot_ly(x=Income, y=Edu,  z=Overall, type='heatmap', colors=colfun, hoverinfo='none', width='75%'))  %>% 
+# contour plot; note with isn't necessary, can use tt$
+# with(tt, 
+#      plot_ly(x=Income, y=Edu,  z=Overall, type='contour', colors=colfun, hoverinfo='none', width='75%', 
+#              contours=list(start=240, end=550,size=10)))  %>% 
+#   layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+with(lapply(tt, round, 2),
+     plot_ly(x=Income, y=Edu,  z=Overall, type='heatmap', colors=colfun, width='75%'))  %>%
   layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 ```
 
-First and foremost the figure reflects the individual plots (e.g. one can see the decrease in scores at the highest income levels), and we can see that middling on Education and high on Income generally produces the highest scores.  Conversely, being low on both the Education and Income indices are associated with poor Overall science scores. However, while interesting, these respective smooths were created separately of one another, and there is another way we might examine how these two effects work together in predicting the response.  
+First and foremost the figure reflects the individual plots, and we can see that middling to high on Education and high on Income generally produces the highest scores.  Conversely, being low on both the Education and Income indices are associated with poor Overall science scores. However, while interesting, these respective smooths were created separately of one another, and there is another way we might examine how these two effects work together in predicting the response.  
 
-Let's take a look at another approach, continuing the focus on visual display. It may not be obvious at all, but one can utilize smooths of more than one variable, in effect, a smooth of the smooths of the variables that go into it.  Let's create a new model to play around with this feature. After fitting the model, I provide a visualization for comparison to the previous, as well as a 3D view.
+So let's take a look at another approach, continuing the focus on visual display. It may not be obvious at all, but one can utilize smooths of more than one variable, in effect, a smooth of the smooths of the variables that go into it.  This is akin to an interaction in typical models<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">See the smooth `ti` for an ANOVA decomposition of such smooths into main effects and interaction.</span>. Let's create a new model to play around with this feature. After fitting the model, I provide a visualization for comparison to the previous, as well as a 3D view one can rotate to their liking.
 
 ```{r mod_gam3, eval=1:2}
 mod_gam3 <- gam(Overall ~ te(Income, Edu), data=pisa)
@@ -403,19 +423,23 @@ tt$Overall = t(tt$Overall)
 # because of a lack of  sense, x is y in plotting
 
 colfun = rev(colorRampPalette(RColorBrewer::brewer.pal(9, 'RdBu'))(100))
-with(tt, plot_ly(x=Income, y=Edu,  z = Overall, type='heatmap', colors=colfun, width='75%'))  %>% 
+with(lapply(tt, round, 2), plot_ly(x=Income, y=Edu,  z = Overall, type='heatmap', colors=colfun, width='75%'))  %>% 
   layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-with(tt, plot_ly(x=Income, y=Edu,  z = Overall, type='surface', colors=colfun, hoverinfo='none', width='75%'))  %>% 
+with(lapply(tt, round, 2), plot_ly(x=Income, y=Edu,  z = Overall, type='surface', hoverinfo='none', colors=colfun, width='75%',
+                                   lighting=list(roughness=.01, ambient=.75), 
+                                   contours=list(x=list(highlightcolor=toRGB('gray90'), width=1),
+                                                 y=list(highlightcolor=toRGB('gray90'), width=1),
+                                                 z=list(highlightcolor=toRGB('gray90'), width=1))))  %>% 
   layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 ```
 
-In the above we are using a type of smooth called a tensor product smooth, and by smoothing the marginal smooths of Income and Education, we see a bit clearer story.  As we might suspect, wealthy countries with more of an apparent educational infrastructure are going to score higher on the Overall science score.  However, wealth is not necessarily indicative of higher science scores (note the dark bottom right corner on the contour plot)<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">This is likely due to Qatar.  Refer again to the previous [figure](#countryscatter).</span>, though without at least moderate wealth hopes are fairly dim for a decent score.
+In the above we are using a type of smooth called a tensor product smooth, and by smoothing the marginal smooths of Income and Education, we see a bit clearer story.  As we might suspect, wealthy countries with more of an apparent educational infrastructure are going to score higher on the Overall science score.  However, wealth alone does not necessarily guarantee higher science scores (note the dark bottom right corner on the contour plot)<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Probably this is due to Qatar.  Refer again to the previous [figure](#countryscatter).</span>, though without at least moderate wealth hopes are fairly dim for a decent score.
 
-One can also, for example, examine interactions between a smooth and a linear term $f(x)z$, and in a similar vein of thought look at smooths at different levels of a grouping factor. We'll leave that for some other time.
+One can also, for example, examine interactions between a smooth and a linear term $f(x)z$, and in a similar vein of thought look at smooths at different levels of a [grouping factor](#cats).
 
 ### <a name='modComparisonMulti'>Model Comparison</a>
 
-As before, we can examine indices such as GCV or perhaps adjusted R-square, which both suggest our GAM performs considerably better. Statistically we can compare the two models with the anova function as before.  
+As before, we can examine indices such as GCV or perhaps adjusted R-squared, which both suggest our GAM performs considerably better. Statistically we can compare the two models with the anova function as before.  
 
 ```{r mod_lm2_mod_gam2_anova}
 anova(mod_lm2, mod_gam2, test="Chisq")

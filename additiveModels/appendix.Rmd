@@ -126,13 +126,13 @@ Xp <- spl.X(xp, knots)        # prediction matrix
 
 # plot
 library(ggplot2)
-ggplot(aes(x=x, y=wear), data=data.frame(x,wear))+
+ex1 = ggplot(aes(x=x, y=wear), data=data.frame(x,wear))+
   geom_point(color="#FF8000") +
   geom_line(aes(x=xp, y=Xp%*%coef(mod.1)), data=data.frame(xp,Xp), color="#2957FF") +
   theme_trueMinimal() +
   theme(plot.background=element_blank(),
         panel.background=element_blank())
-ggplotly()
+ggplotly(ex1, width='75%') %>% layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 ```
 
 
@@ -162,7 +162,7 @@ csplot = ggplot(aes(x=x, y=wear), data=d) +
   theme_trueMinimal() +
   theme(plot.background=element_blank(),
         panel.background=element_blank())
-ggplotly(width='75%')
+ggplotly(width='75%') %>% layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 ```
 
 
@@ -201,7 +201,8 @@ pisa2 = data.frame(Income, bs) %>%
 #   theme_plotly()
 plot_ly(pisa2, width='75%') %>%  
   add_trace(data=arrange(pisa2,Income), x=Income, y=bsfunc, group=bs) %>% 
-  theme_plotly()
+  theme_plotly() %>% 
+  layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 ```
 
 However, if we plot Income against the basis multiplied by the estimated coefficients of the model, the data story begins to reveal itself.
@@ -238,7 +239,8 @@ plot_ly(data=filter(pisa3, bs=='int' & Income<knots[2]), x=Income, y=bsfunc, mod
              # plotly stupidly add markers automatically when less than 20 observations
 # add_trace(data=filter(pisa3, bs=='X8' & Income>=knots[8]), x=Income, y=bsfunc, mode='line', name='X8') %>%
     add_trace(data=filter(pisa3, bs=='X9' & Income>=knots[9]), x=Income, y=bsfunc, mode='line', name='X9') %>% 
-  theme_plotly()
+  theme_plotly() %>% 
+  layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 ```
 
 Each trend line represents the fit at the knot points. For example, The intercept is the starting point, and from there the function is initially increasing. After the second knot point that initial increase starts to slow down.  If it helps, think of a quadratic function. This is similar to a scenario where the coefficient for $x$ is positive while it is negative and smaller for $x^2$. We then see the trend turn strongly positive again and so on.  Here is the final plot. Note that since we used lm, this is an **unpenalized fit** and so overfits the data a bit at the end where there extreme and few values.  This serves also as an insight into the benefits of the penalization process. Using the gam function, our fit would not drop so much for Qatar.
@@ -246,8 +248,11 @@ Each trend line represents the fit at the knot points. For example, The intercep
 ```{r echo=FALSE}
 plot_ly(x=sort(Income), y=fitted(lmMod)[order(Income)], name='unpenalized', width='75%') %>% 
   add_trace(x=sort(Income),y=fitted(mod_gam1)[order(Income)], name='penalized') %>% 
+  theme_plotly() %>% 
   layout(yaxis=list(title='Overall'),
-         xaxis=list(title='Income'))
+         xaxis=list(title='Income'), 
+         paper_bgcolor='rgba(0,0,0,0)', 
+         plot_bgcolor='rgba(0,0,0,0)')
 ```
 
 
