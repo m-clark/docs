@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=TRUE, message = F, warnings
 
 # Introduction
 
-This document provides ways to speed up your code *before* parallelization.  There are many ways to use R in an optimal fashion, but often these are not taught in applied courses or perhaps are not presented in a cohesive way.  In other cases, one may simply be new to R, or coming at it from a programming language that works differently.  
+This document provides ways to speed up your code *before* parallelization.  There are many ways to use R in an optimal fashion, but often these are not taught in applied statistics courses or perhaps are not otherwise presented in a cohesive way.  In other cases, one may simply be new to R, or coming at it from a programming language that works differently.  
 
 The 'R is slow' mantra is an old one, and has never been accurate in my opinion for two reasons. First, even if it is slower, and it is relative to many languages for many situations, the time saved in programming will far exceed any computational time lost.  R often can do things in 1 or 2 lines of code that will require custom functions to be written in other languages, and in that sense R is one of the fastest languages out there for statistical analysis. This is usually the case for data processing/manipulation as well.  
 
@@ -156,8 +156,7 @@ microbenchmark(read_csv = read_csv('data/testreadr.csv', progress = F),
 
 ## Loops
 
-As a working example we'll start with a function that does a random walk, based on [this document](https://www.stat.auckland.ac.nz/~ihaka/downloads/Taupo-handouts.pdf), co-authored by one of the R's in R, with some slight additions and modifications. I like it because it demonstrates that sometimes even seemingly sequential operations might be put in a form that would not require a loop.  First we'll do things the hard way with a loop, and then show alternative methods later.
-
+As one of our working examples, we'll start with a function that does a random walk, based on [this document](https://www.stat.auckland.ac.nz/~ihaka/downloads/Taupo-handouts.pdf), co-authored by one of the R's in R, with some slight additions and modifications. First we'll do things the hard way with a loop, and then show alternative methods later.
 
 ### Pre-allocation
 
@@ -282,7 +281,46 @@ identical(doubleLoopDist(d), doubleLoopDist2(d))
 microbenchmark(dloop1 = doubleLoopDist(d), dloop2 = doubleLoopDist2(d))
 ```
 
+
+## Apply
+
+There is a set of functions in R that typically make explicit loops unnecessary, which reduces programming time, and makes code cleaner. Furthermore, they are parallelizable, and so potentially far faster.  There is a misconception that these functions are faster than loops out-of-the-box, but this is incorrect, and they can even be slower.  Again though, you automatically gain in coding efficiency and possibly gain a lot in computation time.
+
+### apply functions
+
+- apply
+- sapply, lapply
+- tapply
+- mapply
+- replicate
+
+
+### plyr alternates
+
+All plyr functions work based on the first two letters. For example, ldply takes a list and converts the output to a data.frame.
+
+- Lists: ldply, llply, laply
+
+- Arrays: a*ply
+
+- Dataframes: d*ply
+
+- Multiple arguments: m*ply
+
+
+### Parallel versions
+
+parApply, parLapply etc.
+
+for plyr, use the argument `.parallel=TRUE`
+
+
+
+
+
 ## Using faster languages
+
+### Base R internals
 
 Much of base R is not written in R, but much faster languages such as C, C++ and Fortran, and using those functions can lead to enormous speed gains.  Relative to an explicit loop that does the same thing, there is no comparison to a base R function that's calling internal C or other code.  Not only will the built-in function run faster, but your code will be more succinct.
 
@@ -338,42 +376,9 @@ microbenchmark(dist= dist(d),
 Furthermore, like most languages, it is easy enough to run another language script from within that program.  So if you're working within another language for the heavy lifting, you could call R from it, or vice versa, i.e. write what you need in another language and call it from R.
 
 
-## Apply
-
-There is a set of functions in R that typically make explicit loops unnecessary, which reduces programming time, and makes code cleaner. Furthermore, they are parallelizable, and so potentially far faster.  There is a misconception that these functions are faster than loops out-of-the-box, but this is incorrect, and they can even be slower.  Again though, you automatically gain in coding efficiency and possibly gain a lot in computation time.
-
-### apply functions
-
-- apply
-- sapply, lapply
-- tapply
-- mapply
-- replicate
-
-
-### plyr alternates
-
-All plyr functions work based on the first two letters. For example, ldply takes a list and converts the output to a data.frame.
-
-- Lists: ldply, llply, laply
-
-- Arrays: a*ply
-
-- Dataframes: d*ply
-
-- Multiple arguments: m*ply
-
-
-### Parallel versions
-
-parApply, parLapply etc.
-
-for plyr, use the argument `.parallel=TRUE`
-
-
 
 ## Vectorization
-
+I like it because later we'll see that sometimes even seemingly sequential operations might be put in a form that would not require a loop.  
 colmeans
 sequential operations may still be vectorizable 
 vectorization link http://www.noamross.net/blog/2014/4/16/vectorization-in-r--why.html
