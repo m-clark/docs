@@ -15,8 +15,13 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=TRUE, message = F, warnings=F, 
+knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=F, message = F, warnings=F, 
                       R.options=list(width=120))
+```
+
+
+```{r loadlibs, echo=FALSE}
+library(microbenchmark);library(readr); library(dplyr); library(data.table); library(feather)
 ```
 
 # Introduction
@@ -30,15 +35,11 @@ Secondly, there are simply faster ways to use R, and they almost invariably invo
 For the timings we'll be using the <span class="pack">microbenchmark</span> package, which can show speed differences for even extremely fast operations.  This way we don't have to engage in necessarily slow operations to show the differences well.  You'll need to install it if you want to make your own comparisons.
 
 - To be added
+    - pooling: https://github.com/rstudio/pool
+    - dtplyr
+    - sweep
 
-- pooling: https://github.com/rstudio/pool
-- dtplyr
-- lm vs. lm.fit
-- sweep
 
-```{r loadlibs, echo=FALSE}
-library(microbenchmark);library(readr); library(dplyr); library(data.table); library(feather)
-```
 
 
 # Faster Data Input/Output
@@ -107,7 +108,6 @@ microbenchmark(readr = dplyr::filter(read_csv('data/testchunk.csv', progress = F
 
 The <span class="pack">data.table</span> package also has a read function that will amount to faster read speeds. The function <span class="func">fread</span> works much like the previous functions to detect column types quickly and otherwise has optimizations in place to speed the process.  Both <span class="func">read_*</span> and <span class="func">fread</span> might be viable depending on the situation.  Wickham notes the following comparison:
 
-
 > - Compared to fread, readr:
 > 
 > - Is slower (currently ~1.2-2x slower. If you want absolutely the best performance, use data.table::fread().
@@ -156,16 +156,11 @@ microbenchmark(read_csv = read_csv('data/testreadr.csv', progress = F),
 
 ## Loops
 
-As one of our working examples, we'll start with a function that does a random walk, based on [this document](https://www.stat.auckland.ac.nz/~ihaka/downloads/Taupo-handouts.pdf), co-authored by one of the R's in R, with some slight additions and modifications. First we'll do things the hard way with a loop, and then show alternative methods later.
+Before getting to alternative methods, we'll first do things with a standard loop, and then show different options later.  Loops in and of themselves are not a problem in R, nor necessarily slow for some tasks, they just often have more efficient alternatives, whether it be more succinct code, or possibly vastly quicker computation.
 
-### Pre-allocation
+As one of our working examples, we'll start with a function that does a random walk. The code is based on [this document](https://www.stat.auckland.ac.nz/~ihaka/downloads/Taupo-handouts.pdf), co-authored by one of the R's in R, with some slight additions and modifications. 
 
-One thing you'll want to note, if you must use an explicit loop, first create an empty vessel to contain the elements of the loops output, rather than taking an append-as-you-go approach.  The reasoning is similar to the reasoning behind vectorization noted later.  By not having R do some (internal) operations every single iteration, you save time, and it adds up.
-
-In the following we'll compare the random walk both with and witout pre-allocation. Some lines you can use on your own to profile, to see where bottlenecks arise specifically. For the first one I show an example graph. all others will look like some (random) version of that, so are subsequently commented out in the code.
-
-```{r loops}
-# no preallocation
+```{r}
 rw2d_loop_nopre <- function(n) {
   xpos = ypos = 0
   xdir = c(T, F)
@@ -187,7 +182,15 @@ rw2d_loop_nopre <- function(n) {
 
 # rw2d_loop_nopre(1e5) # for profiling
 ggplot2::qplot(x, y, data=rw2d_loop_nopre(1000), geom='path') + lazerhawk::theme_trueMinimal() # plot check
+```
 
+### Pre-allocation
+
+One thing you'll want to note, if you must use an explicit loop, first create an empty vessel to contain the elements of the loops output, rather than taking an append-as-you-go approach.  The reasoning is similar to the reasoning behind <span class="emph">vectorization</span> noted later.  By not having R do some (internal) operations every single iteration, you save time, and it adds up.
+
+In the following we'll compare the random walk both with and witout pre-allocation. I have a line for each function so you can use them for <span class="emph">profiling</span>, to see where bottlenecks arise specifically.  In (newer versions of) RStudio, you can simply highlight that line and hit Ctrl+Alt+Shft+P to do so. Also, for the first demonstration above I showed an example graph, but all others will look like some (random) version of that, so are subsequently commented out in the code.
+
+```{r loops}
 # preallocation
 rw2d_loop_pre <- function(n) {
   xpos = ypos = numeric(n)
@@ -207,19 +210,20 @@ rw2d_loop_pre <- function(n) {
   }
   data.frame(x=xpos, y=ypos)
 }
+
 # rw2d_loop_pre(1e5) # for profiling
 # ggplot2::qplot(x, y, data=rw2d_loop_pre(1000), geom='path')
 
 microbenchmark(rw2d_loop_nopre(1000), rw2d_loop_pre(1000))
 ```
 
+As we can see, even with this quick example pre-allocation is already saving some time.  
 
 ### Smaller code != faster
 
-Note that the goal is fast running code, but this doesn't mean there is a one-to-one correlation between speed and code size.  The following is a recursive version of the above and it's three lines of code.  It is a little faster than the non-pre-allocated loop, but slower than one with pre-allocation.
+Note that the goal is fast running code, but this doesn't mean there is a one-to-one correlation between speed and code size.  The following is a recursive version of the above and it's three lines of code.  It is a little faster than the non-pre-allocated loop, but slower than one with pre-allocation.  I might also mention that R is not really that great for recursive functions in my experience, often 'nesting too deeply' where other languages have no issue.
 
-
-```{r recursive, echo=1}
+```{r recursive}
 rw2d2_recursive <- function(n, x=0, y=0) {
   if(n == 1) return(cumsum(data.frame(x=x, y=y)))
   step = sample(1:4, 1)
@@ -230,16 +234,19 @@ rw2d2_recursive <- function(n, x=0, y=0) {
 
 # cannot be profiled
 # ggplot2::qplot(x, y, data=rw2d2_recursive(1000), geom='path')
+```
 
+```{r loopsCompare, echo=FALSE}
 microbenchmark(rw2d_loop_nopre(1000),
                rw2d_loop_pre(1000),
                rw2d2_recursive(1000))
 ```
-The test above is based on 1000 x,y pairs.  Looks can be deceiving!
+
+Looks can be deceiving!
 
 ### Double loops
 
-Double loops are almost always an inefficient way to use R, especially for common data processing tasks, so if you find yourself using one, you should probably think very hard about possible alternatives.  In this example we create a distance matrix based on Euclidean distance between rows in a given matrix `m`, which for timing demonstration will be a 100 x 100 matrix.
+Double loops are almost always an inefficient way to use R, especially for common data processing tasks, so if you find yourself using one, you should probably think very hard about what alternatives might be possible.  In this example we create a distance matrix based on Euclidean distance between rows in a given matrix `m`, which for timing demonstration will be a 100 x 100 matrix.
 
 ```{r dloops, cache=TRUE}
 doubleLoopDist <- function(m) {
@@ -281,73 +288,178 @@ identical(doubleLoopDist(d), doubleLoopDist2(d))
 microbenchmark(dloop1 = doubleLoopDist(d), dloop2 = doubleLoopDist2(d))
 ```
 
+Later on we'll see just how slow this is when we compare it to the base R <span class="func">dist</span> function, which uses compiled C code.
 
 ## Apply
 
-There is a set of functions in R that typically make explicit loops unnecessary, which reduces programming time, and makes code cleaner. Furthermore, they are parallelizable, and so potentially far faster.  There is a misconception that these functions are faster than loops out-of-the-box, but this is incorrect, and they can even be slower.  Again though, you automatically gain in coding efficiency and possibly gain a lot in computation time.
+A set of functions exists in R that typically make explicit loops unnecessary, and can reduce programming time, and potentially make code cleaner. Furthermore, they are parallelizable, and so potentially far faster.  There is a misconception that these functions are faster than loops out-of-the-box, but this is incorrect, and they technically can even be slower.  Again though, you automatically gain in coding efficiency and possibly gain a lot in computation time with the use of parallelization.
 
 ### apply functions
 
-- apply
-- sapply, lapply
-- tapply
-- mapply
-- replicate
+- <span class="func">apply</span>: arrays, matrices, data.frames
+- <span class="func">lapply</span>, <span class="func">sapply</span>, <span class="func">vapply</span>: lists, data.frames, vectors
+- <span class="func">tapply</span>: grouped operations (table apply)
+- <span class="func">mapply</span>: multivariate version of sapply
+- <span class="func">replicate</span>: similar to sapply
+
+As a simple example, let's estimate some column means. An explicit loop might look like the following.
+```{r colMeansLoop, echo=1:4}
+means_loop = rep(0, ncol(d))  # initialized the means vector
+for (n in 1:ncol(d)){
+  means_loop[n] = mean(d[,n])
+}
+head(means_loop)
+```
+
+```{r colMeansLoopFunc, echo=F}
+# because echoing specific lines doesn't work with notebooks apparently
+means_loop_func <- function(d) {
+  means = rep(0, ncol(d))
+  for (n in 1:ncol(d)){
+    means[n] = mean(d[,n])
+  }
+  means
+}
+```
+
+Let's use the apply function instead.  The primary arguments are a matrix/data.frame, the margin to iterate over (e.g. rows or columns), and the function we want to apply, which in this case is the mean.
+
+```{r  colMeansApply}
+means_apply = apply(d, 2, mean)
+identical(means_loop, means_apply)
+
+```
+
+And that's all there is to it.  A point of emphasis however: *there is no guaranteed speed gain here*, only more succinct code. The following demonstrates using a loop vs. apply on a 1000x1000 matrix. For a simple operation like this, the explicit loop is actually faster.  However, most would not want to write a loop everytime they want column or row means.
+
+```{r colMeansCompare, echo=F}
+x = matrix(rnorm(1e6), ncol=1e3)
+microbenchmark(means_loop = means_loop_func(x), 
+               means_apply = apply(x, 2, mean))
+```
 
 
 ### plyr alternates
 
-All plyr functions work based on the first two letters. For example, ldply takes a list and converts the output to a data.frame.
+The plyr package All plyr functions work based on the first two letters. The first denotes the input, the second the output.  For example, <span class="func">ldply</span> takes a list and converts the output to a data.frame.
 
-- Lists: ldply, llply, laply
+- Lists: <span class="func">ldply</span>, <span class="func">llply</span>, <span class="func">laply</span>
 
-- Arrays: a*ply
+- Arrays: <span class="func">a*ply</span>
 
-- Dataframes: d*ply
+- Dataframes: <span class="func">d*ply</span>
 
-- Multiple arguments: m*ply
+- Multiple arguments: <span class="func">m*ply</span>
+
+As an example will use <span class="func">adply</span> on the column mean example.  The <span class="objclass">d</span> object is a <span class="objclass">matrix</span>, and we'll get a <span class="objclass">data.frame</span> as output.
+
+```{r plyr}
+library(plyr)
+adply(d, 2, mean)
+```
+
+Unfortunately, the flexibility does come at a price, and <span class="pack">plyr</span> functions are very slow.  Using the 1000x1000 matrix again, and using <span class="func">aaply</span> to be more comparable, we see the <span class="pack">plyr</span> function is much slower.
+
+```{r plyrComparison, echo=FALSE}
+microbenchmark(means_loop = means_loop_func(x), 
+               means_apply = apply(x, 2, mean),
+               aaply = aaply(x, 2, mean))
+```
+
+However, there is comparable functionality for <span class="objclass">data.frames</span> in <span class="pack">dplyr</span> that would be much faster.
 
 
 ### Parallel versions
 
-parApply, parLapply etc.
+Another thing that puts the apply approach ahead of loops regards parallelization.  Most of the base R apply functions have par* counterparts, e.g. parApply, parLapply etc.  This is also the case for plyr functions, which have a `.parrallel=TRUE` argument.  Example code would like the following.
 
-for plyr, use the argument `.parallel=TRUE`
+```{r parDemo, eval=FALSE}
+x = matrix(rnorm(1e7), ncol=1e6)
+library(parallel)
+cl = makeCluster(8)
+clusterExport(cl, 'x')
+means = parApply(cl, x, 2, mean)
+stopCluster(cl)
+```
+
+For the plyr functions, one needs to use the foreach package and register the cluster, and supply the `.parallel` argument.  It's still exceedingly slow, and whatever it's doing is not an optimal use of parallelization, so I suggest avoiding plyr's implementation.  
+
+```{r parPlyr, eval=FALSE}
+library(foreach); library(doParallel)
+library(parallel)
+cl = makeCluster(12)
+registerDoParallel(cl)
+means = aaply(x, 2, mean, .parallel = T, .paropts = list(.export='x'))
+stopCluster(cl)
+```
 
 
+```{r multidplyr, eval=FALSE}
+library(multidplyr)
+```
 
+
+For something simple like this, there isn't going to be much gained in going parallel. And this is an important point to note: *using more cores does not necessarily mean more speed*, and this is especially the case when spreading operations across machines.  Had I used 12 instead of 8 on my machine, the difference would have been negligible.  I should also note that none of these approaches is nearly as fast as we could get with a built-in R function, colMeans.
+
+```{r parallelComparison, echo=FALSE, eval=FALSE}
+parallelComparison = microbenchmark(means_loop = means_loop_func(x), 
+                                    means_apply = apply(x, 2, mean),
+                                    parallelMeans = parApply(cl, x, 2, mean), times=10)
+save(parallelComparison, file='data/parallelComparison.RData')
+stopCluster(cl)
+```
+
+
+```{r loadParallelComparison, echo=FALSE}
+load('data/parallelComparison.RData')
+parallelComparison
+```
 
 
 ## Using faster languages
 
 ### Base R internals
 
-Much of base R is not written in R, but much faster languages such as C, C++ and Fortran, and using those functions can lead to enormous speed gains.  Relative to an explicit loop that does the same thing, there is no comparison to a base R function that's calling internal C or other code.  Not only will the built-in function run faster, but your code will be more succinct.
+Much of base R is not written in R, but much faster languages such as C, C++ and Fortran, and using those functions can lead to enormous speed gains.  Relative to an explicit loop that does the same thing, there is no comparison to a base R function that's calling internal C or other code.  Not only will the built-in function run faster, but your code will be more succinct because you're making a single function call as opposed to an explicit loop.
 
-As an example let's compare the previous double loops to the base R function dist.
+As an example let's compare the previous double loops to the base R function <span class="func">dist.</span>
 
 ```{r echo=FALSE}
-microbenchmark(dloop = doubleLoopDist(d), dloop2=doubleLoopDist2(d), dist= dist(d, diag = T, upper = T))
+microbenchmark(dloop = doubleLoopDist(d), 
+               dloop2=doubleLoopDist2(d), 
+               dist= dist(d, diag = T, upper = T))
 ```
 
 
-If there are actually only two columns though, dist would be slower due to some preliminary checks and calculations that sum and sqrt functions do not have to make (note that these timings are in **micro**seconds).
+If there are actually only two columns though, dist would be slower due to some preliminary checks and calculations that <span class="func">sum</span> and <span class="func">sqrt</span> functions do not have to make (note that these timings are in **micro**seconds). 
 
 ```{r distfor2col, echo=FALSE}
 microbenchmark(dist= dist(d[,1:2]), sqrtsum = sqrt(sum((d[,1] - d[,2])^2)))
 ```
 
+Again, when there isn't much to optimize, don't waste time figuring out how to do so.
+
+> Premature optimization is the root of all evil <br>
+> \~ DonaldKnuth
+
+
+As another example, let's use the <span class="func">colMeans</span> function on that large 10 x 1000000 matrix we used before.
+
+```{r colmeans, echo=FALSE}
+rbind(parallelComparison, microbenchmark(colMeans = colMeans(x)))
+```
+
+That's *microseconds*, and it means using the compiled C in the <span class="func">colMeans</span> function is way faster than even parallelizing.
 
 
 ### Rcpp
 
-We can potentially take advantage of the power of C++ in some cases, by using the Rcpp package. 
+We can potentially take advantage of the power of C++ explicitly within R, by using the Rcpp package. Many R packages do so.
 
-```{r cache=T}
+```{r cache=F}
 library(Rcpp)
 
-distC =
-cppFunction('
+distC = cppFunction('
 NumericMatrix distC(NumericMatrix x) {
   int n = x.nrow();
   NumericMatrix out(n, n);
@@ -403,11 +515,12 @@ rw2d2_vec_ifelse <- function(n) {
 #                rw2d2_vec_ifelse(1000))
 
 
-rw2d2_vec_ifelse <- function(n) {
+# dplyr if_else can be faster if there are many operations
+rw2d2_vec_ifelse2 <- function(n) {
   steps = sample(c(-1, 1), n-1, replace=T)
   xdir = sample(c(T, F), n-1, replace=T)
   xpos = c(0, cumsum(if_else(xdir, steps, 0)))
-  ypos = c(0, cumsum(ifelse(xdir, 0, steps)))
+  ypos = c(0, cumsum(if_else(xdir, 0, steps)))
   data.frame(x=xpos, y=ypos)
 }
 
@@ -418,25 +531,23 @@ rw2d2_vec_noifelse <- function(n) {
   ypos = c(0, c(0, 0, -1, 1)[dir])
   cumsum(data.frame(x=xpos, y=ypos))
 }
-rw2d2_vec_noifelse(1e7)
-ggplot2::qplot(x, y, data=rw2d2_vec_noifelse(1000), geom='path')
-microbenchmark(rw2d_loop_nopre(1000),
-               rw2d_loop_pre(1000),
-               rw2d2_vec_ifelse(1000),
-               rw2d2_vec_noifelse(1000))
 
-ggplot2::autoplot(
-microbenchmark(rw2d_loop_nopre(1000),
-               rw2d_loop_pre(1000),
-               rw2d2_vec_ifelse(1000),
-               rw2d2_vec_noifelse(1000),
-               rw2d2_recursive(1000))
-)
+# ggplot2::qplot(x, y, data=rw2d2_vec_noifelse(1000), geom='path')
+microbenchmark(rw2d_loop_nopre(10000),
+               rw2d_loop_pre(10000),
+               rw2d2_vec_ifelse(10000),
+               rw2d2_vec_ifelse2(10000),
+               rw2d2_vec_noifelse(10000))
+
+# ggplot2::autoplot(
+# microbenchmark(rw2d_loop_nopre(1000),
+#                rw2d_loop_pre(1000),
+#                rw2d2_vec_ifelse(1000),
+#                rw2d2_vec_noifelse(1000),
+#                rw2d2_recursive(1000))
+# )
 
 
-# while ifelse is slow, we do have another alternative.
-
-dplyr::if_else()
 ```
 
 
@@ -446,10 +557,10 @@ dplyr::if_else()
 
 # Matrix operations
 
-Consider a linear combination to produce model predictions. We multiply each column by a coefficient and sum them.
+Consider a linear combination to produce model predictions as in a standard regression model. We multiply each column by a coefficient and sum them.
 
 
-```{r}
+```{r lincom}
 b = runif(11) # first value is the intercept
 
 X = matrix(rnorm(100000), ncol=10)
@@ -459,26 +570,87 @@ lincom1 = b[1] + b[2]*X[,1] + b[3]*X[,2] + b[4]*X[,3] + b[5]*X[,4] + b[6]*X[,5] 
 
 We can use matrix multiplication to produce the same result.  In addition, the biggest gain here is programming time.  Matrix multiplication takes far less to code up.
 
-```{r}
+```{r lincomMatrix}
 X = cbind(1, X) # add intercept column
 lincom2  = X %*% b
 ```
 
 However, even within matrix operations there might be faster ways to do it. In this case, crossprod is slightly faster.
 
-```{r}
+```{r lincomCrossprod}
 lincom3 = tcrossprod(X, t(b))
-```
 
-Let's time them.
-
-```{r}
-microbenchmark(lc1 = b[1] + b[2]*X[,1] + b[3]*X[,2] + b[4]*X[,3] + b[5]*X[,4] + b[6]*X[,5] + b[7]*X[,6] + b[8]*X[,7] + b[9]*X[,8] + b[10]*X[,9] + b[11]*X[,10],
-               lc2 = X %*% b,
-               lc3 = tcrossprod(X, t(b)))
 identical(lincom1, c(lincom2))
 identical(lincom2, lincom3)
 ```
 
+Let's time them.
 
-They all produce identical output, but using a matrix operation is over 4 times as fast as the simple sum, and crossprod over 11 times as fast.  Programming time is quicker also.
+```{r lincomTime, echo=FALSE}
+microbenchmark(lc1 = b[1] + b[2]*X[,1] + b[3]*X[,2] + b[4]*X[,3] + b[5]*X[,4] + b[6]*X[,5] + b[7]*X[,6] + b[8]*X[,7] + b[9]*X[,8] + b[10]*X[,9] + b[11]*X[,10],
+               lc2 = X %*% b,
+               lc3 = tcrossprod(X, t(b)))
+```
+
+
+They all produce identical output, but using a matrix operation is over 4 times as fast as the simple sum, and crossprod over 11 times as fast.  Programming time is quicker also.  
+
+
+Even how we do the matrix operations can have an effect. The following examples use various means to estimate a standard linear regression model.  We'll start with just the base R lm function.  The next is the lm.fit function, which is what lm uses, but after a lot of pre- and post-processing of the data.  After that we use basic matrix multiplication, a grouped version of it, followed by use of the crossprod function.
+
+```{r matrixLM}
+set.seed(1234)
+n = 10000000                   # sample size
+x = rnorm(n)                   # covariate
+y =  5 + 2*x + rnorm(n)        # target
+X = cbind(1, x)                # model.matrix
+
+
+# lm
+lm_base  = lm(y ~ x)
+
+# use the underlying fit function
+lm_fit  = lm.fit(X, y)
+
+# normal equations to get coefficients
+matrix_raw = solve(t(X) %*% X) %*% t(X) %*% y
+
+matrix_grouped = solve(t(X)%*%X) %*% (t(X) %*% y)
+
+# crossprod approach
+matrix_crossprod = crossprod(solve(crossprod(X)), crossprod(X,y))
+
+cbind(cbind(lm_base=coef(lm_base), 
+      lm_fit=coef(lm_fit), 
+      matrix_raw=matrix_raw[,1],
+      matrix_grouped=matrix_grouped[,1],
+      matrix_crossprod=matrix_crossprod[,1]))
+```
+
+```{r matrixlmComparisonsConstruct, echo=FALSE, eval=FALSE}
+matrixlm = microbenchmark(lm_base  = lm(y ~ x), 
+                          lm_fit  = lm.fit(X, y),
+                          matrix_raw = solve(t(X) %*% X) %*% t(X) %*% y,
+                          matrix_grouped = solve(t(X)%*%X) %*% (t(X) %*% y),
+                          matrix_crossprod = crossprod(solve(crossprod(X)), crossprod(X,y)), times=10)
+
+save(matrixlm, file='data/matrixlm.RData')
+```
+
+We can see above that these approaches all procuce the same results, but take very different amounts of time to complete. We get a significant gain if we reduce the lm overhead, where lm.fit is almost 10x faster. We can halve that by using matrix operations, and even get a slight gain if we group them a certain way.  This reduces memory usage as well.  The idea is that if we go from `solve(t(X)%*%X)` and post multiply by `t(X)`, we're dealing with a 2 x `r n` matrix. If we first `t(X) %*% y`, we're now just multiplying a 2x2 matrix with a 2x1 matrix.
+
+```{r matrixlmComparisonsDisplay, echo=FALSE, eval=TRUE}
+load('data/matrixlm.RData')
+matrixlm
+```
+
+
+# Other R builds
+
+[Microsoft Open R](https://mran.revolutionanalytics.com/open/) While the build is a bit behind, the current version of R
+
+
+# Summary
+
+> "Programmers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered. We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that critical 3%." <br>
+\~ Donald Knuth
