@@ -165,6 +165,17 @@ microbenchmark(read_csv = read_csv('data/testreadr.csv', progress = F),
                read_feather = read_feather('data/testfeather.feather'), times=20)
 ```
 
+# Data Structures
+
+While data.frames are probably the most commonly used data structures in R, they are very slow to work with.  Packages 
+
+For Flux, one thing that should be added is to use data on local disk
+rather than a network volume wherever possible.  For many small files,
+this can increase speed by a factor of 3 or more with not other
+changes.  For large files, it can vary from twice as fast as unbusy,
+high-speed network storage to more than ten times as fast if the
+storage in on a hammered, slow NFS server, or going over a slow
+network connection with many hops.
 
 
 # Loops and Alternatives
