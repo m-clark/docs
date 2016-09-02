@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+docs.Rproj
+lord/art/senn*
+lord/art/1983*
+fasterR/data/testchunk.csv
