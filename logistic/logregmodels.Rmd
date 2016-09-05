@@ -76,6 +76,7 @@ $$ \textrm{Logit} = X\beta $$
 
 The transformation function, or <span class="emph">link function</span>, of interest is the <span class="emph">logistic</span> link, hence the name logistic regression. Probabilities are inherently nonlinear, e.g. the change from .05 to .10 is a doubling of the probability, while that from .50 to .55 is only a 10% increase. To engage in a linear model, the logistic link transforms the probability response to the logit.  Converting back to the probability scale requires the inverse logistic function, which might be depicted in different ways.
 
+<a id="binpred"></a> 
 $$ \pi = \textrm{Logit}^{-1}$$
 $$ \pi = \frac{1}{1+e^{-XB}}, \textrm{or}$$
 $$ \pi = \frac{e^{XB}}{1+e^{XB}}$$
@@ -111,6 +112,7 @@ Logit = plogis(LP)
 Probit = pnorm(LP)
 Probit_t = extraDistr::pnst(LP, df=1)
 Extreme = exp(-exp(-LP))  # Generalized EV, with shape parameter = 0 (Gumbel) = cloglog
+# qplot(LP, exp(-LP)*exp(-exp(-LP)), geom='line') # density function
 # Cloglog = 1-exp(-exp(LP))
 dlinks = tidyr::gather(data_frame(`Linear Predictor`=LP,Logit,Probit, `T`=Probit_t, 
                                   `Extreme Value`=Extreme),  #, Cloglog
@@ -285,11 +287,12 @@ $$ \mathcal{L} = \ln(\frac{e^{X_{y=1}\beta}}{\sum_{k=1}^N e^{Z_k\beta}})$$
 
 The Bradley-Terry model (BT henceforth) is one in which we look to model pairwise rankings. For example, if one were to choose among various brands of some product they might select between two products at a time.  In the simplest case, the BT model posits the probability product $i$ is chosen over product $j$ as:
 
-$$\pi_{ij} = \frac{\exp(\beta_i)}{\exp(\beta_i)+\exp(\beta_j)}$$
-$$\pi_{ij} = \frac{\exp(\beta_i-\beta_j)}{1+\exp(\beta_i-\beta_j)}$$
+$$\pi_{i>j} = \frac{\exp(\beta_i)}{\exp(\beta_i)+\exp(\beta_j)}$$
+$$\pi_{i>j} = \frac{\exp(\beta_i-\beta_j)}{1+\exp(\beta_i-\beta_j)}$$
+$$\mathrm{Logit}(\pi_{i>j})  = \log(\frac{\pi_{i>j}}{1 - \pi_{i>j}}) = \log(\frac{\pi_{i>j}}{\pi_{j>i}}) = \beta_i - \beta_j$$
 
 
-It turns out the BT model has a connection to the standard logistic model. We start by creating a model matrix where each column is 1 if that item is chosen, -1 if it isn't, and zero if it is not considered. Our response in this case is simply positive values. Once constructed we can run the standard logistic model, and I do so with a custom function to demonstrate the differencing, and with the glm function.
+Thus it turns out the BT model has a connection to the standard logistic model, though we'll have to set up hte data in a specific manner for comparison. We start by creating a model matrix where each column is 1 if that item is chosen, -1 if it isn't, and zero if it is not considered. Our response in this case is simply positive values. 
 
 ```{r BTdatasetup, echo=F}
 logreg = function(par, X, y){
@@ -303,7 +306,7 @@ BTdat = data.frame(item1 = c(-1, rep(1,7), rep(0,4)),
                    item3 = c(1,-1,-1,-1, rep(0,4), -1,1,1,1),
                    y=1)
 
-DT::datatable(BTdat,rownames=F, style='bootstrap',  options=list(dom='t'), width=400)
+DT::datatable(BTdat,rownames=F, style='bootstrap',  options=list(dom='t', pageLength=12), width=400)
 ```
 
 ```{r BTglm}
@@ -312,13 +315,16 @@ DT::datatable(BTdat,rownames=F, style='bootstrap',  options=list(dom='t'), width
 glmmod = glm(y ~ -1 + ., data=BTdat[,c(2,3,1,4)], family=binomial)  
 coef(glmmod)
 
-# using logreg function in appendix; here we get all coef values before differencing
+# using logreg function in appendix;
 out = optim(rep(0,3), logreg, X=as.matrix(BTdat[,-4]), y=BTdat$y, method='BFGS')
-out$par
-out$par[2:3]-out$par[1]  # same as glm
+out$par                  # default chooses item 3 as reference
+out$par[2:3]-out$par[1]  # now same as glm with item 1 as reference
 ```
 
-For the BT model we need a different data structure, and will have a binary response where 1 represents that comparison the first comparison item was chosen. We can see that all results are the same.  The following uses the <span class="pack">BradleyTerry2</span> package and compares the results to the standard logistic both with our custom function and the glm result.
+Once constructed we can run the standard logistic model, and I do so with a custom function, and with the glm function.  For identification, one of the parameters must be set to zero, which glm just simply drops out.  By default the optim output settles on the third item as the reference (as would glm[^btaslogreg]).
+
+For the BT model we need a different data structure, and will have a binary response where 1 represents that comparison the first comparison item was chosen. I show the first few rows here.
+
 
 ```{r BTdatasetup2, echo=F}
 # create data format for BT2 package, y is 1 = winner
@@ -330,8 +336,11 @@ BTdat2 = BTdat2 %>%
   mutate(comp1=factor(comp1, levels=c('item1','item2','item3')),
          comp2=factor(comp2, levels=c('item1','item2','item3')))
 
-DT::datatable(BTdat2,rownames=F, style='bootstrap',  options=list(dom='t'), width=300)
+DT::datatable(BTdat2,rownames=F, style='bootstrap',  options=list(dom='t', pageLength=6), width=300)
 ```
+
+The following uses the <span class="pack">BradleyTerry2</span> package and compares the results to the standard logistic both with our custom function and the glm result.
+
 
 ```{r BTcomparison, echo=-7}
 library(BradleyTerry2)
@@ -343,7 +352,10 @@ btmod = BTm(y, comp1, comp2, data = BTdat2)
 data.frame(optim=out$par[2:3]-out$par[1], glm=coef(glmmod)[-3], BT=coef(btmod)) %>% round(5)
 ```
 
-The output parameters from the model thus tells us the coefficient *difference* from some reference group coefficient, in much the same way interactions in standard linear models do.  This will pop up again when we talk about individual specific effects in multinomial choice models. Note also the BT model is generalizable to counts, just like binary logistic is a special case of binomial regression more generally.  Also, the BT model can handle ties, and choice specific covariates, but at that point we're in the realm of multinomial regression, so we'll turn to that now.
+
+We can see that all results are the same.  Once again the output parameters from the model thus tells us the coefficient *difference* from some reference group coefficient.  Using the inverse logit transform tells us the probability of selecting that item relative to the reference group, but as noted previously, that transformation applied to any difference of the coefficients tells us that probability.  For example, with Item 1's parameter set to zero, the probability of choosing Item 1 vs. Item 2 is `plogis(0-(-2.83894))` `r round(plogis(0-(-2.83894)),3)`, which you can confirm by applying the <span class="func">fitted</span> function to the <span class="objclass">btmod</span>.  
+
+Note also the BT model is generalizable to counts, just like binary logistic regression is a special case of binomial regression more generally.  Also, the BT model can handle ties, and choice specific covariates, but at that point we're in the realm of multinomial regression, so we'll turn to that now.
 
 
 
@@ -351,12 +363,15 @@ The output parameters from the model thus tells us the coefficient *difference* 
 
 # More than two
 
-In many situations the variables of interest have more than two categories, and as such the standard binary approach will not be the best approach. In the simplest case, we might have the same interpretation, but as we will see things can be notably extended from that.
+In many situations the variables of interest have more than two categories, and as such the standard binary approach will not be the best approach[^mach]. In the simplest case, we might have the same interpretation, but as we will see things can be notably extended from that.
 
 
 ## Multinomial Logistic Regression
 
-We'll start with another example from the [UCLA ATS website](http://www.ats.ucla.edu/stat/stata/dae/mlogit.htm) (the example is done in Stata there for those interested). 200 entering high school students make program choices: general program, vocational program and academic program. We will model their choice using their writing score as a proxy for scholastic ability and their socioeconomic status (categorical variable of low, middle, and high).  
+
+### A starting point
+
+We'll start with another example from the [UCLA ATS website](http://www.ats.ucla.edu/stat/stata/dae/mlogit.htm) (the example there is done with Stata for those interested). 200 entering high school students make program choices: general program, vocational program and academic program. We will model their choice using their writing score as a proxy for scholastic ability and their socioeconomic status, a categorical variable of low, middle, and high values.  
 
 ```{r echo=3, eval=T}
 # haven gets entirely too cute with what is a simple data set
@@ -365,50 +380,260 @@ program = foreign::read.dta('data/hsbdemo.dta')
 program$prog <- relevel(program$prog, ref = "academic")
 ```
 
-As there are three categories we no longer use the glm function.  There are a few packages available, I'll use the <span class="pack">mlogit</span> package.  I should also mention that it has a very extensive vignette that is worth perusal.  See also the <span class="pack">mnlogit</span> package, which has a faster implementation.
+As there are three categories we no longer use the glm function, which does not have the multinomial as a possible value to the 'family' argument.  There are a few packages available we could use, and here I'll use the <span class="pack">mlogit</span> package[^mnlogit].  I should also mention that it has a very extensive vignette that is worth perusal, at least part of which has been incorporated into later discussion.  
 
-Let's run the model to predict program choice. Because of the <span class="pack">mlogit's</span> modeling flexibility, the data either has to have a specific structure or be told what the structure is. This oddly means that one can apparently not use it directly for a standard multinomial model without pre-processing, and it's not the most intuitive process. The gist is that the all choices must be represented for each individual, along with a variable that represents the actual choice made. Those familiar with mixed models, e.g. with longitudinal data, will note this as *long* format.
+Let's run the model to predict program choice. Because of the <span class="pack">mlogit's</span> modeling flexibility, the data either has to have a specific structure or be told what the structure is. This oddly means that one can apparently not use it directly for what some might consider the standard multinomial model without pre-processing, and it's not the most intuitive approach to get it into the proper format with the <span class="func">mlogit.data</span> function. The gist is that the all choices must be represented for each individual, along with a variable that represents the actual choice made. Those familiar with mixed models, e.g. with longitudinal data, will note this as *long* format.
 
-```{r mlogit_data_proc, echo=c(1,2,4)}
+Original: 
+
+```{r mlogit_data_orig, echo=FALSE}
+DT::datatable(program[,1:7], options=list(dom='t', pageLength=5), style='bootstrap', rownames=F, width=600)
+```
+
+<br>
+Long format:
+
+```{r mlogit_data_proc, echo=F}
 library(mlogit)
-head(program[,1:5])
+
 programLong = program %>% 
   select(id, prog, ses, write) %>% 
   mlogit.data(data=, shape='wide', choice='prog', id.var='id')
-head(programLong)
+DT::datatable(programLong, options=list(dom='t', pageLength=5), style='bootstrap', width=600, rownames=F)
 ```
 
 The program variable is now just a logical variable that notes which of the alternatives, i.e. the `alt` variable, was chosen. The reason for this data format is that it would allow for alternative specific variables to come into the model as well, something we will see later.
 
-Keeping with our previous formulation: 
+Keeping with our previous formulation, we can see the model as a *set* of logistic regression models for the probability of some category vs. a reference category.  Here we'll choose the reference category as academic.
 
-$$\ln\left(\frac{\pi_{\textrm{prog=general}}}{\pi_{\textrm{prog=academic}}}\right) = b_{0\_\mathrm{gen}} + b_{1\_\mathrm{gen}}write + b_{3\_\mathrm{gen}}\textrm{ses}_\textrm{middle} + b_{4\_\mathrm{gen}}\textrm{ses}_\textrm{high}$$
-$$\ln\left(\frac{\pi_{\textrm{prog=vocation}}}{\pi_{\textrm{prog=academic}}}\right) = b_{0\_\mathrm{voc}} + b_{1\_\mathrm{voc}}write + b_{3\_\mathrm{voc}}\textrm{ses}_\textrm{middle} + b_{4\_\mathrm{voc}}\textrm{ses}_\textrm{high}$$
+$$\ln\left(\frac{\pi_{\textrm{prog=general}}}{\pi_{\textrm{prog=academic}}}\right) = b_{0\_\mathrm{gen}} + b_{1\_\mathrm{gen}}\mathrm{write} + b_{3\_\mathrm{gen}}\textrm{ses}_\textrm{middle} + b_{4\_\mathrm{gen}}\textrm{ses}_\textrm{high}$$
+$$\ln\left(\frac{\pi_{\textrm{prog=vocation}}}{\pi_{\textrm{prog=academic}}}\right) = b_{0\_\mathrm{voc}} + b_{1\_\mathrm{voc}}\mathrm{write} + b_{3\_\mathrm{voc}}\textrm{ses}_\textrm{middle} + b_{4\_\mathrm{voc}}\textrm{ses}_\textrm{high}$$
+
+
+So our interpretation will be as before, it's just that we'll have to interpret K-1 sets of parameters for K total categories. Let's go ahead and run the model.
 
 ```{r}
 multi_mod = mlogit(prog ~ 1|write + ses, data=programLong)
 summary(multi_mod)
 ```
 
-Note that we get two sets of output. You can think of it as you would two separate binary logistic regressions, one where academic is the reference group and general the positive value, and another model that also has academic as the reference group and vocational as the positive value.  We see statistically notable effects of write and high ses (low ses is the reference category).  The general interpretation would similar to before, but sometimes the expontiated values are referred to *relative risk* rather than an odds ratio. It is no longer $\pi/(1-\pi)$, but a ratio of two relative probabilities (one group vs. an arbitrary reference group), hence the name relative risk (the 'risk' comes from biostats where the event of interest is usually something like death, disease, etc.).
+Note that we get two sets of output. You can think of it as you would two separate binary logistic regressions, one where academic is the reference group and general the positive value, and another model that also has academic as the reference group and vocational as the positive value.  We see statistically notable effects of write and high ses (low ses is the reference category).  The general interpretation would similar to before, but sometimes the expontiated values are referred to *relative risk* rather than an odds ratio. It is no longer $\pi/(1-\pi)$, but a ratio of two relative probabilities (one group vs. an arbitrary reference group), hence the name relative risk (the 'risk' comes from biostats where the event of interest is usually something like death, disease, etc.)[^rrr].
 
-As we move up one score on the variable write, we would see a decrease of `r round(coef(multi_mod)[3],3)` in the log probability of choosing the general program relative to the academic.  In other words, higher write scores are associated with a more likely choosing of the academic program instead of the general. The same goes for the vocational group, but is stronger, i.e. we're even more likely to select the academic program over the vocational with an increase in write score.
+As we move up one score on the variable write, we would see a decrease of `r round(coef(multi_mod)[3],3)` in the log probability of choosing the general program relative to the academic.  In other words, higher write scores are associated with a more likely choosing of the academic program instead of the general. The same goes for the vocational group, but it is stronger, i.e. we're even more likely to select the academic program over the vocational with an increase in write score.
 
-It is important to note that we don't actually know what the overall effect of write is due to the relative nature of the model.  Let's plot the predictions so that we can understand it better. In the following, ses is fixed to be 'middle'.
+It is important to note that the output doesn't tell us the overall effect of write is due to the relative nature of the model.  Let's plot the predictions so that we can understand it better. In the following, ses is fixed to be 'middle'.
 
 ```{r plotmultinom, echo=FALSE}
-preddata = data.frame(write=c(replicate(3, seq(min(program$write), max(program$write), length.out=90))), ses=factor('middle', levels=levels(program$ses)))
+preddata = data.frame(write=c(replicate(3, seq(min(program$write), max(program$write), length.out=90))),
+                      ses=factor('middle', levels=levels(program$ses)))
 preddata = data.frame(preddata, predict(multi_mod, newdata=arrange(preddata, write), returnData=T))
-preddata %>% 
-  select(-ses) %>% 
-  gather(key=outcome, value=probability, -write) %>% 
+
+preddata %>%
+  select(-ses) %>%
+  gather(key=outcome, value=probability, -write) %>%
+  arrange(write) %>%
   ggplot(aes(x=write,y=probability, color=outcome)) +
   geom_line(lwd=1) +
   theme_trueMinimal()
 ```
 
-So the general interpretation of the effect of write would be that higher scores increase the probability of choosing the academic program, decrease the probability of choosing the vocational program, and have no effect on choosing the general program.
+So the general interpretation of the effect of write would be that higher scores increase the probability of choosing the academic program, decrease the probability of choosing the vocational program, and have no effect on choosing the general program.  Here are predictions for all three ses levels.
 
+
+```{r plotmultinom2, fig.width=8, fig.height=3, echo=FALSE}
+preddata = data.frame(write=c(replicate(3, seq(min(program$write), max(program$write), length.out=90))), 
+                      ses=factor(rep(levels(program$ses), t=90), levels(program$ses)))
+preddata = data.frame(preddata, predict(multi_mod, newdata=arrange(preddata, write), returnData=T))
+
+preddata %>% 
+  gather(key=outcome, value=probability, -write, -ses) %>% 
+  ggplot(aes(x=write,y=probability, color=outcome)) +
+  geom_line(lwd=1) +
+  facet_grid(~ses) +
+  theme_trueMinimal()
+```
+
+
+
+### Utility Maximization
+
+In general we can consider the bi/multinomial logistic model from the perspective of utility maximization, in which a person (or whatever the unit of observation is) selects the choice that will provide most utility to them[^utility]. The probability a person will choose alternative $i$, $\pi_i$, given some utility over all other alternatives $j$, can be formulated as:
+
+$$ \pi_i = \textrm{Prob}(U_i > U_{\forall j\neq i)}$$
+
+Note that the actual value of utility doesn't matter, just the difference.  So comparing choice $i$ vs. some specific category $j$:
+
+$$ \pi_i = \textrm{Prob}(U_i - U_j > 0)$$
+
+
+The fact that only differences matter has implications for how we estimate the model. Consider the utility for category 1 and 2 we have the typical linear combination we've seen before.  Here we'll assume X is an individual level covariate, say age. There might be other covariates as well, but we'll just focus on this one.
+
+$$U_1 = \dots + b^1_1\mathrm{Age} + \epsilon_1$$
+$$U_2 = \dots + b^1_2\mathrm{Age} + \epsilon_2$$
+
+If we try to estimate the probability U_2 - U_1 > 0, the age variable doesn't change for the individual and thus would drop out.  However, we can set the $b^1_1$ to zero and we end up with the following:
+
+$$\begin{align}
+U_1 &= \dots + \epsilon_1 \\
+U_2 &= \dots + b_2\mathrm{Age} + \epsilon_2
+\end{align}$$
+
+And $b_2$ now represents the difference $b^1_2 - b^2_2$.  The interpretation of the coefficient isn't the effect of age on the utility of choice 2, but rather on the utility of choice 2 relative to choice 1.  We can also see this in terms of the predicted probabilities.  Recall our previous depiction for the [binary outcome case](#binpred).  Now the probability of selecting choice $i$ is:
+
+$$ \frac{e^{X\beta_i}}{\Sigma^J_{j=1}e^{X\beta_j}}$$
+
+
+If the first set of coefficients is zero, then it becomes:
+
+$$ \pi_1 = \frac{1}{1 + \Sigma^J_{j=2}e^{X\beta}} \quad \tiny\textrm{(choice 1)}$$
+$$ \pi_{i \neq 1} = \frac{e^{X\beta_i}}{1 + \Sigma^J_{j=2}e^{X\beta_j}}  \quad \tiny\textrm{(others)}$$
+
+
+
+### Alternative specific covariates
+
+Consider the following situation in which we have several possible outcomes[^mlogit] chosen by individuals.
+
+- There are *alternative specific* variables $x_{ij}$ with generic coefficient $\beta$
+- There are *individual specific* variables $z_i$ with alternative specific coefficients $\gamma_j$
+- There are *alternative specific* variables $w_{ij}$ with alternative specific coefficients $\delta_j$
+
+As an example, we have the following data on travel mode choice for travel between Sydney and Melbourne, Australia to help further clarify the nature these types of variables. We have a data frame containing 840 observations on 4 modes for 210 individuals.
+
+- individual: Factor indicating individual with levels 1 to 200.
+- mode: Factor indicating travel mode with levels "car", "air", "train", or "bus".
+- choice: Factor indicating choice with levels "no" and "yes".
+- wait: Terminal waiting time, 0 for car.
+- vcost: Vehicle cost component.
+- travel: Travel time in the vehicle.
+- gcost: Generalized cost measure.
+- income: Household income.
+- size: Party size.
+
+It looks like the following:
+
+```{r, message=FALSE, echo=FALSE}
+library(mlogit)
+data(TravelMode, package='AER')
+head(TravelMode, 10)
+```
+
+In this case income and size are individual specific variables. vcost and travel time are alternative specific. For vcost we want a generic coefficient and for travel time an alternative specific coefficient.
+
+So the conceptual model for the *utility* or *satisfaction index* for alternative $j$ (with intercepts $\alpha$) is:
+$$V_{ij} = \alpha_j + \beta x_{ij} + \gamma_jz_i + \delta_jw_{ij}$$
+
+Common names for some models pertaining to such data are:
+
+*multinomial logit*: in this case we have only individual specific covariates
+
+*conditional logit*: we have only alternative specific covariates
+
+*mixed logit*: has both kinds of variables.
+
+Unfortunately, *conditional logit* also refers to a type of model for longitudinal data, and *mixed logit* might be short for a mixed effects model with random effects. Personally, I'm not sure why people refer to models based on their link function, as if that was descriptive enough. These models are sometimes used with other link functions, e.g. probit, and so the exact same model has to be called yet another name. But I digress. The point is you need to be careful and make sure the model is clear.
+
+```{r}
+library(mlogit)
+data('Train', package='mlogit')
+Tr <- mlogit.data(Train, choice = "choice", shape = "wide",
+                     varying = 4:11, alt.levels = c(1,2), sep = "", id='id')
+head(Tr)
+
+library(dplyr)
+Tr$price= Tr$price/100*2.20371
+Tr$time = Tr$time/60
+
+ml.train = mlogit(choice ~ price + time + change + comfort | 0, data=Tr)
+summary(ml.train)
+```
+
+
+### Extensions
+
+Nested logit
+
+
+
+## Ordinal
+
+### Extensions
+
+gologit
+
+
+## Other
+
+### Distributions
+As Bernoulli is to the binomial, so is the *categorical* distribution, commonly referred to as such in computer science, to the multinomial distribution. In other words, if only one choice among several is made (i.e. we're not dealing with counts), then we have the categorical distribution.
+
+beta binomial
+
+### Logit transformation
+logistic transform = logit probability = softmax = sigmoid
+
+### Probit
+
+### IRT
+
+### Logistic growth curves
+
+### Loss functions
+
+In the above we have assumed a standard likelihood approach
+
+
+# Appendix
+
+## Maximum likelihood estimation 
+
+### Binomial logistic model
+
+```{r logreg_maxlike, eval=T, collapse=TRUE}
+logreg = function(par, X, y){
+  L = X %*% par
+  -sum(dbinom(y, size=1, prob=plogis(L), log=T))
+}
+
+mm = model.matrix(mod)
+resp = admission$admit
+inits = rep(0, 4)
+out = optim(inits, logreg, X=mm, y=resp)
+cbind(out$par, coefs) %>% round(2)
+```
+
+
+### Conditional logistic model
+
+```{r condlogreg_maxlike, code_folding='hide', eval=T}
+condlogreg = function(par, X, y){
+  idx = y==1
+  L1 = X[idx,] %*% par
+  L2 = X[!idx,] %*% par
+  L3 = (X[idx,] - X[!idx,]) %*% par
+  
+  # the following are all identical
+  -sum(log(exp(L1)/(exp(L1)+exp(L2))))
+  -sum(log(exp(L3)/(1+exp(L3))))
+  -sum(dbinom(y[idx], size=1, prob=plogis(L3), log=T))
+}
+
+
+# create 1:1 matching
+infert2 = infert %>% group_by(stratum) %>% slice(1:2)
+mm = model.matrix(glm(case ~ spontaneous + induced, data = infert2, family = binomial))
+mm = mm[,-1]   # no intercept
+resp = infert2$case
+inits = rep(0, 2)     # initial values
+out = optim(inits, condlogreg, X=mm, y=resp)
+coefs = coef(clogit(case ~ spontaneous + induced + strata(stratum), data = infert2))
+cbind(out$par, coefs) %>% round(2)
+```
+
+
+### Multinomial logistic model
+
+#### Individual varying only
 
 ```{r multinomMaxLike}
 multinomregML <- function(par, X, y) {
@@ -488,161 +713,22 @@ out$value
 
 
 
-### Utility Maximization
-
-In general we can consider the multinomial model from the perspective of utility maximization, in which a person (or whatever the unit of observation is) selects the choice that will provide most utility to them. The probability a person will choose alternative $i$, $\pi_i$, given some utility over all other alternatives $j$, can be formulated as:
-
-$$ \pi_i = \textrm{Prob}(U_i > U_{\forall j\neq i)}$$
-
-
-for a given U we have the typical linear combination we've seen before.
-
-$$U = X\beta + \epsilon$$
-
-###
-
-Consider the following situation in which we have several possible outcomes[^mlogit] chosen by individuals.
-
-- There are *alternative specific* variables $x_{ij}$ with generic coefficient $\beta$
-- There are *individual specific* variables $z_i$ with alternative specific coefficients $\gamma_j$
-- There are *alternative specific* variables $w_{ij}$ with alternative specific coefficients $\delta_j$
-
-As an example, we have the following data on travel mode choice for travel between Sydney and Melbourne, Australia to help further clarify the nature these types of variables. We have a data frame containing 840 observations on 4 modes for 210 individuals.
-
-- individual: Factor indicating individual with levels 1 to 200.
-- mode: Factor indicating travel mode with levels "car", "air", "train", or "bus".
-- choice: Factor indicating choice with levels "no" and "yes".
-- wait: Terminal waiting time, 0 for car.
-- vcost: Vehicle cost component.
-- travel: Travel time in the vehicle.
-- gcost: Generalized cost measure.
-- income: Household income.
-- size: Party size.
-
-It looks like the following:
-
-```{r, message=FALSE, echo=FALSE}
-library(mlogit)
-data(TravelMode, package='AER')
-head(TravelMode, 10)
-```
-
-In this case income and size are individual specific variables. vcost and travel time are alternative specific. For vcost we want a generic coefficient and for travel time an alternative specific coefficient.
-
-So the conceptual model for the *utility* or *satisfaction index* for alternative $j$ (with intercepts $\alpha$) is:
-$$V_{ij} = \alpha_j + \beta x_{ij} + \gamma_jz_i + \delta_jw_{ij}$$
-
-Common names for some models pertaining to such data are:
-
-*multinomial logit*: in this case we have only individual specific covariates
-
-*conditional logit*: we have only alternative specific covariates
-
-*mixed logit*: has both kinds of variables.
-
-Unfortunately, *conditional logit* also refers to a type of model for longitudinal data, and *mixed logit* might be short for a mixed effects model with random effects. Personally, I'm not sure why people refer to models based on their link function, as if that was descriptive enough. These models are sometimes used with other link functions, e.g. probit, and so the exact same model has to be called yet another name. But I digress. The point is you need to be careful and make sure the model is clear.
-
-```{r}
-library(mlogit)
-data('Train', package='mlogit')
-Tr <- mlogit.data(Train, choice = "choice", shape = "wide",
-                     varying = 4:11, alt.levels = c(1,2), sep = "", id='id')
-head(Tr)
-
-library(dplyr)
-Tr$price= Tr$price/100*2.20371
-Tr$time = Tr$time/60
-
-ml.train = mlogit(choice ~ price + time + change + comfort | 0, data=Tr)
-summary(ml.train)
-```
-
-Note that exponentiating the coefficient does not typically reproduce an odds ratio, but a *relative risk*. In the case of 1 to 1 matching, they are identical. But in the case where there isn't 1:1, the exponentiated coefficients are relative risk ratios.
-
-
-
-## Ordinal
-
-### Extensions
-
-gologit
-
-
-## Other
-
-### Distributions
-As Bernoulli is to the binomial, so is the *categorical* distribution, commonly referred to as such in computer science, to the multinomial distribution. In other words, if only one choice among several is made (i.e. we're not dealing with counts), then we have the categorical distribution.
-
-beta binomial
-
-### Logit transformation
-logistic transform = logit probability = softmax = sigmoid
-
-### Probit
-
-### IRT
-
-### Logistic growth curves
-
-### Loss functions
-
-In the above we have assumed a standard likelihood approach
-
-
-# Appendix
-
-## Maximum likelihood estimation of the binomial logistic model
-
-```{r logreg_maxlike, eval=T, collapse=TRUE}
-logreg = function(par, X, y){
-  L = X %*% par
-  -sum(dbinom(y, size=1, prob=plogis(L), log=T))
-}
-
-mm = model.matrix(mod)
-resp = admission$admit
-inits = rep(0, 4)
-out = optim(inits, logreg, X=mm, y=resp)
-cbind(out$par, coefs) %>% round(2)
-```
-
-
-
-## Maximum likelihood estimation of the conditional logistic model
-
-```{r condlogreg_maxlike, code_folding='hide', eval=T}
-condlogreg = function(par, X, y){
-  idx = y==1
-  L1 = X[idx,] %*% par
-  L2 = X[!idx,] %*% par
-  L3 = (X[idx,] - X[!idx,]) %*% par
-  
-  # the following are all identical
-  -sum(log(exp(L1)/(exp(L1)+exp(L2))))
-  -sum(log(exp(L3)/(1+exp(L3))))
-  -sum(dbinom(y[idx], size=1, prob=plogis(L3), log=T))
-}
-
-
-# create 1:1 matching
-infert2 = infert %>% group_by(stratum) %>% slice(1:2)
-mm = model.matrix(glm(case ~ spontaneous + induced, data = infert2, family = binomial))
-mm = mm[,-1]   # no intercept
-resp = infert2$case
-inits = rep(0, 2)     # initial values
-out = optim(inits, condlogreg, X=mm, y=resp)
-coefs = coef(clogit(case ~ spontaneous + induced + strata(stratum), data = infert2))
-cbind(out$par, coefs) %>% round(2)
-```
-
 
 [^subscript]: I drop the subscript to denote individual observations as it doesn't add clarity here.  You may treat it as a single observation or $N$ observations.  Later it will become more important.
 
 [^stratum]: Technically one of the strata has a single case and control.
 
+[^btaslogreg]: It would be more accurate to simply estimate two coefficients while fixing the reference to zero.
+
+[^mach]: One place you will see the situation routinely ignored is with machine learning approaches, where 'multi-class' problems end up being multiple outcomes of 1 category vs. all others, or possibly all pairwise comparisons of categories.  In other words, it is just made into multiple binary classification problems.
+
 [^mlogit]: This is a summary of a nicely laid out portion of the vignette for the mlogit package.
 
+[^mnlogit]: See also the <span class="pack">mnlogit</span> package, which has a faster implementation.
 
+[^rrr]: This is how Stata refers to the exponentiated coefficients.
+
+[^utility]: The notion of *utility* doesn't really work so well if your outcome is a disease or similarly negatively oriented outcomes.  In that case, one can just think of it as a latent variable representing the likelihood of some category. 
 
 
 # References
