@@ -4,11 +4,9 @@ author: "Michael Clark"
 output: 
   html_document: 
     css: ../style_for_miles_and_miles_so_much_style_that_its_wasted.css
-    highlight: tango
-    theme: sandstone
+    highlight: pygments
     toc: yes
     toc_float: yes
-    smart: yes
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message=F, fig.align='center', cache = FALSE, comment='', warning=F, R.options=list(width=120))
@@ -373,7 +371,7 @@ In many situations the variables of interest have more than two categories, and 
 
 We'll start with another example from the [UCLA ATS website](http://www.ats.ucla.edu/stat/stata/dae/mlogit.htm) (the example there is done with Stata for those interested). 200 entering high school students make program choices: general program, vocational program and academic program. We will model their choice using their writing score as a proxy for scholastic ability and their socioeconomic status, a categorical variable of low, middle, and high values.  
 
-```{r echo=3, eval=T}
+```{r readLogitData, echo=3, eval=T}
 # haven gets entirely too cute with what is a simple data set
 # haven::write_dta(foreign::read.dta("http://www.ats.ucla.edu/stat/data/hsbdemo.dta"), 'logistic/data/hsbdemo.dta')
 program = foreign::read.dta('data/hsbdemo.dta')
@@ -382,7 +380,7 @@ program$prog <- relevel(program$prog, ref = "academic")
 
 As there are three categories we no longer use the glm function, which does not have the multinomial as a possible value to the 'family' argument.  There are a few packages available we could use, and here I'll use the <span class="pack">mlogit</span> package[^mnlogit].  I should also mention that it has a very extensive vignette that is worth perusal, at least part of which has been incorporated into later discussion.  
 
-Let's run the model to predict program choice. Because of the <span class="pack">mlogit's</span> modeling flexibility, the data either has to have a specific structure or be told what the structure is. This oddly means that one can apparently not use it directly for what some might consider the standard multinomial model without pre-processing, and it's not the most intuitive approach to get it into the proper format with the <span class="func">mlogit.data</span> function. The gist is that the all choices must be represented for each individual, along with a variable that represents the actual choice made. Those familiar with mixed models, e.g. with longitudinal data, will note this as *long* format.
+Let's run the model to predict program choice. Because of the <span class="pack">mlogit's</span> modeling flexibility, the data either has to have a specific structure or be told what the structure is. This oddly means that one can apparently not use it directly for what some might consider the standard multinomial model without pre-processing, and it's not the most intuitive approach to get it into the proper format with the <span class="func">mlogit.data</span> function. The gist is that all choices must be represented for each individual, along with a binary variable that represents the actual choice made. Those familiar with mixed models, e.g. with longitudinal data, will note this as *long* format.
 
 Original: 
 
@@ -412,12 +410,12 @@ $$\ln\left(\frac{\pi_{\textrm{prog=vocation}}}{\pi_{\textrm{prog=academic}}}\rig
 
 So our interpretation will be as before, it's just that we'll have to interpret K-1 sets of parameters for K total categories. Let's go ahead and run the model.
 
-```{r}
+```{r mlogit_model}
 multi_mod = mlogit(prog ~ 1|write + ses, data=programLong)
 summary(multi_mod)
 ```
 
-Note that we get two sets of output. You can think of it as you would two separate binary logistic regressions, one where academic is the reference group and general the positive value, and another model that also has academic as the reference group and vocational as the positive value.  We see statistically notable effects of write and high ses (low ses is the reference category).  The general interpretation would similar to before, but sometimes the expontiated values are referred to *relative risk* rather than an odds ratio. It is no longer $\pi/(1-\pi)$, but a ratio of two relative probabilities (one group vs. an arbitrary reference group), hence the name relative risk (the 'risk' comes from biostats where the event of interest is usually something like death, disease, etc.)[^rrr].
+Note that we get two sets of output. You can think of it as you would two separate binary logistic regressions, one where academic is the reference group and general the positive value, and another model that also has academic as the reference group and vocational as the positive value.  We see statistically notable effects of writing score and high ses (low ses is the reference category).  The general interpretation would similar to before, but sometimes the expontiated values are referred to *relative risk* rather than an odds ratio. It is no longer $\pi/(1-\pi)$, but a ratio of two relative probabilities (one group vs. an arbitrary reference group), hence the name relative risk (the 'risk' comes from biostats where the event of interest is usually something like death, disease, etc.)[^rrr].
 
 As we move up one score on the variable write, we would see a decrease of `r round(coef(multi_mod)[3],3)` in the log probability of choosing the general program relative to the academic.  In other words, higher write scores are associated with a more likely choosing of the academic program instead of the general. The same goes for the vocational group, but it is stronger, i.e. we're even more likely to select the academic program over the vocational with an increase in write score.
 
@@ -437,7 +435,7 @@ preddata %>%
   theme_trueMinimal()
 ```
 
-So the general interpretation of the effect of write would be that higher scores increase the probability of choosing the academic program, decrease the probability of choosing the vocational program, and have no effect on choosing the general program.  Here are predictions for all three ses levels.
+So the general interpretation of the effect of write would be that higher scores increase the probability of choosing the academic program, decrease the probability of choosing the vocational program, and have little effect on choosing the general program.  Here are predictions for all three ses levels.
 
 
 ```{r plotmultinom2, fig.width=8, fig.height=3, echo=FALSE}
@@ -478,7 +476,7 @@ U_1 &= \dots + \epsilon_1 \\
 U_2 &= \dots + b_2\mathrm{Age} + \epsilon_2
 \end{align}$$
 
-And $b_2$ now represents the difference $b^1_2 - b^2_2$.  The interpretation of the coefficient isn't the effect of age on the utility of choice 2, but rather on the utility of choice 2 relative to choice 1.  We can also see this in terms of the predicted probabilities.  Recall our previous depiction for the [binary outcome case](#binpred).  Now the probability of selecting choice $i$ is:
+And $b_2$ now represents the difference $b^1_2 - b^2_2$.  The interpretation of the coefficient isn't the effect of age on the utility of choice 2, but rather on the utility of choice 2 relative to choice 1.  In addition, it turns out that if we assume an extreme value distribution for the $\epsilon$, the logistic distribution naturally arises when considering their difference. In terms of the predicted probabilities, recall our previous depiction for the [binary outcome case](#binpred).  Now the probability of selecting choice $i$ is:
 
 $$ \frac{e^{X\beta_i}}{\Sigma^J_{j=1}e^{X\beta_j}}$$
 
@@ -490,11 +488,12 @@ $$ \pi_{i \neq 1} = \frac{e^{X\beta_i}}{1 + \Sigma^J_{j=2}e^{X\beta_j}}  \quad \
 
 
 
+
 ### Alternative specific covariates
 
 Consider the following situation in which we have several possible outcomes[^mlogit] chosen by individuals.
 
-- There are *alternative specific* variables $x_{ij}$ with generic coefficient $\beta$
+- There are *alternative specific* variables $x_{ij}$ with constant coefficient $\beta$
 - There are *individual specific* variables $z_i$ with alternative specific coefficients $\gamma_j$
 - There are *alternative specific* variables $w_{ij}$ with alternative specific coefficients $\delta_j$
 
@@ -555,30 +554,183 @@ Nested logit
 
 
 
-## Ordinal
+# Ordered categories
 
-### Extensions
+In the case of ordered categories, we can still use the latent variable conceptualization as before.  The following represents the <span class="emph">ordered logistic</span> model, otherwise known as the proportional odds model.
 
-gologit
+$$U = \theta_j + X\beta$$
+
+$$\begin{align}
+y &= 1 \quad \textrm{if}\quad U \leq \theta_1 \\
+y &= 2 \quad \textrm{if}\quad \theta_1 < U \leq \theta_2 \\
+y &= 3 \quad \textrm{if}\quad \theta_2 < U \leq \theta_3 \\
+\vdots \\
+y &= K \quad \textrm{if}\quad \theta_{k-1} < U \leq \theta_k \\
+\end{align}$$
 
 
-## Other
+The $\theta_j$ represent cutoffs, or thresholds, which when transformed represent the baseline probability for category $j$ or below.  When running a standard ordinal model such as this, one will get the regular coefficients from a logistic model along with a threshold for k-1 categories, as the last is set to $\infty$. Note that if we only had two categories, it is equivalent to the binary logistic regression model.
 
-### Distributions
+As an example, we can look at data regarding wine bitterness via the <span class="pack">ordinal</span> package. See `?wine` for details, but essentially we are looking at factors in the pressing process that might contribute to bitterness. These are the temperature (warm vs. cold) and contact between juice and skins (yes-no).
+
+```{r ologit}
+library(ordinal)
+wine_mod <- clm(rating ~ contact + temp, data=wine)
+summary(wine_mod)
+# lm(as.integer(rating) ~ contact + temp, data=wine) # for comparison
+# lm(response ~ contact + temp, data=wine)           # for comparison via raw response scale
+```
+
+The coefficients speak to the probability of being in a higher category relative to a lower category[^backwardsorder].  Thus warmer temperatures and contact lead to a higher bitterness rating. The following shows how to get probabilities for each class.
+
+```{r ologit_probs, echo=-8}
+# get fitted probs
+mm = model.matrix(wine_mod)$X[,-1]
+thresh = coef(wine_mod)[1:4]
+beta = coef(wine_mod)[-(1:4)]
+fits = sapply(thresh, function(int) plogis(int - mm %*% beta))
+probs14 = t(apply(cbind(0, fits), 1, diff)); colnames(probs14) = paste0('cat',1:4)
+round(cbind(probs14, 
+            cat5 = 1-rowSums(probs14), 
+            ordpackfit = fitted(wine_mod), 
+            rating=wine$rating), 2) %>% 
+  head
+detach(package:ordinal)
+```
+
+## Extensions
+
+### Different links
+
+As with other models discussed, we could use different link function in the approach. As with the other categorical models, a very common one is the <span class="emph">probit</span> link function, which in this case will provide similar fits.  Another common link is the <span class="emph">complementary log-log</span>[^cloglog] link, which leads to a proportional hazards interpretationa a la survival analysis.
+
+### Generalized
+
+We noted that the standard model was a proportional odds model, in which the effects are the same whether we are talking about moving from category one to any above, or category (one or) two to any above etc.  The generalized ordinal logistic model would relax this assumption, and allow any set of coefficients to vary depending on the category.  Thus if there are $i$ $\beta$ coefficients, we could potentially have $i * K-1$ parameters plus the thresholds.
+
+### Other models
+
+Other models can be used based on substantive considerations.  As an example, an adjacent category approach would posit models for categories 1 vs. 2, 2 vs. 3 etc.  The continuation ratio compares previous categories to the current, e.g. 1 vs. 2, 1 and 2 vs. 3 etc. the following graphic demonstrates these models visually.
+
+```{r visologit, echo=FALSE}
+y = factor(1:9)
+x = factor(1:5)
+
+base_d = expand.grid(x, y)
+base_d$value = 1
+base_d$value[base_d$Var2 %in% c(2,4,6,8)] = 2
+# qplot(Var1, Var2, data=base_d, geom='tile', fill=value)
+
+d_mlogit = base_d
+d_mlogit$value[2:4] = 2
+d_mlogit$value[5] = 3
+d_mlogit$value[c(12,13,15)] = 2
+d_mlogit$value[14] = 3
+d_mlogit$value[c(22,24:25)] = 2
+d_mlogit$value[23] = 3
+d_mlogit$value[33:35] = 2
+d_mlogit$value[32] = 3
+
+
+mlogit = ggplot(aes(Var1, Var2, fill=factor(value)), data=d_mlogit) +
+  geom_tile(color='white') +
+  labs(x='category', y='', title='Multinomial Logit') +
+  scale_fill_manual(values=c('lightblue', 'white', 'salmon')) +
+  lazerhawk::theme_trueMinimal() +
+  theme(legend.position='none',
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid=element_line(size=2),
+        plot.title=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray25'))
+
+d_ologit = base_d
+d_ologit$value[5] = 3
+d_ologit$value[c(14:15)] = 3
+d_ologit$value[c(23:25)] = 3
+d_ologit$value[32:35] = 3
+
+
+ologit = ggplot(aes(Var1, Var2, fill=factor(value)), data=d_ologit) +
+  geom_tile(color='white') +
+  labs(x='category', y='', title='Ordered Logit (proportional odds)') +
+  scale_fill_manual(values=c('lightblue', 'white','salmon')) +
+  lazerhawk::theme_trueMinimal() +
+  theme(legend.position='none',
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid=element_line(size=2),
+        plot.title=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray25'))
+
+d_acat = base_d
+d_acat$value[1:3] = 2
+d_acat$value[5] = 3
+d_acat$value[c(11,12,15)] = 2
+d_acat$value[14] = 3
+d_acat$value[c(21,24,25)] = 2
+d_acat$value[23] = 3
+d_acat$value[33:35] = 2
+d_acat$value[32] = 3
+
+
+acat = ggplot(aes(Var1, Var2, fill=factor(value)), data=d_acat) +
+  geom_tile(color='white') +
+  labs(x='category', y='', title='Ordered Logit (adjacent category)') +
+  scale_fill_manual(values=c('lightblue', 'white','salmon')) +
+  lazerhawk::theme_trueMinimal() +
+  theme(legend.position='none',
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid=element_line(size=2),
+        plot.title=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray25'))
+
+
+d_crat = base_d
+# d_crat$value[1:3] = 2
+d_crat$value[5] = 3
+d_crat$value[15] = 2
+d_crat$value[14] = 3
+d_crat$value[24:25] = 2
+d_crat$value[23] = 3
+d_crat$value[33:35] = 2
+d_crat$value[32] = 3
+
+
+crat = ggplot(aes(Var1, Var2, fill=factor(value)), data=d_crat) +
+  geom_tile(color='white') +
+  labs(x='category', y='', title='Ordered Logit (continuation ratio)') +
+  scale_fill_manual(values=c('lightblue', 'white','salmon')) +
+  lazerhawk::theme_trueMinimal() +
+  theme(legend.position='none',
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid=element_line(size=2),
+        plot.title=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray25'))
+
+gridExtra::grid.arrange(mlogit, ologit, acat, crat)
+```
+
+
+# Other
+
+## Distributions
 As Bernoulli is to the binomial, so is the *categorical* distribution, commonly referred to as such in computer science, to the multinomial distribution. In other words, if only one choice among several is made (i.e. we're not dealing with counts), then we have the categorical distribution.
 
 beta binomial
 
-### Logit transformation
+## Logit transformation
 logistic transform = logit probability = softmax = sigmoid
 
-### Probit
+## Probit
 
-### IRT
+## IRT
 
-### Logistic growth curves
+## Logistic growth curves
 
-### Loss functions
+## Loss functions
 
 In the above we have assumed a standard likelihood approach
 
@@ -685,33 +837,41 @@ for (i in 1:200){
 }
 ll
 out$value
-
-
-
-# stanmod = '
-# data {
-#   int K;
-#   int N;
-#   int D;
-#   int y[N];
-#   vector[D] x[N];
-# }
-# parameters {
-#   matrix[K,D] beta;
-# }
-# model {
-#   for (k in 1:K)
-#     beta[k] ~ normal(0, 5);
-#   for (n in 1:N)
-#     y[n] ~ categorical(softmax(beta * x[n]));
-# }'
-# 
-# datalist = list(x = X, y=as.integer(y), K=n_distinct(y), D=ncol(X))
-# library(rstan)
-# out = stan(model_code=stanmod, data=datalist)
 ```
 
 
+### Ordered logistic model
+
+```{r ordereddMaxLike, echo=-1}
+library(ordinal)
+ologit_ll = function(par, X, y){
+  ncats = dplyr::n_distinct(y)
+  theta = par[1:(ncats-1)]
+  beta = par[-(1:(ncats-1))]
+  
+  probs = rep(0, length(y))
+  LP = X %*% beta
+  for (i in 1:ncats){
+    if (i == 1){
+      probs[y==i] = plogis(theta[i] - LP[y==i, ])
+    } else if (i < ncats) {
+      probs[y==i] = plogis(theta[i] - LP[y==i, ]) - plogis(theta[i-1] - LP[y==i, ])
+    } else {
+      probs[y==i] = 1- plogis(theta[i-1] - LP[y==i])
+    }
+  }
+  ll = -sum(log(probs))
+  ll
+}
+
+# starting values
+pars = c(-(4:1), runif(2))
+
+# compare to wine data example
+out = optim(pars, ologit_ll, X=model.matrix(rating ~ contact + temp, data=wine)[,-1], y=as.integer(wine$rating), 
+            method='BFGS')
+out
+```
 
 
 [^subscript]: I drop the subscript to denote individual observations as it doesn't add clarity here.  You may treat it as a single observation or $N$ observations.  Later it will become more important.
@@ -730,6 +890,9 @@ out$value
 
 [^utility]: The notion of *utility* doesn't really work so well if your outcome is a disease or similarly negatively oriented outcomes.  In that case, one can just think of it as a latent variable representing the likelihood of some category. 
 
+[^backwardsorder]: Some statistical packages use references in which the interpretation is in the reverse, and so the coefficients will be of opposite sign.  I think it makes more sense to keep it consistent with a standard regression.
+
+[^cloglog]: This would suggest the underly latent variable has an extreme value distribution.
 
 # References
 
