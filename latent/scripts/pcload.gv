@@ -1,0 +1,90 @@
+digraph Factor  {
+  rankdir=RL;
+  size="8,6";
+  node [fontname="Helvetica" fontsize=14 shape=box, width=2];
+  edge [fontname="Helvetica" fontsize=10];
+V1  [label = "VisualPerception"];
+V2  [label = "Cubes"];
+V3  [label = "PaperFormBoard"];
+V4  [label = "Flags"];
+V5  [label = "GeneralInformation"];
+V6  [label = "PargraphComprehension"];
+V7  [label = "SentenceCompletion"];
+V8  [label = "WordClassification"];
+V9  [label = "WordMeaning"];
+V10  [label = "Addition"];
+V11  [label = "Code"];
+V12  [label = "CountingDots"];
+V13  [label = "StraightCurvedCapitals"];
+V14  [label = "WordRecognition"];
+V15  [label = "NumberRecognition"];
+V16  [label = "FigureRecognition"];
+V17  [label = "ObjectNumber"];
+V18  [label = "NumberFigure"];
+V19  [label = "FigureWord"];
+V20  [label = "Deduction"];
+V21  [label = "NumericalPuzzles"];
+V22  [label = "ProblemReasoning"];
+V23  [label = "SeriesCompletion"];
+V24  [label = "ArithmeticProblems"];
+node [shape=ellipse, width ="1"];
+PC1-> V5 [ label = 0.8 ];
+PC1-> V6 [ label = 0.8 ];
+PC1-> V7 [ label = 0.8 ];
+PC1-> V8 [ label = 0.6 ];
+PC1-> V9 [ label = 0.8 ];
+PC1-> V22 [ label = 0.4 ];
+PC3-> V1 [ label = 0.7 ];
+PC3-> V2 [ label = 0.6 ];
+PC3-> V3 [ label = 0.7 ];
+PC3-> V4 [ label = 0.6 ];
+PC3-> V20 [ label = 0.4 ];
+PC3-> V23 [ label = 0.5 ];
+PC2-> V10 [ label = 0.8 ];
+PC2-> V11 [ label = 0.6 ];
+PC2-> V12 [ label = 0.8 ];
+PC2-> V13 [ label = 0.6 ];
+PC2-> V21 [ label = 0.5 ];
+PC2-> V24 [ label = 0.5 ];
+PC4-> V14 [ label = 0.7 ];
+PC4-> V15 [ label = 0.7 ];
+PC4-> V16 [ label = 0.6 ];
+PC4-> V17 [ label = 0.7 ];
+PC4-> V18 [ label = 0.5 ];
+PC4-> V19 [ label = 0.4 ];
+{ rank=same;
+V1;V2;V3;V4;V5;V6;V7;V8;V9;V10;V11;V12;V13;V14;V15;V16;V17;V18;V19;V20;V21;V22;V23;V24;}{ rank=same;
+PC1;PC3;PC2;PC4;}}<div style="width:500px; height:500px; margin-left:auto;  margin-right:auto">
+  <div id="htmlwidget-6093" style="width:500px;height:500px;" class="grViz html-widget"></div>
+  <script type="application/json" data-for="htmlwidget-6093">{"x":{"diagram":"digraph Factor  {\n  rankdir=RL;\n  size=\"8,6\";\n  node [fontname=\"Helvetica\" fontsize=14 shape=box, width=2];\n  edge [fontname=\"Helvetica\" fontsize=10];\nV1  [label = \"VisualPerception\"];\nV2  [label = \"Cubes\"];\nV3  [label = \"PaperFormBoard\"];\nV4  [label = \"Flags\"];\nV5  [label = \"GeneralInformation\"];\nV6  [label = \"PargraphComprehension\"];\nV7  [label = \"SentenceCompletion\"];\nV8  [label = \"WordClassification\"];\nV9  [label = \"WordMeaning\"];\nV10  [label = \"Addition\"];\nV11  [label = \"Code\"];\nV12  [label = \"CountingDots\"];\nV13  [label = \"StraightCurvedCapitals\"];\nV14  [label = \"WordRecognition\"];\nV15  [label = \"NumberRecognition\"];\nV16  [label = \"FigureRecognition\"];\nV17  [label = \"ObjectNumber\"];\nV18  [label = \"NumberFigure\"];\nV19  [label = \"FigureWord\"];\nV20  [label = \"Deduction\"];\nV21  [label = \"NumericalPuzzles\"];\nV22  [label = \"ProblemReasoning\"];\nV23  [label = \"SeriesCompletion\"];\nV24  [label = \"ArithmeticProblems\"];\nnode [shape=ellipse, width =\"1\"];\nPC1-> V5 [ label = 0.8 ];\nPC1-> V6 [ label = 0.8 ];\nPC1-> V7 [ label = 0.8 ];\nPC1-> V8 [ label = 0.6 ];\nPC1-> V9 [ label = 0.8 ];\nPC1-> V22 [ label = 0.4 ];\nPC3-> V1 [ label = 0.7 ];\nPC3-> V2 [ label = 0.6 ];\nPC3-> V3 [ label = 0.7 ];\nPC3-> V4 [ label = 0.6 ];\nPC3-> V20 [ label = 0.4 ];\nPC3-> V23 [ label = 0.5 ];\nPC2-> V10 [ label = 0.8 ];\nPC2-> V11 [ label = 0.6 ];\nPC2-> V12 [ label = 0.8 ];\nPC2-> V13 [ label = 0.6 ];\nPC2-> V21 [ label = 0.5 ];\nPC2-> V24 [ label = 0.5 ];\nPC4-> V14 [ label = 0.7 ];\nPC4-> V15 [ label = 0.7 ];\nPC4-> V16 [ label = 0.6 ];\nPC4-> V17 [ label = 0.7 ];\nPC4-> V18 [ label = 0.5 ];\nPC4-> V19 [ label = 0.4 ];\n{ rank=same;\nV1;V2;V3;V4;V5;V6;V7;V8;V9;V10;V11;V12;V13;V14;V15;V16;V17;V18;V19;V20;V21;V22;V23;V24;}{ rank=same;\nPC1;PC3;PC2;PC4;}}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div> 
+lavaan (0.5-20) converged normally after  19 iterations
+
+                                                  Used       Total
+  Number of observations                          7183        8985
+
+  Estimator                                         ML
+  Minimum Function Test Statistic                0.000
+  Degrees of freedom                                 0
+  Minimum Function Value               0.0000000000000
+
+Parameter Estimates:
+
+  Information                                 Expected
+  Standard Errors                             Standard
+
+Latent Variables:
+                   Estimate  Std.Err  Z-value  P(>|z|)   Std.lv  Std.all
+  depressed =~                                                          
+    FeltDown          1.000                               0.541    0.813
+    BeenHappy        -0.732    0.020  -37.329    0.000   -0.396   -0.609
+    DeprssdLstMnth    0.719    0.019   37.992    0.000    0.388    0.655
+
+Variances:
+                   Estimate  Std.Err  Z-value  P(>|z|)   Std.lv  Std.all
+    FeltDown          0.150    0.007   20.853    0.000    0.150    0.339
+    BeenHappy         0.266    0.006   46.489    0.000    0.266    0.629
+    DeprssdLstMnth    0.201    0.005   41.606    0.000    0.201    0.571
+    depressed         0.292    0.010   30.221    0.000    1.000    1.000
+
+[1] 0.441856
