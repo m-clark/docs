@@ -1,0 +1,35 @@
+---
+title: "Other"
+author: |
+  | Michael Clark
+  | Statistician Lead
+  | Consulting for Statistics, Computing and Analytics Research
+  | <span style="color:'#00274c'">Advanced Research Computing</span>
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    css: indexCSS.css
+    highlight: tango
+    theme: cosmo
+    toc: TRUE
+    toc_float: TRUE
+  pdf_document:
+    highlight: pygments
+    toc: yes
+always_allow_html: yes
+---
+
+# Other
+
+These are other topics that may be covered in varying detail in the future. With packages noted.
+
+- IRT
+    - ltm or lavaan
+- Multiple group analysis
+    - lavaan
+- Multilevel SEM
+- Collaborative filtering
+    - recommenderlab
+- HMM, Linear Dynamical Systems
+    - HMM, HiddenMarkov depmixS4
+- Others

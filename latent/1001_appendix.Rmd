@@ -1,0 +1,148 @@
+---
+title: "Appendix"
+author: |
+  | Michael Clark
+  | Statistician Lead
+  | Consulting for Statistics, Computing and Analytics Research
+  | <span style="color:'#00274c'">Advanced Research Computing</span>
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    css: indexCSS.css
+    highlight: tango
+    theme: cosmo
+    toc: TRUE
+    toc_float: TRUE
+  pdf_document:
+    highlight: pygments
+    toc: yes
+always_allow_html: yes
+---
+
+# Appendix
+
+## Data set descriptions
+
+### McClelland 
+
+#### Description
+
+- McClelland et al. (2013) abstract 
+
+> This study examined relations between children's attention span-persistence in preschool and later school achievement and college completion. Children were drawn from the Colorado Adoption Project using adopted and non-adopted children (N = 430). Results of structural equation modeling indicated that children's age 4 attention span-persistence significantly predicted math and reading achievement at age 21 after controlling for achievement levels at age 7, adopted status, child vocabulary skills, gender, and maternal education level. Relations between attention span-persistence and later achievement were not fully mediated by age 7 achievement levels. Logistic regressions also revealed that age 4 attention span-persistence skills significantly predicted the odds of completing college by age 25. The majority of this relationship was direct and was not significantly mediated by math or reading skills at age 7 or age 21. Specifically, children who were rated one standard deviation higher on attention span-persistence at age 4 had 48.7% greater odds of completing college by age 25. Discussion focuses on the importance of children's early attention span-persistence for later school achievement and educational attainment.
+
+#### Reference
+
+McClelland, Acock, Piccinin, Rheac, Stallings. (2013). Relations between preschool attention span-persistence and age 25 educational outcomes. [link](http://www.sciencedirect.com/science/article/pii/S0885200612000762)
+
+
+
+### National Longitudinal Survey of Youth (1997, NLSY97)
+
+#### Description
+
+NLSY97 consists of a nationally representative sample of approximately 9,000 youths who were 12 to 16 years old as of December 31, 1996. Round 1 of the survey took place in 1997. In that round, both the eligible youth and one of that youth's parents received hour-long personal interviews. In addition, during the screening process, an extensive two-part questionnaire was administered that listed and gathered demographic information on members of the youth's household and on his or her immediate family members living elsewhere. Youths are interviewed on an annual basis. 
+
+The NLSY97 is designed to document the transition from school to work and into adulthood. It collects extensive information about youths' labor market behavior and educational experiences over time. Employment information focuses on two types of jobs, "employee" jobs where youths work for a particular employer, and "freelance" jobs such as lawn mowing and babysitting. These distinctions will enable researchers to study effects of very early employment among youths. Employment data include start and stop dates of jobs, occupation, industry, hours, earnings, job search, and benefits. Measures of work experience, tenure with an employer, and employer transitions can also be obtained. Educational data include youths' schooling history, performance on standardized tests, course of study, the timing and types of degrees, and a detailed account of progression through post-secondary schooling.
+
+#### Reference
+
+[Bureau of Labor Statistics](http://www.bls.gov/nls/nlsy97.htm)
+
+
+### Wheaton 1977 data 
+
+#### Description
+
+> Longitudinal data to develop a model of the stability of alienation from 1967 to 1971, accounting for socioeconomic status as a covariate. Each of the three factors have two indicator variables, SES in 1966 is measured by education and occupational status in 1966 and alienation in both years is measured by powerlessness and anomia.
+
+#### Reference
+
+Wheaton, B., Muthen B., Alwin, D., & Summers, G., 1977, "Assessing reliability and stability in panel models", in D. R. Heise (Ed.), _Sociological Methodology 1977_ (pp. 84-136), San Francisco: Jossey-Bass, Inc. 
+
+
+### Old Faithful
+
+#### From the R helpfile
+
+Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA. A closer look at faithful$eruptions reveals that these are heavily rounded times originally in seconds, where multiples of 5 are more frequent than expected under non-human measurement. For a better version of the eruption times, see the example below.
+
+There are many versions of this dataset around: Azzalini and Bowman (1990) use a more complete version.
+
+### Harman 1974
+
+#### Description
+
+A correlation matrix of 24 psychological tests given to 145 seventh and eight-grade children in a Chicago suburb by Holzinger and Swineford.
+
+#### Reference
+
+Harman, H. H. (1976) Modern Factor Analysis, Third Edition Revised, University of Chicago Press, Table 7.4.
+
+
+
+
+## Terminology in SEM
+
+SEM as it is known has been widely used in psychology and education for decades, while other disciplines have developed and advanced techniques that are related, but would not typically call them SEM.  The following will be expanded over time.
+
+**Latent variable**: an unobserved or hidden variable.  It's specific interpretation will depend on the modeling context.
+
+**Factor Analysis**: in the SEM literature, this refers to a latent variable (measurement) model to assess the underlying construct behind the correlations among a set of observed variables.  Elsewhere it may refer to a very broad family of matrix factorization techniques that would include things like principal components analysis, non-negative matrix factorization, etc.
+
+**Exploratory vs. Confirmatory**: This distinction is problematic.  Science and data analysis is inherently exploratory, and most who use SEM do some model exploration as they would with any other model.  Some SEM models have more constraints than others, but that does not require a separate name or way of thinking about the model.
+
+**Mediation** and moderation:  These mean different things, both straightforward, and which is utilized in a model should be based on theoretical notions.
+
+- Mediation: an indirect effect, e.g. A->B->C, A has an indirect effect on C. A can have a direct effect on C too. 
+- Moderation: an interaction (the same ones utilized in a standard regression modeling)
+
+**Fit**: Model fit is something very difficult to ascertain in SEM, and notoriously problematic in this setting, where all proposed cutoffs for a good fit are ultimately arbitrary.  Even if one had most fit indices suggesting a 'good' fit, there's little indication the model has predictive capability.
+
+**Endo/Exogenous**: Endogenous variables are determined by other variables, exogenous variables have no analyzed causes.
+
+**Disturbance**: residual variance. Includes measurement error and unknown causes.
+
+**Mixture Models**: models using categorical latent variables.
+
+
+## Resources
+
+This list serves only as a starting point, though may be added to over time.
+
+
+### Graphical Models
+
+[UseR Series](http://link.springer.com/bookseries/6991): Contains texts on graphical models, Bayesian networks, and network analysis.
+
+
+### Measurement Models
+
+[Personality Project](http://personality-project.org/index.html): William Revelle's website and text on psychometric theory.
+
+
+### SEM
+
+Kline, Rex. *Principles and Practice of Structural Equation Modeling*. A very applied introduction.
+
+Beaujean, A. A. (2014). [Latent variable modeling using R: A step by step guide](http://blogs.baylor.edu/rlatentvariable/). New York, NY: Routledge/Taylor and Francis. Lavaan based guide to SEM
+
+
+### lavaan
+
+[lavaan website](http://lavaan.ugent.be/)
+
+[Tutorial](http://lavaan.ugent.be/tutorial/tutorial.pdf) 
+
+[Bayesian estimation with lavaan](https://cran.r-project.org/package=blavaan)
+
+[Complex surveys with lavaan](https://cran.r-project.org/package=lavaan.survey)
+
+[Interactive lavaan](https://github.com/kylehamilton/lavaan.shiny)
+
+
+### Other SEM
+
+[semTools]: Excellent set of tools for reliability assessment, measurement invariance, fit, simulation etc.
+
+[semPlot]: Visualize your lavaan models.

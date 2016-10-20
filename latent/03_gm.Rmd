@@ -43,8 +43,8 @@ Any statistical model you've conducted can be expressed as a graphical model.  A
 
 A key idea of a graphical model is that of *conditional independence*, something one should keep in mind when constructing their models.  The concept can be demonstrated with the following graph.
 
-```{r conditionalIndependence, echo=FALSE, eval=FALSE}
-DiagrammeR("
+```{r conditionalIndependence, echo=FALSE, eval=T, fig.align='center'}
+DiagrammeR::DiagrammeR("
 digraph DAG {
   # Intialization of graph attributes
   graph [overlap = false]
@@ -52,12 +52,11 @@ digraph DAG {
   # Initialization of node attributes
   node [shape = circle,
         fontname = Helvetica,
+        fontsize = 10,
         color = gray80,
         type = box,
-        fixedsize = true]
-
-  # Initialization of edge attributes
-  edge [color = gray25, rel = yields]
+        fixedsize = true,
+        width = .5]
 
   # Node statements
   X; Y; Z; 
@@ -69,10 +68,10 @@ digraph DAG {
   X -> Y; Y -> Z;
 }
 ", type='grViz')
+# <img src="img/conditionalIndependence.png" style="display:block; margin: 0 auto; width:25%">
 ```
 
 
-<img src="img/conditionalIndependence.png" style="display:block; margin: 0 auto; width:25%">
 
 
 In this graph, X is *conditionally independent* of Z given Y- there is no correlation between X and Z once Y is accounted for[^condind].  We will revisit this concept when discussing path analysis and latent variable models.  Graphs can be *directed*, *undirected*, or *mixed*. Directed graphs have arrows, sometimes implying a causal flow (a difficult endeavor to demonstrate explicitly) or noting a time component. Undirected graphs merely denote relations among the nodes, while mixed graphs might contain both directional and symmetric relationships.  Most of the models discussed in this course will be directed or mixed.
@@ -568,3 +567,11 @@ Path analysis in SEM is a form of theoretically motivated graphical model involv
 
 
 
+[^condind]: There are other assumptions at work also, e.g. that the model is correct and there are no other confounders.
+[^pathOld]: Sewall Wright first used path analysis almost 100 years ago.
+[^mvreg]: I use *multivariate* here to refer to multiple dependent variables, consistent with *multivariate analysis* generally.  Some use it to mean multiple predictors, but since you're not going to see single predictor regression outside of an introductory statistical text, there is no reason to distinguish it.  Same goes for *multiple* regression.
+[^factpca]: One version of factor analysis is nearly identical to PCA in terms of mechanics, save for what are on the diagonals of the correlation matrix (1s vs. 'communalities').
+[^oldMediation]: In the past people would run separate OLS regressions to estimate mediation models, particularly for the most simple, three variable case. One paper that for whatever reason will not stop being cited is Baron & Kenny 1986.  *It was 1986*.  Please do not do mediation models like this.  You will always have more than three variables to consider, and always have access to R or other software that can estimate the model appropriately.  While I think it is very helpful to estimate your models in piecemeal fashion for debugging purposes and to facilitate your understanding, use appropriate tools for the model you wish to estimate.  Some packages, such as <span class='pack>mediate</span>, may still require separate models, but there is far more going on 'under the hood' even then.  For more recent work in this area, see the efforts of [Pearl](http://bayes.cs.ucla.edu/jp_home.html) and [Imai](http://imai.princeton.edu/research/index.html) especially.
+[^mccnodescript]: There is a statement "All results controlled for background covariates of vocabulary at age 4, gender, adoption status, and maternal education level." and a picture of only the three-variable mediation part.
+[^medvsdirectModcomp]: I suspect this is likely the case for the majority of modeling scenarios.
+[^nonrecursiveName]: No, 'non'-recursive as a name for these models makes no sense to me either.

@@ -1,5 +1,7 @@
 bookdown::gitbook:
   css: [style.css, latent.css]
+  font-import: http://fonts.googleapis.com/css?family=Risque|Roboto|Open+Sans
+  font-family: 'Risque'
   config:
     toc:
       before: |

@@ -20,11 +20,13 @@ output:
         search: yes
         edit: no
         fontsettings:
-          family: sans
+          family: serif
           size: 2
     # bookdown::tufte_html_book:
     #   toc: yes
     #   css: [toc.css, ../notebooks.css]
+font-import: http://fonts.googleapis.com/css?family=Risque|Roboto|Open+Sans
+font-family: 'Roboto'
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
@@ -39,37 +41,11 @@ knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=F, message = F, warning=F,
 ```
 
 
-# Preface
 
 ```{r echo=FALSE}
 library(tufte); library(tidyverse); library(htmltools)
 ```
 
-<span style="font-variant:small-caps; font-size:150%"></span>This set of notes originally served as a basis for a workshop that introduces participants to what is typically called structural equation modeling.  However, it is now more or less a document on graphical/latent variable modeling more generally, much, if not most, of which may not be covered in the workshop in detail.  
-
-When first encountering these models, it may depend on one's discipline how such models may be presented.  The following will take a broad view initially, but then focus on what is usually referred to as <span class="emph">*structural equation modeling*</span> in the social and educational science literature.  An attempt will be made to use a consistent, rather than discipline specific nomenclature and approach. 
-
-One of the goals of this set of notes is to *not* instill a false sense of comfort and/or familiarity with the techniques. No one is going to be an expert after a couple of afternoons with SEM.  SEM and other techniques covered are typically taught over the course of a few weeks in a traditional statistics course, or given their own course outright.  Instead, one of the primary goals here is to instill a firm conceptual foundation starting with common approaches (e.g. standard regression), while exposing the participant to a wide family of related techniques, any of which might be useful to one's modeling and data situation.
-
-
-## Prerequisites 
-
-### Statistical
-
-One should at least have a *firm* understanding of standard regression modeling techniques. If you are new to statistical analysis in general, I'll be blunt and say you are probably not ready for SEM.  SEM employs knowledge of maximum likelihood, multivariate analysis, measurement error, indirect effects etc., and none of this is typically covered in a first semester of statistics in many applied disciplines.  SEM builds upon that basic regression foundation, and if that is not solid, SEM will probably be confusing and/or magical at best.  
-
-### Programming
-
-SEM requires its own modeling language approach.  As such, the syntax for Mplus and SEM specific programs, as well as SEM models within other languages or programs (e.g. R or Stata) are going to require you to learn something new.  
-
-
-Color coding:
-
-- <span class="emph">emphasis</span>
-- <span class="pack">package</span>
-- <span class="func">function</span>
-- <span class="objclass">object/class</span>
-- [link]()
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
