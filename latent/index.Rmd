@@ -1,7 +1,6 @@
 --- 
 title: <span style="font-size:150%; font-variant:small-caps; font-style:italic; color:#1e90ff">Graphical and Latent Variable Modeling</span>
 author:  |
-  <img src="img/Rlogo.png" style="display:block; margin: 0 auto; width:20%"><br>
   <div class="title"><span style="font-size:125%; font-variant:small-caps; ">Michael Clark</span><br>
   <span style="font-size:75%; margin: 0 auto;">Statistician Lead</span> <br>
   <img src="img/signature-acronym.png" style="width:33%; padding:10px 0;"> <br>
@@ -40,8 +39,6 @@ knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=F, message = F, warning=F,
                       R.options=list(width=120), fig.align='center')
 ```
 
-
-
 ```{r echo=FALSE}
 library(tufte); library(tidyverse); library(htmltools)
 ```
@@ -53,7 +50,8 @@ knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'), 'packages.bib
 ```
 
 
+#
 
+<!-- Empty pound will allow for one to create a single title page -->
 
-
-
+<img src="img/Rlogo.png" style="display:block; margin: 0 auto; width:20%"><br>

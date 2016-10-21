@@ -1,24 +1,3 @@
----
-title: "Other"
-author: |
-  | Michael Clark
-  | Statistician Lead
-  | Consulting for Statistics, Computing and Analytics Research
-  | <span style="color:'#00274c'">Advanced Research Computing</span>
-date: '`r Sys.Date()`'
-output:
-  html_document:
-    css: indexCSS.css
-    highlight: tango
-    theme: cosmo
-    toc: TRUE
-    toc_float: TRUE
-  pdf_document:
-    highlight: pygments
-    toc: yes
-always_allow_html: yes
----
-
 # Other
 
 These are other topics that may be covered in varying detail in the future. With packages noted.
@@ -27,6 +6,21 @@ These are other topics that may be covered in varying detail in the future. With
     - ltm or lavaan
 - Multiple group analysis
     - lavaan
+    *Hope you have a lot of data.*
+
+    Multigroup (also multi-sample, multiple sample etc.) analysis is, as its name implies, engaging SEM across multiple *intact* groups. I say intact to distinguish the mixture models from before, where the categories are latent.  As an example, we could compare 
+    
+    Measurement invariance
+    
+    - Configural
+    - Weak
+    - Strong
+    - Strict
+    
+    Other:
+    
+    - Longitudinal Stability
+
 - Multilevel SEM
 - Collaborative filtering
     - recommenderlab
