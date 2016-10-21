@@ -1,12 +1,10 @@
 digraph DAG {
 graph [rankdir = LR]
 
-node [shape = rectangle, style=filled, fontcolor=gray10, fontsize=8, 
-      fixedsize=false, color=gray80]
-
-node [fillcolor=white]
+node [shape = rectangle, style=filled, fillcolor=white, fontcolor=gray10, fontsize='15%',
+      fixedsize=true, color=gray, nodesize=.5, fontname="Helvetica"]
 attention4; read7; read21;
 
-edge [color=gray25]
+edge [color=gray50]
 attention4 -> read7; vocab4 -> read7; read7 -> read21;
 }
