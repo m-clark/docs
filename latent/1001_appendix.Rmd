@@ -33,8 +33,46 @@ always_allow_html: yes
 
 #### Reference
 
-McClelland, Acock, Piccinin, Rheac, Stallings. (2013). Relations between preschool attention span-persistence and age 25 educational outcomes. [link](http://www.sciencedirect.com/science/article/pii/S0885200612000762)
+McClelland, Acock, Piccinin, Rheac, Stallings. (2013). Relations between preschool attention span-persistence and age 25 educational outcomes. [link](http://www.sciencedirect.com/science/article/pii/S0885200612000762) Note that there is only one age 25 outcome (college completion) and two age 21 outcomes.
 
+The following models duplicate the paper results. Additional non-mediation models are provided for comparison.
+
+```{r, eval=FALSE}
+modReading = "
+  read21 ~ rr*read7 + ar21*attention4 + vocab4 + male + adopted + momed
+  read7 ~ ar7*attention4
+
+  # in
+  att4_read21 := ar7*rr
+"
+reading  = sem(modReading, data=mcclelland, missing='fiml', mimic = 'Mplus', std.ov=TRUE, se ='boot')
+summary(reading, rsquare=TRUE)
+
+modRead = "
+  read21 ~ read7 + attention4 + vocab4 + male + adopted + momed
+
+"
+readnomed  = sem(modread, data=mcclelland, missing='fiml', mimic = 'Mplus', std.ov=TRUE, se ='boot')
+AIC(read, readnomed)
+
+
+modMath = "
+  math21 ~ mm*math7 + am21*attention4 + vocab4 + male + adopted + momed
+  math7 ~ am7*attention4
+
+  # in
+  att4_math21 := am7*mm
+"
+math  = sem(modMath, data=mcclelland, missing='fiml', mimic = 'Mplus', std.ov=TRUE, se ='boot')
+summary(math, rsquare=TRUE, fit=T)
+
+modMath = "
+  math21 ~ math7 + attention4 + vocab4 + male + adopted + momed
+
+"
+mathnomed  = sem(modMath, data=mcclelland, missing='fiml', mimic = 'Mplus', std.ov=TRUE, se ='boot')
+AIC(math, mathnomed)
+```
 
 
 ### National Longitudinal Survey of Youth (1997, NLSY97)
@@ -105,6 +143,20 @@ SEM as it is known has been widely used in psychology and education for decades,
 
 **Mixture Models**: models using categorical latent variables.
 
+## Causal Bias
+
+I figure I should note my stance on soi-disant *causal modeling* so that whatever I might say in this document is taken with the appropriate context. To begin, no statistical model will ever provide evidence of causal effects. This is a fact that cannot be disputed.  Statistical models are inherently probabilistic, atheoretical in and of themselves, and wholly dependent on the data collected. No amount of fancy analysis or double-blind randomization will change the fact that in the end you have a probabilistic result, and one that is highly dependent on many assumptions both statistical and theoretical.  If you are using SEM or other approach to determine causal effects you will thus be unsuccessful. As such you should not be using them if that is the primary reason for doing so.
+
+Philosophically speaking, I also don't think science can prove causal relations.  As an example, there is nothing that convinces me in the least that smoking causes lung cancer, and that is because it doesn't.  If it did, everyone who ever smoked would have lung cancer.   As another example, you can randomly assign people who have cancer to two groups- in one they take an aspirin every day, in the other they drink orange juice every day. You may then find that they are equally effective in terms of remission rates, but it would be silly to think the 'treatments' had any causal effect at all, even though the effects would be non-zero. Modern drug science is not removed from this issue, or even far removed from this example, and regularly finds 'effects' of drugs that have no causal relation to the phenomenon under study.  This is especially the case with psychological phenomena, many of which to this day still have little to no tie to operational definitions based on physiology rather than behavior.  As yet another example, whether or not you get the flu depends first and foremost on whether or not you contract the (live) virus, and whether or not you get the flu shot has nothing to do with that, well certainly not as much as an infected person spitting in your eye (I will admit you may be more likely to catch it by going to the doctor's office in the first place).  One of the main reasons health science results are regularly overturned is precisely because people assign causal effects to things that have no causal relation to the subject under study.  If you don't want the flu, live in a hyperbaric chamber.
+
+I personally think it's misguided to think that a goal of science is to establish causal relations.  Its primary tool for weighing evidence, i.e. statistical modeling, certainly cannot do that. Furthermore, if you can predict something with 99% accuracy, do you really care about the underlying causal reality (assuming such a thing exists)?  But this is the goal of scientific endeavor, i.e. accurate prediction. It definitely is not about parameters and p-values.  The models are wrong, but they can work, and we'd prefer those that work better.  That is something science can provide.  Models can even correspond to 'reality' as we currently know it, but we all know that knowledge of reality changes as well, sometimes due to science. 
+
+A well-worn data set on which to test classification algorithms is the [MNIST hand written digits data](https://en.wikipedia.org/wiki/MNIST_database).  The methods use the pixel grayscale information to classify an image of orginally handwritten digits as being one of the values 0-9.  Modern approaches can get accurate classification *on test data* with less than 1% error.  If one's goal is to understand why the digits are the way they are, this model cannot help you.  A statistical approach can be very successful while still having nothing to say about the causal mechanisms influencing the target variable we wish to speak about.
+
+Another related point, *chance* doesn't cause anything.  There are mechanisms you do not know about contributing to the variability in the subject matter under study, but nothing from your results are *due to chance*.  Statistical models will always have uncertainty regarding them, and how much or how little there is depends on many things.  But just because we don't know what's going on, we cannot put the unknown as due to some magical notion.
+
+
+
 
 ## Resources
 
@@ -113,7 +165,14 @@ This list serves only as a starting point, though may be added to over time.
 
 ### Graphical Models
 
+[Judea Pearl's website](http://bayes.cs.ucla.edu/jp_home.html): Includes papers and technical reports.
+
 [UseR Series](http://link.springer.com/bookseries/6991): Contains texts on graphical models, Bayesian networks, and network analysis.
+
+
+### Potential Outcomes
+
+[Imai's website](http://imai.princeton.edu/projects/mechanisms.html): Papers and other info.
 
 
 ### Measurement Models
@@ -123,7 +182,7 @@ This list serves only as a starting point, though may be added to over time.
 
 ### SEM
 
-Kline, Rex. *Principles and Practice of Structural Equation Modeling*. A very applied introduction.
+Kline, Rex. *Principles and Practice of Structural Equation Modeling*. A very applied introduction that covers a lot of ground.  The latest edition finally includes explicit discussion of the more general graphical modeling framework within which SEM resides.
 
 Beaujean, A. A. (2014). [Latent variable modeling using R: A step by step guide](http://blogs.baylor.edu/rlatentvariable/). New York, NY: Routledge/Taylor and Francis. Lavaan based guide to SEM
 

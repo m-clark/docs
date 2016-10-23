@@ -1,10 +1,12 @@
-digraph DAG {
+digraph mediation {
 graph [rankdir = LR]
 
-node [shape = rectangle, style=filled, fillcolor=white, fontcolor=gray10, fontsize='15%',
-      fixedsize=true, color=gray, nodesize=.5, fontname="Helvetica"]
+node [shape = rectangle, style=filled, fillcolor=white, color=gray, width=.75]
+
+node [fontcolor=gray25, fontname=Helvetica, fixedsize=true, fontsize='5%']
 attention4; read7; read21;
 
 edge [color=gray50]
+
 attention4 -> read7; vocab4 -> read7; read7 -> read21;
 }

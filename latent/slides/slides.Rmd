@@ -1,0 +1,68 @@
+---
+title: <span style="font-size:100%; font-variant:small-caps; font-style:italic;">Graphical and Latent Variable Modeling</span>
+author:  |
+  <img src="../img/Rlogo.png" style="display:block; margin: 0 auto; width:10%"><br>
+  <div class="title"><span style="font-size:125%; font-variant:small-caps; ">Michael Clark</span><br>
+  <span style="font-size:75%; display:block; margin: 0 auto;">Statistician Lead</span> <br>
+  <img src="../img/signature-acronym-white.png" style="display:block; margin: 0 auto;width:33%; padding:10px 0;"> <br>
+  <img src="../img/ARC-acronym-signature-white.png" style="display:block; margin: 0 auto;width:22%; padding:10px 0;"> </div>
+output: 
+  revealjs::revealjs_presentation:
+    theme: dark
+    transition: zoom
+    incremental: true
+    center: true
+css: slides.css
+---
+
+# Starting Out
+
+## Outline
+
+<p class='fragment emph'> Preliminaries</p>
+<p class='fragment emph'> Graphical Modeling</p>
+<p class='fragment emph'> Latent Variables</p>
+<p class='fragment emph'> SEM</p>
+<p class='fragment emph'> Overview of others</p>
+
+# Intro2R
+
+## Basics
+
+Objects
+
+- Functions
+
+Classes
+
+Installing packages
+
+
+## Code
+
+Using functions to create output
+
+Print the object to view it
+
+```{r eval=F}
+myobj = function(arg1=input1, argA=inputA)  
+myobj
+```
+
+- The following creates the object <span class="objclass">nums</span>
+
+- <span class="func">sum</span> sums the elements of <span class="objclass">nums</span>
+
+- The result is <span class="emph">assigned</span> to the object <span class="objclass">numsSum</span>
+
+- Object is printed to view it
+
+```{r}
+nums = c(1,2,3,4)      # c is a function that combines its elements
+numsSum = sum(nums)    # 
+numsSum
+```
+
+<p class='fragment emph'>
+<p class='fragment emph'>
+<p class='fragment emph'>

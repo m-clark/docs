@@ -10,7 +10,7 @@ Not everything we want to measure comes with an obvious yardstick.  If one wants
 
 Any of these might be useful as an *indicator* of their current state of happiness, but of course none of them would tell us whether they truly are happy or not. At best, they can be considered imperfect measures. If we consider those and other indicators collectively, perhaps we can get an underlying measure of something we might call happiness, contentment, or some other arbitrary but descriptive name.
 
-Despite how they are typically used within psychology, educational and related fields, the use of <span class="emph">latent variable</span> models are actually seen all over, and in ways that may have little to do with what we will be focusing on in this course.  Broadly speaking, <span class='emph'>factor analysis</span> can be seen as a dimension reduction technique, or as an approach to  modeling measurement error and understanding underlying constructs.  We will give some description of the former while focusing on the latter.
+Despite how they are typically used within psychology, educational and related fields, the use of <span class="emph">latent variable</span> models are actually seen all over, and in ways that may have little to do with what we will be mostly focusing on here[^factcor].  Broadly speaking, <span class='emph'>factor analysis</span> can be seen as a dimension reduction technique, or as an approach to  modeling measurement error and understanding underlying constructs.  We will give some description of the former while focusing on the latter.
 
 
 ## Dimension Reduction/Compression
@@ -18,6 +18,7 @@ Despite how they are typically used within psychology, educational and related f
 Many times we simply have the goal of taking a whole lot of variables, reducing them to much fewer, but while retaining as much information about the originals as possible.  For example, this is an extremely common goal in areas of image and audio compression.  Statistical techniques amenable to these approaches are commonly referred to as <span class='emph'>matrix factorization</span>.
 
 ### Principal Components Analysis
+
 Probably the most commonly used factor-analytic technique is <span class='emph'>principal components analysis</span> (PCA).  It seeks to extract *components* from a set of variables, with each component containing as much of the original variance as possible.  Components can be seen as a linear combination of the original variables.
 
 PCA works on a covariance/correlation matrix, and it will return as many components as there are variables that go into it, each subsequent component accounting for less variance than the previous component, and summing up to 100% of the total variance in the original data.  With appropriate steps, the components can completely reproduce the original correlation matrix.  However, as the goal is dimension reduction, we only want to retain some of these components, and so the reproduced matrix will not be exact.  This however gives us some sense of a goal to shoot for, and the same idea is also employed in factor analysis/SEM, where we also work with the covariance matrix and prefer models that can closely reproduce the original matrix seen with the observed data.
@@ -129,7 +130,7 @@ Before leaving PCA for factor analysis of the sort we'll mostly be concerned wit
 <span class='emph'>Factor analysis</span> is a general technique for uncovering latent variables within data. While initially one might think it similar to PCA[^factpca], one difference from PCA is that the goal is not to recover maximum variance with each component.    However, we will move beyond factor analysis as a dimension reduction technique (and fully 'exploratory' technique, see below), and instead present it as an approach with a strong theoretical underpinning, and one that can help us assess measurement error, ultimately even leading to regression models utilizing the latent variables themselves.
 
 
-So let us turn to what are typically called <span class="emph">measurement models</span> within SEM. The underlying model can be thought of as a case in which the observed variables, in some disciplines referred to as *indicators* of the latent construct (also *manifest* variables), are caused by the latent variable. The degree to which the observed variables correlate with one another depends in part on how much of the underlying (presumed) latent variable they reliably measure.  
+So let us turn to what are typically called <span class="emph">measurement models</span> within SEM. The underlying model can be thought of as a case in which the observed variables, in some disciplines referred to as *indicators* of the latent construct (also *manifest* variables), are caused by the latent variable. The degree to which the observed variables correlate with one another depends in part on how much of the underlying (presumed) latent variable they reliably measure[^factphil].  
 
 For each indicator we can think of a regression model as follows, where $\beta_0$ is the intercept and $\lambda$ the regression coefficient that expresses the effect of the latent variable $F$ on the observed variable $X$ (I do not note the error).
 
@@ -147,11 +148,12 @@ X_3 &= \beta_{03} + \lambda_{13} F_1
 It is important to understand this regression model, because many who engage in factor analysis seemingly do not, and often think of it the other way around, where the observed variables cause the latent.  In factor analysis, the $\lambda$ coefficients are called <span class="emph">loadings</span> (as they were in PCA), but are interpreted as any other regression coefficient- a one unit change in the latent variable results in a $\lambda$ change in the observed variable. Most factor models assume that, controlling for the latent variable, the observed variables are independent (recall our previous discussion on conditional independence in graphical models), though this is sometimes relaxed.
 
 #### Exploratory vs. Confirmatory
-An unfortunate and unhelpful distinction in some disciplines is that of <span class="emph">exploratory</span> vs. <span class="emph">confirmatory</span> factor analysis (and even exploratory SEM).  In any regression analysis, there is a non-zero correlation between *any* variable and some target variable. We don't include everything for theoretical (and even practical) reasons, which is akin to fixing its coefficient to zero, and here it is no different.  Furthermore, most modeling endeavors could be considered exploratory, regardless of how the model is specified.  As such, this distinction doesn't tell us anything about the model, and is thus unnecessary in my opinion.
+
+An unfortunate and unhelpful distinction in some disciplines (esp. psychology) is that of <span class="emph">exploratory</span> vs. <span class="emph">confirmatory</span> factor analysis (and even exploratory SEM).  In any regression analysis, there is a non-zero correlation between *any* variable and some target variable. We don't include everything for theoretical (and even practical) reasons, which is akin to fixing its coefficient to zero, and here it is no different.  Furthermore, most modeling endeavors could be considered exploratory, regardless of how the model is specified.  As such, this distinction doesn't tell us anything about the model, and is thus unnecessary in my opinion.
 
 As an example, $X_3$ is not modeled by $F_2$, which is the same as fixing the  $\lambda_{23}$ coefficient for $F2$ to 0, but that doesn't tell me whether the model is exploratory or not, and yet that is all the distinction refers to, namely, whether we let all factors load with all indicators or not.  An analysis doesn't suddenly have more theoretical weight, validity etc. due to the paths specified.
 
-### Example
+#### Example
 
 Let's see a factor analysis in action.  The motivating example for this section comes from the National Longitudinal Survey of Youth (1997, NLSY97), which investigates the transition from youth to adulthood. For this example, we will investigate a series of questions asked to the participants in 2006 pertaining to the government’s role in promoting well-being. Questions regarded the government's responsibility for the following: providing jobs for everyone, keeping prices under control, providing health care, providing for elderly, helping industry, providing for unemployed, reducing income differences, providing college financial aid, providing decent housing, protecting the environment.  Each item has four values 1:4, which range from 'definitely should be' to 'definitely should not be'[^backward]. We'll save this for the exercise.
 
@@ -180,7 +182,7 @@ famod = cfa(modelCode, data=depressed)
 summary(famod, standardized=T)
 ```
 
-#### Raw results
+##### Raw results
 
 In a standard measurement model such as this we must *scale the factor* by fixing one of the indicator's loadings to one.  This is done for identification purposes, so that we can estimate the latent variable variance.  Which variable is selected for scaling is arbitrary, but doing so means that the sum of the latent variable variance and the residual variance of the variable whose loading is fixed to one equals the variance of that observed variable[^residualModel].    
 
@@ -188,7 +190,7 @@ In a standard measurement model such as this we must *scale the factor* by fixin
 semPlot::semPaths(famod, layout='tree2', style='lisrel', covAtResiduals=F, 
                   whatLabels = 'par', groups=c('latent', 'man'),  color=list(latent='#ff5503', man=scales::alpha('#ff5503',.5)),
                   sizeMan=5, sizeLat=10, edge.label.cex=1.5, borders=F, #edge.color='#1e90ff',
-                  label.color='#ffffff') 
+                  label.color='#ffffff', edge.width=2.5) 
 ```
 
 ```{r }
@@ -196,11 +198,11 @@ var(depressed$FeltDown, na.rm=T)  # .29 + .15
 ```
 
 
-#### Standardized latent variable
+##### Standardized latent variable
 An alternative way to scale the latent variable is to simply fix its variance to one (the `std.lv=TRUE` results). It does not need to be estimated, allowing us to obtain loadings for each observed variable.
 
 
-#### Standardized latent and observed
+##### Standardized latent and observed
 
 With both standardized (using the <span class="func">summary</span> function, set `standardized=T`), these loadings represent correlations between the observed and latent variables.  This is the default output in the factor analysis we'd get from non-SEM software (i.e. 'exploratory' FA).  If one is just doing a factor-analytic model, these loadings are typically reported. Standardized coefficients in a CFA are computed by taking the unstandardized coefficient (loading) and multiplying it by the model implied standard deviation of the indicator then dividing by the latent variable’s standard deviation. Otherwise, one can simply use standaridized variables in the analysis, or supply only the correlation matrix.
 
@@ -209,7 +211,7 @@ semPlot::semPaths(famod, layout='tree2', style='lisrel', covAtResiduals=F,
                   whatLabels = 'std', groups=c('latent', 'man'),  color=list(latent='#ff5503', man=scales::alpha('#ff5503',.5)),
                   sizeMan=5, sizeLat=10, edge.label.cex=1.5, borders=F, #edge.color='#1e90ff',
                   nCharNodes=6, exoVar=T,
-                  label.color='#ffffff') 
+                  label.color='#ffffff', edge.width=2.5) 
 ```
 
 If you'd like to peel back the curtain and see maximum likelihood estimation based on the raw (covariance) and standardized (correlation) scales, with a comparison to lavaan output, [click here](https://github.com/mclark--/Miscellaneous-R-Code/blob/master/ModelFitting/cfa_ml.R).
@@ -219,7 +221,7 @@ If you'd like to peel back the curtain and see maximum likelihood estimation bas
 
 ### Scale development
 
-A good use of factor analysis regards scale development.  If we come up with 10 items that reflect some underlying construct, factor analysis can provide a sense of how well the scale is put together.  Recall that in path analysis, residual variance, sometimes called disturbance, reflects both omitted causes as well as measurement error.  In this context, $1-R^2_{item}$ provides a sense of how unreliable the item is.  A perfectly reliable item would have a value of zero.  Strong loadings indicate a strong relationship between the item and the underlying construct.
+A good use of factor analysis regards scale development.  If we come up with 10 items that reflect some underlying construct, factor analysis can provide a sense of how well the scale is put together.  Recall that in path analysis, residual variance, sometimes called disturbance[^klinedisturbed], reflects both omitted causes as well as measurement error.  In this context, $1-R^2_{item}$ provides a sense of how unreliable the item is.  A perfectly reliable item would have a value of zero.  Strong loadings indicate a strong relationship between the item and the underlying construct.
 
 ### Factor Scores
 
@@ -293,7 +295,7 @@ digraph DAG2 {
 
 - **Topic Model**: In the analysis of text, one can discover latent 'topics' based on the frequency of words.
 
-- **Collaborative Filtering**: For example, in recommender systems for movies or music, the latent variable might represent genre.
+- **Collaborative Filtering**: For example, in recommender systems for movies or music, the latent variable might represent genre or demographic subsets.
 
 
 
@@ -307,3 +309,14 @@ Latent variable approaches are a necessary tool to have in your statistical tool
 
 - psych
 - lavaan
+
+
+[^factcor]: Some even use use a factor analytic approach to estimating correlations among parameters in models (e.g. I've seen this with gaussian processes and multinomial regression).
+
+[^factphil]: There are actually deep philosophical underpinnings to this approach, going at least as far back as the notion of the Platonic forms, and continuing on through philosophical debates about what mental aspects can be measured scientifically. However, even when it became a more quantitative discipline, the philosophy was not far behind. See, for example, [The Vectors of Mind](https://archive.org/details/vectorsofmindmul010122mbp) by L.L. Thurstone, one of the pioneers of measurement theory (1935).  As a philosophy major from back in the day, latent variable modeling has always had great appeal to me.
+
+[^factpca]: One version of factor analysis is nearly identical to PCA in terms of mechanics, save for what are on the diagonals of the correlation matrix (1s vs. 'communalities').
+
+[^backward]: Please don't do this.
+
+[^klinedisturbed]: Kline distinguishes between the residuals in standard regression and disturbance in SEM (p. 131 4th ed.), but the distinction there appears to conflate the estimated variance as a parameter/construct and the actual residuals ($y - \hat{y}$) you'd get after model estimation.  A standard regression as typically estimated is no different than the same model in the graphical modeling context.  Calling path analysis a causal model makes it no more causal than any other regression model. And the remaining variance is the effect of many things not in the model, and they are causal, regardless of estimation technique.  I think we care more deeply about it in this context, and perhaps that necessitates another name, and anything would be better than 'error'.  However, anything statistical in nature is also by nature non-causal.
