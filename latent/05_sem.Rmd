@@ -1,8 +1,9 @@
 # Structural Equation Modeling
 
-Structural equation modeling combines the path analytic and latent variable techniques together to allow for regression models among latent variables.  Any model, even the SLiM, can be seen as some form of SEM.  However, the term is typically reserved for the combination of latent and observed variables in a model.
+Structural equation modeling combines the path analytic and latent variable techniques together to allow for regression models among latent and observed variables.  Any model, even the SLiM, can be seen as some form of SEM.  However, the term is typically reserved for the combination of latent and observed variables in a model.
 
 ## Measurement model
+
 The <span class="emph">measurement model</span> refers to the latent variable models, i.e. factor analysis, and typical practice in SEM is to investigate these separately and first.  The reason is that one wants to make sure that the measurement model holds before going any further with the underlying constructs. For example, for one's sample of data one might detect two latent variables work better for a set of indicators, or might find that some indicators are performing poorly.
 
 ## Structural model
@@ -56,7 +57,7 @@ semPlot::semPaths(alienation, layout='tree2', style='lisrel', whatLabels = 'path
 # semPlot::semPaths(alienation, residuals=T, style='lisrel', edgeLabels='', residScale=10, nCharNodes=6, exoVar=T, edge.label.cex=1)
 ```
 
-The standardized results of the structural model are shown below, and model results below that. In this case, the structural paths are statistically significant, as is the indirect effect specifically.  Higher socioeconomic status is affiliated with less alienation, while there is a notable positive relationship of prior alienation with later alienation.  We are also accounting for roughly 50% of the variance in 1971 alienation.  Colors represent positive vs. negative weights, and the closer to zero the more faded they are.
+The standardized results of the structural model are visualized below, and model results below that. In this case, the structural paths are statistically significant, as is the indirect effect specifically.  Higher socioeconomic status is affiliated with less alienation, while there is a notable positive relationship of prior alienation with later alienation.  We are also accounting for roughly 50% of the variance in 1971 alienation.  Colors represent positive vs. negative weights, and the closer to zero the more faded they are.
 
 ```{r wheatonStructural, echo=F}
 semPlot::semPaths(alienation, residuals=T, style='lisrel', what='std', 
@@ -67,6 +68,8 @@ semPlot::semPaths(alienation, residuals=T, style='lisrel', what='std',
 ```{r wheatonResults, echo=FALSE}
 summary(alienation, fit=T, rsq=T)
 ```
+
+To be clear, your interpretations based on standard regression still hold here, as the edge parameters are still regression coefficients just like they have always been. It will serve you well in the beginning to interpret each endogenous variable individually as its own model, then move toward the big picture.  Regression with latent variables is the same as regression with observed variables which is the same as a mixture of them.  Correlations, i.e. undirected paths, are still just correlations just like anywhere else.
 
 ## Issues in SEM
 
@@ -97,7 +100,7 @@ semPlot::semPaths(underModel, style='lisrel',
 summary(underModel)
 ```
 
-Now if we had a third variable, we now have six pieces of information to estimate and still seven unknowns. Again though, we usually fix the first loading to 1, so it would be estimated. An alternative approach would be to fix the factor variance to some value (typically 1 to create a standardized latent variable). This will allow us to estimate a unique value for each path.
+Now if we had a third manifest variable, we now have six pieces of information to estimate and still seven unknowns. Again though, we usually fix the first loading to 1, so it would be estimated. An alternative approach would be to fix the factor variance to some value (typically 1 to create a standardized latent variable). This will allow us to estimate a unique value for each path.
 
 Even so, this is the *just identified* situation, and so the model runs, but we won't have any fit measures because we can perfectly reproduce the observed correlation matrix.
 
@@ -182,7 +185,7 @@ residuals(alienation, type='cor')$cor
 
 #### Fit Summarized
 
-A brief summary of these and other old/typical measures of fit are described [here](https://en.wikipedia.org/wiki/Confirmatory_factor_analysis#Evaluating_model_fit).  However they all have issues, and one should *never* use cutoffs as a basis for your ultimate thinking about model performance.  Studies have been done and all the fit indices have issues in various scenarios, and the cutoffs do not hold up under scrutiny.  While they can provide some assistance in the process, they are not meant to overcome a global assessment of theory-result compatibility.
+A brief summary of these and other old/typical measures of fit are described [here](https://en.wikipedia.org/wiki/Confirmatory_factor_analysis#Evaluating_model_fit).  However they all have issues, and one should *never* use cutoffs as a basis for your ultimate thinking about model performance.  Studies have been done and all the fit indices can potentially have problems in various scenarios, and the cutoffs commonly used by applied researchers do not hold up under scrutiny.  While they can provide some assistance in the process, they are not meant to overcome a global assessment of theory-result compatibility.
 
 ### Model Comparison
 
@@ -190,11 +193,11 @@ All of the above, while rooted in model comparison approaches, are by themselves
 
 #### AIC
 
-AIC is a good way to compare models in SEM just as it is elsewhere, where a penalty is imposed on the likelihood based on the number of parameters estimated, i.e. model complexity.  The value by itself is not useful, but the 'better' model will have a lower value. A natural question arises as to how low is low enough to prefer one model over another, but this is impossible to answer because the value of AIC varies greatly with the data and model in question. However, this frees you to know which is 'better', at least in terms of AIC, while still allowing you to consider the merits of the model even so.  If the lower AIC is associated with the simpler model, you'd be hard-pressed to justify not taking it.  
+AIC is a good way to compare models in SEM just as it is elsewhere, where a penalty is imposed on the likelihood based on the number of parameters estimated, i.e. model complexity.  The value by itself is not useful, but the 'better' model will have a lower value. A natural question arises as to how low is low enough to prefer one model over another, but this is impossible to answer because the value of AIC varies greatly with the data and model in question. However, this frees you to know which is 'better', at least in terms of AIC, while still allowing you to consider the relative merits of the models being considered.  However, if the lower AIC is associated with the simpler model, you'd be hard-pressed to justify not taking it.  
 
 #### BIC
 
-One can probably ignore the BIC in this context. This isn't actually Bayesian, and if you are using a Bayesian approach, WAIC or DIC would be appropriate.  If you aren't using a Bayesian approach, then AIC would likely be preferable in most circumstances.  The BIC has a different penalty than AIC, and is not a measure based on predictive performance, which is what we typically want in model selection.
+One can probably ignore the BIC in this context. This isn't actually Bayesian, and if you were using a Bayesian approach, WAIC or DIC would be appropriate.  If you aren't using a Bayesian approach, then AIC would likely be preferable in most circumstances.  The BIC has a different penalty than AIC, and is not a measure based on predictive performance, which is what we typically want in model selection.
 
 #### Example
 

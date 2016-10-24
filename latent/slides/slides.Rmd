@@ -15,7 +15,20 @@ output:
 css: slides.css
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=F, message = F, warning=F, 
+                      R.options=list(width=120), fig.align='center')
+library(tidyverse)
+```
+
+
+
 # Starting Out
+
+## Document
+
+[m-clark.github.io/docs/sem](https://m-clark.github.io/docs/sem)
+
 
 ## Outline
 
@@ -24,6 +37,45 @@ css: slides.css
 <p class='fragment emph'> Latent Variables</p>
 <p class='fragment emph'> SEM</p>
 <p class='fragment emph'> Overview of others</p>
+
+
+
+#   {data-background="../../img/rstudio.png"}
+
+
+##  {.col2}
+
+Primary components
+
+<p class='fragment emph'>Scripts/Docs</p>
+<p class='fragment emph'>Console</p>
+<p class='fragment emph'>Viewer</p>
+<p class='fragment emph'>Other</p>
+
+<br><br><br><br>
+
+<img src="../../img/rstudio.png" style="display:block; margin: 0 auto; width:225%">
+
+## Scripts/Docs
+
+For this workshop, use traditional R script or notebook
+
+Script is where your code goes
+
+Ctrl+Enter will run current line or selected lines
+
+
+## Console
+
+Where the code is run
+
+Typically your output will be viewed here
+
+
+## Viewer
+
+Visualizations
+
 
 # Intro2R
 
@@ -49,6 +101,8 @@ myobj = function(arg1=input1, argA=inputA)
 myobj
 ```
 
+## Code
+
 - The following creates the object <span class="objclass">nums</span>
 
 - <span class="func">sum</span> sums the elements of <span class="objclass">nums</span>
@@ -59,10 +113,88 @@ myobj
 
 ```{r}
 nums = c(1,2,3,4)      # c is a function that combines its elements
-numsSum = sum(nums)    # 
+numsSum = sum(nums)     
 numsSum
 ```
 
-<p class='fragment emph'>
-<p class='fragment emph'>
-<p class='fragment emph'>
+
+## Example lavaan code
+
+```{r eval=FALSE}
+library(lavaan)                     # loads the library
+
+myModel = "
+ # latent variables aka measurment models
+ Factor1 =~ x1 + x2 + x3            
+ Factor2 =~ y1 + y2 + y3
+
+ # regresssions aka structural model
+ Factor2 ~ Factor1 + z1 + z3
+"
+
+mySEM = sem(myModel, otherinputs)   # run the model
+summary(mySem)                      # display results
+```
+
+
+## Save your work
+
+Always save your scripts
+
+If desired, can save your work as RData file
+
+
+```{r eval=F}
+save(obj1, obj2, file='filelocation/myRstuff.RData')
+
+save.image('filelocation/myRstuff.RData')     # saves everything
+```
+
+# Graphical Models
+
+##
+
+```{r echo=FALSE, fig.width=5, fig.height=5, fig.align='center', dev='svg'}
+mcclelland = haven::read_dta('../data/path_analysis_data.dta')
+mcclellandNoCollege = select(mcclelland, -college, -college_missing) %>% 
+  na.omit %>% 
+  sapply(as.numeric) %>% 
+  data.frame
+blacklist = data.frame(from = c(rep(c('read21', 'math21'), each=7), rep(c('read7','math7'), each=5),
+                                rep(c('vocab4', 'attention4'), each=3),
+                                rep(c('adopted',  'male', 'momed'), times=2),
+                                'math21','read21', 'math7','read7'),
+                       to = c(rep(c('read7', 'math7', 'attention4', 'vocab4', 'adopted',  'male', 'momed'), times=2),
+                              rep(c('attention4', 'vocab4', 'adopted',  'male', 'momed'), times=2),
+                              rep(c('adopted',  'male', 'momed'), times=2),
+                              c('male',  'momed', 'adopted'), c('momed',  'adopted', 'male'),
+                              'read21', 'math21','read7','math7'))
+
+library(bnlearn)
+model = gs(mcclellandNoCollege, blacklist = blacklist, test='mi-g-sh')  
+
+library(visNetwork); library(igraph)
+g = graph_from_edgelist(model$arcs)
+g = toVisNetworkData(g)
+# there is no way to use circle without the label fucking the size up
+visNetwork(nodes=data.frame(g$nodes, value=100), edges=g$edges, width='75%') %>% 
+  visNodes(shadow=list(enabled=T, color='rgba(0,0,0,0.25)'),
+           font=list(size=12, color='#fff'),
+           shape='circle', 
+           scaling=list(label=list(enabled=T, min=10, max=12), max=5),  
+           color=list(background='#ff5503', highlight=list(background='salmon'))) %>% 
+  visEdges(color='#1e90ff', arrows='to', smooth=list(enabled=T, forceDirection='horizontal')) %>% 
+  visLayout(randomSeed=123)
+
+```
+
+## Overview
+
+<p class='fragment emph'>Directed Graphs</p>
+- <p class='emph'>Path Analysis</p>
+- <p class='emph'>Mediation</p>
+- <p class='emph'>Bayesian Networks</p>
+<p class='fragment emph'>Undirected</p>
+- <p class='fragment emph'>Network analysis</p>
+<p class='fragment emph'></p>
+<p class='fragment emph'></p>

@@ -44,6 +44,7 @@ Any statistical model you've conducted can be expressed as a graphical model.  A
 A key idea of a graphical model is that of <span class="emph">conditional independence</span>, something one should keep in mind when constructing their models.  The concept can be demonstrated with the following graph.
 
 ```{r conditionalIndependence, echo=FALSE, eval=T, fig.align='center'}
+tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%", 
 DiagrammeR::DiagrammeR("
 digraph DAG {
   # Intialization of graph attributes
@@ -67,7 +68,7 @@ digraph DAG {
   # Edge statements
   X -> Y; Y -> Z;
 }
-", type='grViz')
+", type='grViz'))
 # <img src="img/conditionalIndependence.png" style="display:block; margin: 0 auto; width:25%">
 ```
 
@@ -318,7 +319,7 @@ As expected, the results of <span class="pack">lavaan</span> and <span class="pa
 
 #### Cavets about indirect effects
 
-One should think very hard about positing an indirect effect, especially if there is no time component or obvious pseudo-causal path.  If the effect isn't immediately obvious, then one should probably just examine the direct effects.  Unlike other standard explorations one might do with models (e.g. look for nonlinear relationships), the underlying causal connection is more explicit in this context.  Many models I've seen in consulting struck me as arbitrary as far as which covariate served as the mediator, required a fairly convoluted explanation for its justification, or ignored other relevant variables because the reasoning would have to include a plethora of indirect effects if it were to be logically consistent.  Furthermore, I can often ask one or two questions and will discover that researchers are actually interested in interactions (i.e. moderation), rather than indirect effects.
+One should think very hard about positing an indirect effect, especially if there is no time component or obvious pseudo-causal path.  If the effect isn't immediately obvious, or you are dealing with cross-sectional data, then you should probably just examine the direct effects.  Unlike other standard explorations one might do with models (e.g. look for nonlinear relationships), the underlying causal connection and associated assumptions are more explicit in this context.  Many models I've seen in consulting struck me as arbitrary as far as which covariate served as the mediator, required a fairly convoluted explanation for its justification, or ignored other relevant variables because the reasoning would have to include a plethora of indirect effects if it were to be logically consistent.  Furthermore, I can often ask one or two questions and will discover that researchers are actually interested in interactions (i.e. moderation), rather than indirect effects.
 
 This document will not get into models that have *moderated mediation* and *mediated moderation*. In my experience these are often  associated with models that are difficult to interpret at best, or are otherwise not grounded very strongly in substantive concerns.  However, there are times, e.g. in experimental settings, which surprisingly few SEM are applied to, where perhaps it would be very much appropriate. It is left to the reader to investigate those particular complexities when the time comes.
 
@@ -372,7 +373,7 @@ In many cases of path analysis, the path model is not strongly supported by prio
 
 A more exploratory approach to graphical models is available however.  <span class="emph">Bayesian Networks</span>, an approach within Pearl's structural causal model framework just mentioned and which led to its development, are an alternative to graphical modeling of the sort we've been doing. Though they can be used to produce exactly the same results that we obtain with path analysis via maximum likelihood estimation, they can also be used for constrained or wholly exploratory endeavors as well, with regularization in place to keep from overfitting.
 
-As an example, I use the McClelland data to explore potential paths via the <span class='pack'>bnlearn</span> package.  I make the constraints that variables later in time do not effect variables earlier in time, no variables are directed toward background characteristics like sex, and at least for these purposes I keep math and reading at a particular time from having paths to each other.  I show some of the so-called *blacklist* of constraints here.  Note that we can also require certain paths be in the model via a *whitelist*.
+As an example, I use the McClelland data to explore potential paths via the <span class='pack'>bnlearn</span> package.  I make the constraints that variables later in time do not effect variables earlier in time[^time_cause], no variables are directed toward background characteristics like sex, and at least for these purposes I keep math and reading at a particular time from having paths to each other.  I show some of the so-called *blacklist* of constraints here.  Note that we can also require certain paths be in the model via a *whitelist*.
 
 ```{r blacklist, echo=F, eval=-c(3:10)}
 mcclellandNoCollege = select(mcclelland, -college, -college_missing) %>% 
@@ -672,7 +673,7 @@ Graphical models are a general way to formulate and visualize statistical models
 
 [^psychlit]: In general, avoid using the applied psychological literature as a basis for how to conduct or report methods. While excellent examples may be found, the field has largely ignored its own quantitative methodologists, even the APA recommendations of various task forces regarding methods, for decades.
 
-[^kline_indvmed]: Kline distinguishes indirect effects vs. mediation. I don't, because I don't believe SEM to have any inherently greater ability to discern causality than any other framework, and it doesn't.  I do like his suggestion that mediation be reserved for effects involving time precedence.  But even then, and as physics dictates, the arrow of time is inconsequential. All else being equal, your model will fit as well with time 2 $\rightarrow$ time 1 as time 2 $\leftarrow$ time 1.
+[^kline_indvmed]: Kline distinguishes indirect effects vs. mediation. I don't, because I don't believe SEM to have any inherently greater ability to discern causality than any other framework, and it doesn't.  I do like his suggestion that mediation be reserved for effects involving time precedence, and defaulting to 'indirect effects' should keep you out of trouble.  But even then, and as physics dictates, the arrow of time is inconsequential on a macro level. All else being equal, your model will fit as well with time 2 $\rightarrow$ time 1 as time 2 $\leftarrow$ time 1.
 
 [^imai_links]: See the package [vignette](ftp://cran.r-project.org/pub/R/web/packages/mediation/vignettes/mediation.pdf) and Imai's [papers](http://imai.princeton.edu/projects/mechanisms.html) for more detail
 
@@ -682,6 +683,6 @@ Graphical models are a general way to formulate and visualize statistical models
 
 [^mcc_conclusion]: I have no bone to pick nor know the authors, but after seeing the models thus far, at this point I have to question the major conclusion of the McClelland et al. paper, which focuses on the effects of attention span on these outcomes, and concludes the indirect effects are notable and that there is a noteworthy direct effect on math at age 21.  To begin, the attention span variable starts with no strong linear correlation with either outcome. They admit no direct effect on reading, but then suggest there is still an indirect effect even though it is practically zero and the bulk of it clearly is the read7 $\rightarrow$ read21 path.  If demographics only predict read21 (again this isn't clear from their paper, but such a model does duplicate the few values they actually report), then the R^2^ for read7 is ~ 1.6%.  Thus I can't think of any way to conclude a direct or indirect effect of attention span at age 4 on reading at 21. The math results are only marginally better, but even there the internal fit indices are poor (e.g. rmsea etc.). Had a model comparison approach been used, AIC would not have chosen the mediation model in either case. <br><br> In general, if the path from a variable to a mediator is essentially zero to begin with, save yourself some trouble- there is no reason to test for indirect effects (zero times any value is still zero).<br><br> 
 
-
+[^time_cause]: Note that if this approach were able to uncover causal relations via statistical means, a blacklist would not be necessary. If you actually tried it here, you'd find adoption status influenced by early adult scholastic abilties.
 
 [^nonrecursiveName]: No, 'non'-recursive as a name for these models makes no sense to me either.

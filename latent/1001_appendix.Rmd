@@ -1,23 +1,3 @@
----
-title: "Appendix"
-author: |
-  | Michael Clark
-  | Statistician Lead
-  | Consulting for Statistics, Computing and Analytics Research
-  | <span style="color:'#00274c'">Advanced Research Computing</span>
-date: '`r Sys.Date()`'
-output:
-  html_document:
-    css: indexCSS.css
-    highlight: tango
-    theme: cosmo
-    toc: TRUE
-    toc_float: TRUE
-  pdf_document:
-    highlight: pygments
-    toc: yes
-always_allow_html: yes
----
 
 # Appendix
 
@@ -145,17 +125,32 @@ SEM as it is known has been widely used in psychology and education for decades,
 
 ## Causal Bias
 
-I figure I should note my stance on soi-disant *causal modeling* so that whatever I might say in this document is taken with the appropriate context. To begin, no statistical model will ever provide evidence of causal effects. This is a fact that cannot be disputed.  Statistical models are inherently probabilistic, atheoretical in and of themselves, and wholly dependent on the data collected. No amount of fancy analysis or double-blind randomization will change the fact that in the end you have a probabilistic result, and one that is highly dependent on many assumptions both statistical and theoretical.  If you are using SEM or other approach to determine causal effects you will thus be unsuccessful. As such you should not be using them if that is the primary reason for doing so.
-
-Philosophically speaking, I also don't think science can prove causal relations.  As an example, there is nothing that convinces me in the least that smoking causes lung cancer, and that is because it doesn't.  If it did, everyone who ever smoked would have lung cancer.   As another example, you can randomly assign people who have cancer to two groups- in one they take an aspirin every day, in the other they drink orange juice every day. You may then find that they are equally effective in terms of remission rates, but it would be silly to think the 'treatments' had any causal effect at all, even though the effects would be non-zero. Modern drug science is not removed from this issue, or even far removed from this example, and regularly finds 'effects' of drugs that have no causal relation to the phenomenon under study.  This is especially the case with psychological phenomena, many of which to this day still have little to no tie to operational definitions based on physiology rather than behavior.  As yet another example, whether or not you get the flu depends first and foremost on whether or not you contract the (live) virus, and whether or not you get the flu shot has nothing to do with that, well certainly not as much as an infected person spitting in your eye (I will admit you may be more likely to catch it by going to the doctor's office in the first place).  One of the main reasons health science results are regularly overturned is precisely because people assign causal effects to things that have no causal relation to the subject under study.  If you don't want the flu, live in a hyperbaric chamber.
-
-I personally think it's misguided to think that a goal of science is to establish causal relations.  Its primary tool for weighing evidence, i.e. statistical modeling, certainly cannot do that. Furthermore, if you can predict something with 99% accuracy, do you really care about the underlying causal reality (assuming such a thing exists)?  But this is the goal of scientific endeavor, i.e. accurate prediction. It definitely is not about parameters and p-values.  The models are wrong, but they can work, and we'd prefer those that work better.  That is something science can provide.  Models can even correspond to 'reality' as we currently know it, but we all know that knowledge of reality changes as well, sometimes due to science. 
-
-A well-worn data set on which to test classification algorithms is the [MNIST hand written digits data](https://en.wikipedia.org/wiki/MNIST_database).  The methods use the pixel grayscale information to classify an image of orginally handwritten digits as being one of the values 0-9.  Modern approaches can get accurate classification *on test data* with less than 1% error.  If one's goal is to understand why the digits are the way they are, this model cannot help you.  A statistical approach can be very successful while still having nothing to say about the causal mechanisms influencing the target variable we wish to speak about.
-
-Another related point, *chance* doesn't cause anything.  There are mechanisms you do not know about contributing to the variability in the subject matter under study, but nothing from your results are *due to chance*.  Statistical models will always have uncertainty regarding them, and how much or how little there is depends on many things.  But just because we don't know what's going on, we cannot put the unknown as due to some magical notion.
+I figure I should note my stance on soi-disant *causal modeling* so that whatever I might say in this document is taken with the appropriate context. What follows is more or less a philosophical stance, perhaps a naïve and not very well developed one at that, but one that I think is a safer perspective than others commonly held regarding causes and statistics. 
 
 
+To begin, no statistical model by itself will ever provide evidence of causal effects. This is a fact that cannot be disputed.  Statistical models are inherently probabilistic, atheoretical in and of themselves, and wholly dependent on the data collected. No amount of fancy analysis or double-blind randomization will change the fact that in the end you have a probabilistic result, and one that is highly dependent on many assumptions both statistical and theoretical, as well as nuances of the data.  If you are using SEM or other approach to determine causal effects you will thus be unsuccessful, and as such, you should not be using them if that is the primary reason for doing so.
+
+Philosophically speaking, I also don't think science can prove causal relations, and that's setting aside the fact that we've been debating the nature of causality for thousands of years and have yet to come to a conclusion about it.  As a starting example, there is nothing that convinces me in the least that smoking causes lung cancer, and that is because it doesn't.  If it did, everyone who ever smoked would have lung cancer.  This a deterministic notion of causality, and there are others, but it is the one I think is used in everyday parlance. Using a probabilistic approach, e.g. a smoker is more likely to have cancer, just serves to emphasize the uncertainty that exists in the underlying model.  I'm perfectly okay with this, but many seem uncomfortable with it.  I might even say that smoking has an 'effect' on the likelihood of getting lung cancer. But all we have in the data are those that have lung cancer or not, and there is no uncertainty about them having it, nor does our knowledge of their smoking habits change the fact of whether they do.
+
+As another example, you can randomly assign people who have cancer to two groups- in one they take an aspirin every day, in the other they drink orange juice every day. You may then find that they are equally effective in terms of remission rates, but it would be silly to think the 'treatments' had any causal effect at all, even though the effects could be non-zero. Randomization, which is assumed by many to have the magical ability to confer causality on a scientific endeavor, in no way helps the situation either.  Modern health science is not removed from this issue, or even far removed from this example, and regularly finds 'effects' of drugs or behavior that have no causal relation to the phenomenon under study. This is especially the case with psychological phenomena, many of which to this day still have little or no tie to operational definitions based on physiology rather than behavior.  As yet another example, whether or not you get the flu depends first and foremost on whether or not you contract the (live) virus, not whether or not you get the flu shot (though I will admit you may be more likely to catch it by going to the doctor's office in the first place).  One of the main reasons health science results are regularly overturned is precisely because people assign causal effects to things that have no causal relation to the subject under study.  If you don't want the flu, live in a hyperbaric chamber.
+
+I personally think it's misguided to think that a goal of science is to establish causal relations.  Its primary tool for weighing evidence, i.e. statistical modeling, certainly cannot do that. As much as we want control, which is the only thing that could establish causality, it eludes us.  *Ceteris peribus* can only work for what is included in our models and no more. On the practical side, few seem to be engaging in science engaging in it for reasons of determining causal effects (except perhaps in the discussion sections of papers).
+
+
+### Prediction
+
+A well-worn data set on which to test classification algorithms is the [MNIST hand written digits data](https://en.wikipedia.org/wiki/MNIST_database).  The methods use the pixel gray-scale information to classify an image of what are originally handwritten digits as being one of the values 0-9.  Modern approaches can get accurate classification *on test data* with less than 1% error.  If one's goal is to understand why the digits are the way they are, this model cannot help you. And yet, a statistical approach can be very successful while still having nothing to say about the causal mechanisms influencing the target variable we wish to speak about. 
+
+If you can predict something with 99% accuracy, how much do you really care about the underlying causal reality? But this is in fact what I think is the primary goal of scientific endeavor, i.e. accurate prediction. It definitely is not about 'true' parameters and p-values.  The models are wrong, but they can work, and we'd prefer those that work better. That is something science can provide.  Models can even correspond to 'reality' as we currently know it, but we all know that knowledge of reality changes as well, sometimes due to science. Peirce figured this out long ago. I'd personally rather have something that works than have one of the 'true causes' and a model that leaves me no better than guessing.  Let's say you have a 'causal' model and another model that uses other covariates, and yet they both predict equally well. What would be the basis for preferring one over the other? What would tangibly be gained in the preference?
+
+
+### Chance
+
+Another related point, *chance* definitely does not cause anything. There are mechanisms you do not know about contributing to the variability in the subject matter under study, but nothing from your results are *due to chance*.  Statistical models will always have uncertainty regarding them, and how much or how little there is depends on many things.  But just because we don't know what's going on, we cannot put the unknown as due to some magical notion akin to coincidence.
+
+### Other
+
+Even as I write this, there are people, who have been taken seriously in other contexts, actively devoting time, money and energy to determine a. that our current existence is a simulation, and b. to find a way to 'break out of it' (I suspect this has to do with them taking their experience at Burning Man too seriously).  However useless an endeavor this may be, if it was a simulation, where would any theory about causality reside then?
 
 
 ## Resources

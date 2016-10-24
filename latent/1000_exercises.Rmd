@@ -1,27 +1,7 @@
----
-title: "SEM Exercises"
-author: |
-  | Michael Clark
-  | Statistician Lead
-  | Consulting for Statistics, Computing and Analytics Research
-  | <span style="color:'#00274c'">Advanced Research Computing</span>
-date: '`r Sys.Date()`'
-output:
-  html_notebook:
-    css: indexCSS.css
-    highlight: tango
-    theme: cosmo
-    toc: TRUE
-    toc_float: TRUE
-    code_folding: hide
----
-
-```{r setupExercises, include=FALSE}
-knitr::opts_chunk$set(cache = F, message = F, warning = F, R.options=list(width=120), comment=NA)
-library(magrittr); library(dplyr); library(lavaan)
-```
-
 # Exercises
+
+Note that these exercises are intended for those in the workshop first and forement. I provide them a separate notebook file
+
 ## Path Analysis
 ### Part 1
 
@@ -31,7 +11,6 @@ This exercise investigates satisfaction in high school seniors using the 1993 Mo
 
 ```{r paExercise1Old, eval=FALSE, echo=FALSE, results='hide'}
 mcclelland = haven::read_dta('data/path_analysis_data.dta')
-library(lavaan)
 modMath = 
 "
   math21 ~ math7 + read7
@@ -69,7 +48,7 @@ summary(satistifaction_ModelResults, rsquare=T)
 ```
 
 
-Your results should look conform to the following.
+Your results should look like the following.
 
 ```{r echo=FALSE, results='hide', eval=-6}
 satistifaction_ModelResults = sem(satistifaction_ModelCode, data=mtf)
@@ -177,8 +156,8 @@ govtInvolvement_ModelCode2 = '
 model2 = cfa(govtInvolvement_ModelCode2, data=govtInvolvement) 
 summary(model2, fit=T, standardized=T)
 
-# Compare the two († means the better result)
-semTools::compareFit(model1, model2, nested=F)
+# Compare the two († means the better result); requires semTools package
+summary(compareFit(model1, model2, nested=F))
 ```
 
 
