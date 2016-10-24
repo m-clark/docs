@@ -30,6 +30,19 @@ library(tidyverse)
 [m-clark.github.io/docs/sem](https://m-clark.github.io/docs/sem)
 
 
+## Data Etc.
+
+[m-clark.github.io/docs/sem_workshop.zip](m-clark.github.io/docs/sem_workshop.zip)
+
+Steps:
+
+- Download
+- Unzip
+- Open RStudio
+- File/Open Project...
+- Click on SEM.Rproj
+- File/Open/readMe.md
+
 ## Outline
 
 <p class='fragment emph'> Preliminaries</p>
@@ -38,6 +51,13 @@ library(tidyverse)
 <p class='fragment emph'> SEM</p>
 <p class='fragment emph'> Overview of others</p>
 
+## Goal
+
+Give a broad overview of techniques related to SEM
+
+Note connection to others
+
+Be clear on limitations
 
 
 #   {data-background="../../img/rstudio.png"}
@@ -71,19 +91,30 @@ Where the code is run
 
 Typically your output will be viewed here
 
+Avoid using directly
+
 
 ## Viewer
 
 Visualizations
+
+Other HTML
+
+## Other
+
+RStudio tries to make things easier
+
+- Keyboard shortcuts
+- Auto-complete
+
+<span class='fragment emph'>Let it!</span>
 
 
 # Intro2R
 
 ## Basics
 
-Objects
-
-- Functions
+Objects, Functions
 
 Classes
 
@@ -113,6 +144,7 @@ myobj
 
 ```{r}
 nums = c(1,2,3,4)      # c is a function that combines its elements
+class(nums)
 numsSum = sum(nums)     
 numsSum
 ```
@@ -188,13 +220,64 @@ visNetwork(nodes=data.frame(g$nodes, value=100), edges=g$edges, width='75%') %>%
 
 ```
 
+
 ## Overview
 
 <p class='fragment emph'>Directed Graphs</p>
 - <p class='emph'>Path Analysis</p>
 - <p class='emph'>Mediation</p>
 - <p class='emph'>Bayesian Networks</p>
+
 <p class='fragment emph'>Undirected</p>
-- <p class='fragment emph'>Network analysis</p>
-<p class='fragment emph'></p>
-<p class='fragment emph'></p>
+- <p class='emph'>Network analysis</p>
+
+
+
+## Graphical Models
+
+<p class='emph' style="font-size:150%">Nodes, vertices</p>
+<p class='fragment' style="font-size:100%">May define variables, observations, concepts</p>
+
+<p class='emph' style="font-size:150%">Edges, links</p>
+<p class='fragment' style="font-size:100%">Define connections, relations</p>
+
+<p class='emph' style="font-size:150%">Directed, Undirected, Mixed </p>
+
+
+## Path analysis
+
+Extends regression to:
+
+- <p class='fragmentsmall emph'>Multiple targets</p>
+- <p class='fragmentsmall emph'>Indirect effects</p>
+
+
+## Multiple targets
+
+Does not require SEM
+
+Common in some areas:
+
+- traditional 'multivariate' models
+- zero-inflated models
+- one-deck encoding
+
+
+## Indirect effects
+
+<span class='emph'>$A \rightarrow B \rightarrow C$</span>
+<p class='fragment'>Indirect effects</p>
+<p class='fragment'>Still may include direct path</p>
+<p class='fragment'>*Always* more complicated than three variables</p>
+
+## Issues in mediation
+
+<p class='fragmentsmall'>Very difficult to justify in cross-sectional setting</p>
+<p class='fragmentsmall'>Strong causal implications</p>
+<p class='fragmentsmall'>Does not prove a causal relationship</p>
+
+## Other techniques
+
+Bayesian Networks
+
+Network Analysis

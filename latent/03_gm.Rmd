@@ -360,11 +360,6 @@ To reproduce the correlation between A and C (sometimes referred to as a 'total 
 
 In SEM models, it's important to consider how well our model-implied correlations correspond to the actual observed correlations. For *over-identified* models, the correlations will not be reproduced exactly, and thus can serve as a measure of how well our model fits the data. We'll discuss this more later.  In addition, the tracing of paths is important in understanding the <span class="emph">structural causal models</span> approach of Judea Pearl, of which SEM and the potential outcomes framework are part of.
 
-<div style="text-align:center">
-<h3>---[PATH ANALYSIS EXERICISE](#path-analysis-1)---
-</div>
-
-
 
 
 ## Bayesian Networks

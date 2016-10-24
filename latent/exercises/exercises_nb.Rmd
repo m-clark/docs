@@ -16,11 +16,13 @@ output:
     toc_float: TRUE
     code_folding: hide
 ---
-
+ 
 ```{r setupExercises, include=FALSE}
 knitr::opts_chunk$set(cache = F, message = F, warning = F, R.options=list(width=120), comment=NA)
 library(magrittr); library(dplyr); library(lavaan)
 ```
+
+
 
 # Exercises
 ## Path Analysis
@@ -255,7 +257,7 @@ The following will get you started. All you need to do is fill in the model code
 
 ```{r corplot, echo=FALSE, eval=T, message=F, warning=F}
 # corrplot::corrplot(cov2cor(marshCov), order='hclust', addrect=3, rect.col='#ff5503', tl.col='gray50')
-lazerhawk::corrheat(cov2cor(marshCov))
+suppressMessages(lazerhawk::corrheat(cov2cor(marshCov)))  # knitr won't ignore message otherwise
 ```
 
 <br>

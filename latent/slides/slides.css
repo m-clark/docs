@@ -33,6 +33,7 @@ a {
   text-align: left;
 }
 
+
 .reveal ol,
 .reveal dl,
 .reveal ul {
@@ -61,6 +62,10 @@ a {
 .reveal .slides section .fragment {                 /* Used in lieu of lists*/
   font-size: 150%;
   font-weight: 600;
+}
+
+.reveal .slides section .fragmentsmall {                 /* Used in lieu of lists*/
+  font-size: 100%;
 }
 
 .reveal pre code {
