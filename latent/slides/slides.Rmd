@@ -32,7 +32,7 @@ library(tidyverse)
 
 ## Data Etc.
 
-[m-clark.github.io/docs/sem_workshop.zip](m-clark.github.io/docs/sem_workshop.zip)
+[m-clark.github.io/docs/sem_workshop.zip](m-clark.github.io/docs/sem/sem_workshop.zip)
 
 Steps:
 
@@ -281,3 +281,44 @@ Common in some areas:
 Bayesian Networks
 
 Network Analysis
+
+
+# Latent Variable
+
+
+##
+
+
+<img src="../img/lv.png" style="display:block; margin: 0 auto;">
+
+```{r echo=FALSE, eval=FALSE}
+library(htmltools)
+# tags$div(style="width:500px; height:500px; margin-left:auto;  margin-right:auto",
+         DiagrammeR::DiagrammeR('scripts/faVisual.gv', type='grViz', width='500px', height='500px')
+# )
+```
+
+
+## Uses of latent variables
+
+Data compression
+
+Measurement
+
+
+## Data compression
+
+Take many things and produce few
+
+Might focus on variance (e.g. PCA) or covariance (FA)
+
+Use estimated composite or construct scores in other analysis
+
+
+
+# Structural Equation Modeling
+
+
+## SEM
+
+<img src="../img/sem.png" style="display:block; margin: 0 auto;">
