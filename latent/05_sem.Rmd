@@ -261,8 +261,8 @@ Just to be clear, SEM doesn't only have to be about structural relations among l
 Interactions among both observed and latent variables can be included in SEM, and have the same interpretation as they would in any regression model.  A common term for this in SEM is <span class="emph">moderation</span>.  While, many depictions in SEM suggest that one variable *moderates* another, just like with standard interactions it is arbitrary whether one says A interacts with/moderates B or vice versa, and this fact doesn't change just because we are doing SEM.  For latent variables, one can think of adding a latent variable whose indicator variables consists of product terms of the indicators for the latent variables we want to have an interaction. See <span class="func">indProd</span> and <span class="func">probe2WayMC</span> in the <span class="pack">semTools</span> package.
 
 
-
 ### Estimation
+
 In everything demonstrated thus far, we have been using standard maximum likelihood to estimate the parameters.  This often may not be the best choice. The following list comes from the MPlus manual, and most of these are available in <span class="pack">lavaan</span>.
 
 - **ML**: maximum likelihood parameter estimates with conventional standard errors and chi-square test statistic

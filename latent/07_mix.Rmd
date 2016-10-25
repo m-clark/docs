@@ -1,5 +1,7 @@
 # Mixture Models
 
+*I haven't had time to develop this section much or recently*
+
 Thus far we have understood latent variables as possessing an underlying continuum, i.e. normally distributed with a mean of zero and some variance.  This does not have to be the case, and instead we can posit a categorical variable.  Some approaches you may in fact be already familiar with, as any modeling process under the heading of 'cluster analysis' could be said to deal with latent categorical variables.  The issue is that we may feel that there is some underlying structure to the data that is described as discrete, and based on perhaps multiple variables.  
 
 We will approach this in the way that has been done from statistical and related motivations, rather than the SEM/psychometric approach.  This will make clearer what it is we're dealing with as well as not get bogged down in terminology.  Furthermore, mixture models are typically poorly implemented within SEM, as many of the typical issues can often be magnified.  The goal here as before is clarity of thought over 'being able to run it'.  
@@ -8,6 +10,7 @@ A common question in such analysis is *how many clusters*?  There are many, many
 
 
 ## A Motivating Example
+
 Take a look at the following data. It regards the waiting time between eruptions and the duration of the eruption (both in minutes) for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.
 
 ```{r eval=c(1:2, 4), echo=1:2}
@@ -106,3 +109,8 @@ If you would like to see the conceptual innards of estimating mixture models usi
 
 ## R packages used
 - <span class="pack">flexmix</span>
+
+
+[^cluster]: Note that k-means and other common cluster analysis techniques are not model based as in this example.  In model-based approaches we assume some probabilistic data generating process (e.g. normal distribution) rather than some heuristic.
+
+[^latclass]: By contrast, continuous latent variables are typically clearly theoretically motivated in typical SEM practice.  Data set sizes would usually limit the number of groups to three at most, yet there is no reason to believe there would only be three distinct latent classes in any reasonable amount of data.
