@@ -32,7 +32,7 @@ library(tidyverse)
 
 ## Data Etc.
 
-[m-clark.github.io/docs/sem_workshop.zip](m-clark.github.io/docs/sem/sem_workshop.zip)
+[m-clark.github.io/docs/sem/sem_workshop.zip](m-clark.github.io/docs/sem/sem_workshop.zip)
 
 Steps:
 
@@ -42,6 +42,18 @@ Steps:
 - File/Open Project...
 - Click on SEM.Rproj
 - File/Open/readMe.md
+
+## Exercises
+
+For exercises, open the exercises_nb.nb.html 
+
+***with your browser!***
+
+Or go to: 
+
+[m-clark.github.io/docs/sem/exercises/exercises_nb.nb.html](http://m-clark.github.io/docs/sem/exercises/exercises_nb.nb.html)
+
+
 
 ## Outline
 
@@ -283,7 +295,7 @@ Bayesian Networks
 Network Analysis
 
 
-# Latent Variable
+# Latent Variables
 
 
 ##
@@ -301,9 +313,11 @@ library(htmltools)
 
 ## Uses of latent variables
 
-Data compression
+<p class='fragment emph'>Data Compression</p>
 
-Measurement
+<p class='fragment emph'>Measurement of Latent Constructs</p>
+
+<p class='fragment emph'>Other</p>
 
 
 ## Data compression
@@ -312,13 +326,128 @@ Take many things and produce few
 
 Might focus on variance (e.g. PCA) or covariance (FA)
 
-Use estimated composite or construct scores in other analysis
+Use estimated scores in other analysis
+
+
+## Measurement of Constructs
+
+Underlying causal model
+
+$$ x =  \lambda \textrm{F} + \epsilon $$
+
+$$ \epsilon = \textrm{systematic + measurement error} $$
+
+## Examples
+
+Psychological constructs
+
+Scholastic abilities
+
+Topics in text
+
+
+## Issues
+
+Number of factors
+
+Loadings, interpretation
+
+Scale development, reliability
 
 
 
 # Structural Equation Modeling
 
 
+
 ## SEM
 
 <img src="../img/sem.png" style="display:block; margin: 0 auto;">
+
+
+## Putting it all together {data-transition="none-out"}
+
+<div class='fragment emph' style="text-align:center">Measurement model</div>
+
+<div class='fragment emph' style="text-align:center font-size:200%">\+</div>
+
+<div class='fragment emph' style="text-align:center">Structural model</div>
+
+
+## Putting it all together {data-transition='none-in'}
+
+<div class='fragment emph' style="text-align:center">Factor Analysis</div>
+
+<div class='fragment emph' style="text-align:center font-size:200%">\+</div>
+
+<div class='fragment emph' style="text-align:center">Regression</div>
+
+
+## Issues
+
+Many, including:
+
+- <p class='emph'>How to assess fit</p>
+- <p class='emph'>Identification</p>
+- <p class='emph'>Estimation techniques</p>
+- <p class='emph'>Model complexity</p>
+- <p class='emph'>Sample Size</p>
+
+## How to fool yourself
+
+- <p class='emph'>Too little data</p>
+- <p class='emph'>'Poor' data</p>
+- <p class='emph'>Ignoring performance, diagnostics</p>
+
+## Other SEM
+
+Latent Classes
+
+Growth Curves
+
+Multi-sample
+
+
+
+## Reasons NOT to do SEM  {data-transition=fade}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Because it sounds cool</p>
+
+
+## Reasons NOT to do SEM {data-transition=fade}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Because you see it in a paper</p>
+
+
+## Reasons NOT to do SEM {data-transition=fade}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Because you can't get a large sample</p>
+
+
+
+## Reasons to DO SEM{data-transition=fade}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>It's can answer your specific research question better than alternatives</p>
+
+## Reasons to DO SEM{data-transition=fade}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Very strong result if it works</p>
+
+
+## Reasons to DO SEM{data-transition=none}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Measurement is of focus</p>
+
+
+## Reasons to DO SEM{data-transition=none}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Ties to causal thinking</p>
+
+
+## Reasons to DO SEM{data-transition=none}
+
+<p class='fragment emph' style='text-align:center; font-size:150%'>Flexibility with Complexity</p>
+
+
+## Good luck!
+

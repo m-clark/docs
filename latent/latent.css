@@ -31,6 +31,10 @@ p {
   color: #595959;  /*#595959 (i.e. gray35) provides recommended contrast ratio 7:1; previous  #7f7f7f (4:1); */
 }
 
+ul, ol {
+  color: #595959;
+}
+
 pre {
   box-sizing: border-box;
   left: 0; /* This changes where the code chunk box actually starts */

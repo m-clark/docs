@@ -7,9 +7,11 @@ Structural equation modeling combines the path analytic and latent variable tech
 The <span class="emph">measurement model</span> refers to the latent variable models, i.e. factor analysis, and typical practice in SEM is to investigate these separately and first.  The reason is that one wants to make sure that the measurement model holds before going any further with the underlying constructs. For example, for one's sample of data one might detect two latent variables work better for a set of indicators, or might find that some indicators are performing poorly.
 
 ## Structural model
+
 The <span class="emph">structural model</span> specifies the relations among latent and observed variables that do not serve as indicators.  It can become quite complex, but at this stage one can lean on what they were exposed to with path analysis, as conceptually we're in the same place, except now some variables may be latent.
 
 ## Example
+
 The following model is a classic example from Wheaton et al. (1977), which used longitudinal data to develop a model of the stability of alienation from 1967 to 1971, accounting for socioeconomic status as a covariate. Each of the three factors have two indicator variables, SES in 1966 is measured by education and occupational status in 1966 and alienation in both years is measured by powerlessness and anomia. The structural component of the model hypothesizes that SES in 1966 influences both alienation in 1967 and 1971 and alienation in 1967 influences the same measure in 1971.  We also let the disturbances correlate from one time point to the next.
 
 ```{r wheatonSetup, echo=10, results='hide'}
@@ -60,7 +62,7 @@ semPlot::semPaths(alienation, layout='tree2', style='lisrel', whatLabels = 'path
 The standardized results of the structural model are visualized below, and model results below that. In this case, the structural paths are statistically significant, as is the indirect effect specifically.  Higher socioeconomic status is affiliated with less alienation, while there is a notable positive relationship of prior alienation with later alienation.  We are also accounting for roughly 50% of the variance in 1971 alienation.  Colors represent positive vs. negative weights, and the closer to zero the more faded they are.
 
 ```{r wheatonStructural, echo=F}
-semPlot::semPaths(alienation, residuals=T, style='lisrel', what='std', 
+semPlot::semPaths(alienation, residuals=T, style='lisrel', what='std', sizeLat=16,
                   residScale=10, nCharNodes=6, exoVar=T, edge.label.cex=1, 
                   structural=T, borders=F, color='#ff5503', label.color='#ffffff')
 ```
@@ -69,11 +71,12 @@ semPlot::semPaths(alienation, residuals=T, style='lisrel', what='std',
 summary(alienation, fit=T, rsq=T)
 ```
 
-To be clear, your interpretations based on standard regression still hold here, as the edge parameters are still regression coefficients just like they have always been. It will serve you well in the beginning to interpret each endogenous variable individually as its own model, then move toward the big picture.  Regression with latent variables is the same as regression with observed variables which is the same as a mixture of them.  Correlations, i.e. undirected paths, are still just correlations just like anywhere else.
+To be clear, your interpretations based on standard regression still hold here, as the edge parameters are still regression coefficients just like they have always been. It will serve you well in the beginning to interpret each endogenous variable individually as its own model, then move toward the big picture.  Regression with latent variables is the same as regression with observed variables which is the same as a mixture of them.  Correlations, i.e. undirected paths, are still just correlations just like anywhere else.  As for the model fit indices, I will discuss them momentarily and in turn.
 
 ## Issues in SEM
 
 ### Identification
+
 Identification generally refers to the problem of finding a unique estimate of the value for each parameter in the model. Consider the following:
 $$ a + b = 2$$
 
@@ -118,6 +121,7 @@ Note that in the full alienation model, we have 6*7/2 = 21 variances and covaria
 Determining identification is difficult for any complex model. Necessary conditions include there being model degrees of freedom $\geq 0$, and scaling all latent variables, but they are not sufficient. In general though, it is enough to know conceptually what the issue is and how the information you have relates to what you can estimate.
 
 ### Fit
+
 There are many, many measures of model fit for SEM, and none of them will give you a definitive answer as to how your model is doing.  Your assessment, if you use them, is to take a holistic approach to get a global sense of how your model is doing.  Let's look again at the alienation results.
 
 ```{r fitMeasures}
@@ -127,7 +131,7 @@ fitMeasures(alienation, c('chisq', 'df', 'pvalue', 'cfi', 'rmsea', 'srmr', 'AIC'
 
 #### Chi-square test
 
-Conceptually the chi-square test measures the discrepancy between the observed correlations and those implied by the model.  In the [graphical model section](#path-analysis), we actually gave an example of reproducing a correlation from a path analysis. In general, the model goal is to reproduce them as closely as we can.  It compares the fitted model with a (saturated) model that does not have any degrees of freedom. The degrees of freedom for this test are equal to the data (variances + covariances) minus the number of parameters estimated.  A non-significant $\chi^2$ suggests our predictions are not statistically different from those we observe, so yay!
+Conceptually the $\chi^2$ test measures the discrepancy between the observed correlations and those implied by the model.  In the [graphical model section](#path-analysis), we actually gave an example of reproducing a correlation from a path analysis. In general, the model goal is to reproduce them as closely as we can.  It compares the fitted model with a (saturated) model that does not have any degrees of freedom. The degrees of freedom for this test are equal to the data (variances + covariances) minus the number of parameters estimated.  A non-significant $\chi^2$ suggests our predictions are not statistically different from those we observe, so yay!
 
 ```{r chisqOutput, echo=F}
 cat(
@@ -242,23 +246,23 @@ alienation - alienationNoInd 200.28  1  <.001    0.0941')
 pander::pander(compfit, split.table=Inf)
 ```
 
-The first result is a likelihood ratio test. The model with no path is nested within the model with a path and so this is a viable option.  It tells us essentially that adding the indirect path results in a statistically significantly better model. In terms of fit indices, the model including the indirect effect is better (note that the .000 is actually 1.00).  So now we can say that not only does our model appear to fit the data well, but is better than a plausible competitor.
+The first result is a likelihood ratio test. The model with no path is nested within the model with a path and so this is a viable option.  It tells us essentially that adding the indirect path results in a statistically significantly better model. In terms of fit indices, the model including the indirect effect appears to fit the data well (note that the .000 is actually 1.00), while the other model does not.  So now we can say that not only does our model appear to fit the data well, but is better than a plausible competitor.
 
 
 ### Prediction
 
 While the fitted correlation matrix is nice to be able to obtain, it has always struck me a bit odd that one can't even predict the actual data with typical SEM software.  Part of this is due to the fact that the models regard the covariance matrix as opposed to the raw data, and that is the focus in many SEM situations. But in path analysis, measurement models, and SEM where mean structures are of focus (e.g. growth curves), it stands to reason that one would like to get predicted values and/or be able to test a model on new data. Even in more complex models, predictions can be made by fixing parameters at estimated values and supplying new data.
 
-<span class="pack">Lavaan</span> at least does do this for you, and its <span class="func">lavPredict</span> function allows one to get predicted values for both latent and observed variables, for the current or new data.  There is also a fit index, obtainable through the <span class="func">fitMeasures</span> function, called Expected Value of Cross-Validation Index (or ECVI), that speaks to this notion.  In addition, the <span class="pack">semTools</span> package is a great resource for comparing models generally, comparing models across groups, model simulation and so forth.
+<span class="pack">Lavaan</span> at least does do this for you, and its <span class="func">lavPredict</span> function allows one to get predicted values for both latent and observed variables, for the current or new data.  In addition, the <span class="pack">semTools</span> package is a great resource for comparing models generally, comparing models across groups, model simulation and so forth.
 
 ### Observed covariates
 
-Just to be clear, SEM doesn't only have to be about structural relations among latent variables.  At any point observed covariates can be introduced to the structural model as well, and this is common practice.  As an example, the alienation model is fundamentally wrong, as it doesn't include many background or other characteristics we'd commonly collect on individuals and which might influence feelings of alienation.
+While I would hope it is by now, just to be clear, SEM doesn't only have to be about structural relations among latent variables.  At any point observed covariates can be introduced to the structural model as well, and this is common practice.  As an example, the alienation model is fundamentally wrong (from a causal perspective if that's of particular interest), as it doesn't include many background or other characteristics we'd commonly collect on individuals and which might influence feelings of alienation.
 
 
 ### Interactions
 
-Interactions among both observed and latent variables can be included in SEM, and have the same interpretation as they would in any regression model.  A common term for this in SEM is <span class="emph">moderation</span>.  While, many depictions in SEM suggest that one variable *moderates* another, just like with standard interactions it is arbitrary whether one says A interacts with/moderates B or vice versa, and this fact doesn't change just because we are doing SEM.  For latent variables, one can think of adding a latent variable whose indicator variables consists of product terms of the indicators for the latent variables we want to have an interaction. See <span class="func">indProd</span> and <span class="func">probe2WayMC</span> in the <span class="pack">semTools</span> package.
+Interactions among both observed and latent variables can be included in SEM, and have the same interpretation as they would in any regression model.  As noted previously, a common term for this in SEM terminology is <span class="emph">moderation</span>.  While many depictions in SEM suggest that one variable *moderates* another, just like with standard interactions it is arbitrary whether one says **A** interacts with/moderates **B** or vice versa, and this fact doesn't change just because we are conducting an SEM.  For latent variables, one can think of adding a latent variable whose indicator variables consists of product terms of the indicators for the latent variables we want to have an interaction. See <span class="func">indProd</span> and <span class="func">probe2WayMC</span> in the <span class="pack">semTools</span> package.
 
 
 ### Estimation
@@ -297,9 +301,9 @@ Kline's third edition text listed over 50(!) ways in which one could fool themse
 
 ### Sample size
 
-If you don't have at least a thousand observations, you will probably only be able to conduct (possibly unrealistically) simple SEM models, or just the measurement models for scale development, or only structural models with observed variables (path analysis).  Even with simpler modeling situations, one should have several hundred observations.  In the simple alienation model above, we already are dealing with 17 parameters, and it doesn't include any background covariates of the individuals, which is unrealistic.  Furthermore, because it's a mediation model, adding such variables might require additional direct and indirect paths, time-varying covariates that would have effects at both years, etc., and the number of parameters could balloon quite quickly.
+If you don't have at least a thousand observations, you will probably only be able to conduct (possibly unrealistically) simple SEM models, or just the measurement models for scale development, or only structural models with observed variables (path analysis).  Even with simpler modeling situations, one should have several hundred observations.  In the simple alienation model above, we already are dealing with 17 parameters to estimate, and it doesn't include any background covariates of the individuals, which is unrealistic.  Furthermore, because it's a mediation model, adding such variables might require additional direct and indirect paths, time-varying covariates that would have effects at both years, etc., and the number of parameters could balloon quite quickly.
 
-One will see many articles of published research with low sample sizes using SEM.  This doesn't make it correct to do so, and one should be highly suspicious of the results suggested in those papers as they are overfit or not including relevant information.
+One will see many articles of published research with low sample sizes using SEM.  This doesn't make it correct to do so, and one should be highly suspicious of the results suggested in those papers, as they are overfit or not including relevant information.
 
 ### Poor data
 
@@ -307,7 +311,7 @@ If the correlations among the data are low, one isn't going to magically have st
 
 ### Naming a latent variable doesn't mean it exists
 
-While everything may turn out well for one's measurement model, and the results in keeping with theory, that doesn't make it so.  This is especially so with less reliable measures. Latent constructs require operational definitions and other considerations in order to be useful, and rule out that one isn't simply measuring something else, or that it makes sense that such a construct has real (physical ties).
+While everything may turn out well for one's measurement model, and the results in keeping with theory, this doesn't make it so.  This is especially the case with less reliable measures. Latent constructs require operational definitions and other considerations in order to be useful, and rule out that one isn't simply measuring something else, or that it makes sense that such a construct has real (physical ties).
 
 As an example, many diagnoses in the Diagnostic and Statistical Manual of Mental Disorders have not even been shown to exist via a statistical approach like SEM[^dsm], while others are simply assumed to exist, and even presumably (subsequently) supported by measurement models (often with low N), only to be shown to have no ties to any underlying physiology.
 
@@ -317,7 +321,7 @@ Ignoring residuals, warning messages, etc. is a sure path to trying to interpret
 
 ### Ignoring performance
 
-As in our previous path analysis example, one can write a paper on a good fitting model with statistically significant results, and not explain any of the target variables. Check things like R-square (and accuracy if binary outputs) when running your models.
+As in our previous path analysis example, one can write a paper on a good fitting model with statistically significant results, and not explain the targets of interest very well on a practical level. Check things like R-square (and accuracy if binary targets) when running your models.
 
 ## Summary
 

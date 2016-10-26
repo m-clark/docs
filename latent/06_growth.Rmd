@@ -26,7 +26,7 @@ At this point it looks like a standard regression, and is conceptually.  In addi
 $$b_{0c} = b_0 + u_c$$
 
 
-These random effects are typically assumed normally distributed with some standard deviation, just like our 'error'.
+These random effects $u$ are typically assumed normally distributed with some standard deviation, just like our 'error'.
 
 $$u_c \sim N(0, \tau)$$
 
