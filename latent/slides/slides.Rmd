@@ -449,5 +449,7 @@ Multi-sample
 <p class='fragment emph' style='text-align:center; font-size:150%'>Flexibility with Complexity</p>
 
 
-## Good luck!
+# SEM requires hard thinking!
+
+# Good luck!
 
