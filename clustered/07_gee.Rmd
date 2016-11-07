@@ -1,0 +1,78 @@
+# Generalized Estimating Equations
+
+A <span class="emph">generalized estimating equation</span> is an *estimation procedure*[^notamodel] for dealing with clustered data, and is seemingly very popular in disciplines trained with a biostatistics perspective, but perhaps not too commonly used elsewhere.  Models using this approach are sometimes called <span class="emph">marginal models</span>,  and can be seen as follows, where the target $y$ is multivariate normal with mean vector $X\beta$ and covariance matrix $\Sigma$, which is typically block diagonal as we created at the beginning[^geevsre].
+
+$$ y \sim \mathcal{N}(X\beta,  \Sigma) $$
+
+
+Here the focus is on the 'population average' effects, akin to 'fixed' effects in the RE model, though in some circumstances they are identical.  In addition, one specifies the type of covariance structure thought to underlie the data. Among the more common are:
+
+- *independence*: no correlation
+- *autoregressive*: as described previously
+- *exchangeable*: same correlation everywhere (aka 'compound symmetry' or 'spherical')
+- *unstructured*: all possible correlations are estimated as parameters
+
+And there are many others. The GEE approach is identical to RE intercept-only model approach if one conducts a linear Gaussian model, as in this case. In addition, these correlation structures are often available to mixed models tools, so this alone should not be a reason[^lme4] to use the GEE approach.
+
+We'll use the <span class="pack">geepack</span> package in order to conduct the gee approach to the model.  We'll specify an autoregressive correlation structure as we did with the mixed model, and as the data was in fact designed with.
+
+```{r geeMod, echo=-(4:5)}
+library(geepack)
+
+gee_mod = geeglm(y ~ time + treatment, data=d, corstr='ar1', id=id, waves=time)
+summary(gee_mod)$coefficients %>% pander(digits=3, round=3)
+summary(gee_mod)$dispersion$Estimate %>% round(3) %>%  pander
+summary(gee_mod)$corr %>% pander(round=3)
+```
+
+We should be getting used to the coefficient estimates for the population-average, a.k.a. fixed effects, by now.  We also obtain an estimate for the residual correlation, here noted as alpha.
+
+Note the similarities here compared with the mixed model where there is only a random intercept. A couple of changes are made to keep things as similar as possible.
+
+```{r mixedgeeComparison, echo=1}
+mixed_mod_ri_only = lme(y ~ time + treatment, data=d, random = ~1|id, cor=corAR1(form=~time), 
+                        control=lmeControl(opt='optim'), method='ML')  # changed opt bc nlminb had issues
+summary(mixed_mod_ri_only) %>% pander(digits=3, round=3)
+VarCorr(mixed_mod_ri_only)[,1:2]  %>% pander(round=3)
+coef(mixed_mod_ri_only$modelStruct$corStruct, unconstrained=F) %>% round(3) %>% pander
+```
+
+The population average effects are identical (though the <span class="func">geeglm</span> function automatically does cluster robust standard errors). The estimated correlations for both are similar, and a bit high.  There is essentially no cluster variance, as it is now all residual variance, and both estimated similarly, and similar to the standard linear model we started with.  This makes sense as the variance is equal to the residual variance + the intercept variance + slope variance.
+
+
+```{r geelmelmvar}
+summary(lm_mod)$sigma^2                   # similar to gee and random intercept only
+sum(as.numeric(VarCorr(mixed_mod)[,1]))   # model that incorporates all sources of variance
+intsd^2 + timesd^2 + sigmasq              # 'truth'
+```
+
+
+While GEE models are robust to misspecification of the covariance structure, they are rarely implemented for more than simple clustering[^kerby].
+
+
+## Pros
+
+- Easy modeling of different correlation structures
+- Focus on population level effects
+- Robust to misspecification of correlation structure
+- May be more feasible with larger data situations than mixed models
+
+## Cons
+
+- Cluster-specific effects are not estimated
+- Not easily extendable to other clustering situations, e.g. nested
+- Missing data is assumed Missing Completely at Random (MCAR) (RE and FE assume MAR)
+
+Gist: If your goal is to focus on population average effects and ignore subject specific effects, without the drawbacks of the FE model, this might be considered
+
+
+
+[^notamodel]: Not a model!  We're just doing a GLM here.
+
+[^lme4]: <span class="pack">lme4</span> is a very widely used mixed model package that does not allow the specification of a correlation structure for the residuals.
+
+[^geevsre]: The corresponding matrix formulation for the *conditional* model of the random effects approach is:
+$$ y \sim \mathcal{N}(X\beta + Z\Gamma,  \Sigma) $$
+where $Z$ is some subset of $X$, and $\Gamma$ contains the random effects.
+
+[^kerby]: CSCAR director [Kerby Shedden](https://github.com/kshedden) has worked on a Python implementation for nested structures as part of the [statsmodels module](http://statsmodels.sourceforge.net/devel/gee.html).

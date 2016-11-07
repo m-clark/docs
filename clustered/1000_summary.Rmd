@@ -1,0 +1,128 @@
+# Summary
+
+Let's revisit the results all at once. Seeing the output side-by-side may prove helpful in comparing the different approaches.
+
+## Fixed Effects
+
+We'll start with the 'fixed effects' or 'population average' estimates. It may be worth sorting by `Effect`[^lmgroupedSE].  I also include an random intercept only model for a more direct comparison between the RE and FE models.
+
+```{r feEstimates, echo=F}
+lmResults = as_data_frame(summary(lm_mod)$coefficients[,1:2]); colnames(lmResults)[2]='SE'
+lmGroupedResults = data_frame(Estimate=colMeans(coef(lottalm)), SE=apply(coef(lottalm), 2, sd)/sqrt(n))
+clusterrobResults = data_frame(Estimate=summary(clusterrob_mod)$coefficients[,1], 
+                               SE=vcovHC(clusterrob_mod, method='arellano', cluster='group') %>% diag %>% sqrt)
+FEResults = as_data_frame(summary(FE_mod)$coefficients[,1:2, drop=F]); colnames(FEResults)[2]='SE'
+REResults_intOnly = as_data_frame(summary(mixed_mod_ri_only)$tTable[,1:2]); colnames(REResults_intOnly)= c('Estimate', 'SE')
+REResults = as_data_frame(summary(mixed_mod)$tTable[,1:2]); colnames(REResults)= c('Estimate', 'SE')
+GEEResults = as_data_frame(summary(gee_mod)$coefficients[,1:2]); colnames(GEEResults)[2]='SE'
+GCResults = data_frame(Estimate=growth_mod@ParTable$est[c(23:24, 9)], SE=growth_mod@ParTable$se[c(23:24, 9)])
+# see parTable(growth_mod)
+
+coef_results = bind_rows(list(lmResults, lmGroupedResults, clusterrobResults,
+                               FEResults, REResults_intOnly, REResults, 
+                              GEEResults, GCResults)) %>% 
+  mutate(SE = format(SE, digits=1, nsmall=3),
+         Estimate = format(Estimate, digits=1, nsmall=3)) %>% 
+  mutate(Model = c(rep('LM',3), 'LM_Grouped', 'LM_Grouped', rep('Cluster Robust', 3),
+                   'FE', rep('RE_int_only', 3), rep('RE', 3), rep('GEE', 3), rep('Growth',3)),
+         Effect = c('Intercept', 'time', 'treatment', 'Intercept','time', 'Intercept', 'time', 'treatment',
+                    'time','Intercept', 'time', 'treatment','Intercept', 'time', 'treatment', 
+                    'Intercept', 'time', 'treatment', 'Intercept', 'time', 'treatment')) %>% 
+  select(Model, Effect, Estimate, SE) # rearrange columns
+
+datatable(coef_results, rownames=F, fillContainer=F, autoHideNavigation=F,  
+          options=list(pageLength=18, ordering=T, searching=F, lengthChange=F, caption=F, paging=F))
+```
+
+<br>
+
+The main thing to note is that we would come to no grand differences in substantive conclusions, except for the Grouped and FE approach, where we can come to no conclusion about the treatment effect.  Even statistically, the conclusions would be the same, so what can one conclude about these main effects?
+
+For one, we typically don't have 10000 observations for our models, and so the differences would be more notable in that case.  I invite you to rerun the simulation with a smaller sample size where n = 100 individuals instead of 2500, as well as with smaller effects (these are large), and see what you come up with.  In general, with a lot of data you shouldn't come to wildly different conclusions with different techniques[^moardata].
+
+While I have yet to come across a client that actually cares what the precise value of the standard error is, many care about statistical significance.  If that is of primary concern, and it shouldn't be, then one would prefer techniques that get better estimates of the standard error[^seproblems].  In that sense, a cluster robust approach would help, but would be better if applied in the FE/RE/GEE model settings.
+
+
+## Variance estimates
+
+Here we'll compare variance estimates.  I add mixed and gee models with no residual correlation estimate to make more direct comparisons to the growth curve model, as well as an random intercept only with no dependency structure assumed (other than independence) for comparison to the FE model.
+
+```{r varEstimates, echo=FALSE}
+gee_mod_nocorr = geeglm(y ~ time + treatment, data=d, corstr='independence', id=id, waves=time)
+mixed_mod_ri_nocorr = lme(y ~ time + treatment, random = ~1|id)
+
+lmResults = data_frame(`Residual Var.` = summary(lm_mod)$sigma^2, `Intercept Var.`=NA, `Time Var`=NA, `Residual Cor`=NA)
+
+lmGroupedResults = data_frame(`Residual Var.` = NA, `Intercept Var.`=NA, `Time Var`=NA, `Residual Cor`=NA)
+
+clusterrobResults = data_frame(`Residual Var.` = c(crossprod(clusterrob_mod$residuals)/clusterrob_mod$df.residual),
+                               `Intercept Var.`=NA, `Time Var`=NA, `Residual Cor`=NA)
+
+FEResults = data_frame(`Residual Var.` = c(crossprod(summary(FE_mod)$residuals)/summary(FE_mod)$df.residual), 
+                       `Intercept Var.`=NA, `Time Var`=NA, `Residual Cor`=NA)
+
+REResults_intOnly = data_frame(`Residual Var.` =VarCorr(mixed_mod_ri_only)[2,1], 
+                               `Intercept Var.`=VarCorr(mixed_mod_ri_only)[1,1], 
+                               `Time Var`= NA, 
+                               `Residual Cor`=coef(mixed_mod_ri_only$modelStruct$corStruct, unconstrained=F)) %>% 
+  mutate_all(as.numeric)
+REResults_intOnly_noCorr = data_frame(`Residual Var.` =VarCorr(mixed_mod_ri_nocorr)[2,1], 
+                               `Intercept Var.`=VarCorr(mixed_mod_ri_nocorr)[1,1], 
+                               `Time Var`= NA, 
+                               `Residual Cor`=NA) %>% 
+  mutate_all(as.numeric)
+REResults_noCorr = data_frame(`Residual Var.` =VarCorr(mixed_mod_nocorr)[3,1], 
+                              `Intercept Var.`=VarCorr(mixed_mod_nocorr)[1,1], 
+                              `Time Var`= VarCorr(mixed_mod_nocorr)[2,1], 
+                              `Residual Cor`=NA) %>% 
+  mutate_all(as.numeric)
+REResults = data_frame(`Residual Var.` =VarCorr(mixed_mod)[3,1], 
+                       `Intercept Var.`=VarCorr(mixed_mod)[1,1], 
+                       `Time Var`=VarCorr(mixed_mod)[2,1], 
+                       `Residual Cor`=coef(mixed_mod$modelStruct$corStruct, unconstrained=F)) %>% 
+  mutate_all(as.numeric)
+
+GEEResults_nocorr = data_frame(`Residual Var.` = summary(gee_mod_nocorr)$dispersion$Estimate, `Intercept Var.`=NA, `Time Var`=NA, 
+                               `Residual Cor`= NA)
+GEEResults = data_frame(`Residual Var.` = summary(gee_mod)$dispersion$Estimate, `Intercept Var.`=NA, `Time Var`=NA, 
+                        `Residual Cor`= summary(gee_mod)$corr$Estimate)
+
+GCResults = data_frame(`Residual Var.` = growth_mod@ParTable$est[11], `Intercept Var.`=growth_mod@ParTable$est[15], 
+                       `Time Var`=growth_mod@ParTable$est[16], `Residual Cor`=NA)
+
+var_results = bind_rows(list(lmResults, lmGroupedResults, clusterrobResults, FEResults, 
+                             REResults_intOnly_noCorr, REResults_intOnly, REResults_noCorr, REResults, 
+                             GEEResults_nocorr, GEEResults, GCResults)) %>% 
+  mutate_all(format, digits=1, nsmall=3) %>% 
+  mutate(Model = c('LM', 'LM Grouped','Cluster Robust','FE', 
+                   'RE_int_only_nocorr', 'RE_int_only_corr','RE_nocorr', 'RE_full', 
+                   'GEE_nocorr', 'GEE', 'Growth')) %>% 
+  select(Model, contains('v'), contains('cor')) # rearrange
+
+
+datatable(var_results, rownames=F, fillContainer=F, autoHideNavigation=F,  
+          options=list(pageLength=18, ordering=T, searching=F, lengthChange=F, caption=F, paging=F))
+```
+
+<br>
+
+Cluster robust modifications alone will change nothing compared to a SLiM except for the standard errors of the main effects. A GEE approach with an independence structure and constant residual variance is equivalent to the SLiM. The FE residual variance is equivalent to the SLiM if `id` had been included in the model, and is equivalent to that estimated by an RE intercept only model with no residual dependency estimated.  The estimates of RE model with random intercepts and slopes but no correlation structure assumed are identical to the growth curve estimates.
+
+## Conclusion
+
+This is only a single and contrived data example that is based on random effects as part of the underlying data generating process.  If there is no clustering effect, then the standard linear model would obviously the way to go, but that is also not the situation we're interested in.  If there is no residual correlation, or only cluster-specific effects akin to an 'intercept-only' model, little changes from what has been noted above, aside from latent growth curve models being less of an option, and they wouldn't be in a non-longitudinal setting anyway.  In general, the same issues noted above would still be in play for the most part for simpler settings.
+
+Specifically, I think it's safe to say that the standard linear model approach has drawbacks and is simply not necessary given how easy it is to conduct more appropriate methods.  Using cluster robust standard errors may help, but ignores what could potentially be a very rich investigation of cluster specific effects, and may be best used as a diagnostic or signal for a misspecified model.  I also think it's difficult to justify the FE approach where we can't even investigate cluster level covariates, but again, that is my bias, and may not be shared by others.  Latent growth curve models will probably only be useful if one is dealing with very complex SEM, and which in that case, one will have a host of other issues to contend with that aren't applicable in this setting.  Otherwise, LGCM will be identical to mixed models, and even some more complex than depicted, and may only make for more tedious coding with little else gained.
+
+That leaves the mixed model and GEE GLM approaches. Between these two, we don't even have to choose if it's a random intercept, linear model, as they would have similar 'population-average' interpretations, and similar estimates of like parameters, though the RE approach provides cluster-specific effects and predictions.  Interpretations do change with nonlinear models such as with a binary outcome, but see the Gardiner reference below for how the estimated coefficients relate to one another in those cases.
+
+Only the mixed model provides cluster-specific effects and predictions, while allowing for complex cluster structures and retaining cluster level covariates. What's more, they can be specified to overcome the primary motivation for preferring FE models. In addition, they readily extend to other types of 'random effects' models (e.g. spatial).
+
+In conclusion then, the random effects/mixed model approach can provide most everything one could want in dealing with a variety of clustered data situations. It is highly flexible, and a very powerful tool to have at one's disposal.
+
+
+[^lmgroupedSE]: For the grouped SE, I just calculated as one would the mean `sd/sqrt(n)`.  I thought about using Rubin's rules as one would for the missing value situation, but each four observation linear model has very high variance. This approach puts it in the ball park of the other estimates.
+
+[^seproblems]: Note that when there are multiple sources of variance, it is difficult to know what the standard error should be. Programs like Stata and SAS make the decision for you, and provide approximate p-values (via Kenward-Roger or other approximation), while the R package <span class="pack">lme4</span> will not provide p-values.  One can get decent interval estimates (e.g. via bootstrap or MCMC), but see the R wiki reference for some details on this issue.
+
+[^moardata]: "More data beats a cleverer algorithm." ~  Pedro Domingos

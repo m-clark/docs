@@ -1,0 +1,74 @@
+# Data setup
+
+First we need to set up the data, and to do so we'll consider the longitudinal setting in which individuals are observed over time[^long]. The goal is to create a data set with several (four) observations per individual, i.e. the 'repeated measures' scenario. Aside from variables that represent individual and time point, I will also create an individual level variable, which means that it is constant for each individual. In this case it will be a simple binary variable indicating 'treatment' or 'control' as in an experiment.
+
+The data will also have a certain correlation structure, an autoregressive structure. This means that the residuals of each time point will be notably correlated with the previous, but less so as the time between observations increases. If this is unfamiliar territory to you, just see it as an extra parameter (called rho in the following code) we'll have to estimate and by which you can check the model results against the 'true' value.
+ 
+Here are the main parameters of interest.
+
+```{r setupData1}
+library(Matrix)
+set.seed(8675309)
+tp = 4             # number of timepoints
+n = 2500           # number of individuals
+sigmasq = 1        # residual variance
+rho = .7           # rho of AR1 model
+
+intercept = .2     # intercept
+time_beta = .5     # time effect
+treat_beta = -.5   # treatment effect
+
+intsd = .5         # intercept standard devation
+timesd = .25       # slope of time variable standard deviation
+```
+
+Now we can create the data. Here are the main components- time, individual id, and treatment. We will also create an individual specific effect for intercepts and the slope for time.  These are our 'random' effects[^random].
+
+```{r setupData2}
+time = rep(0:(tp-1), n)                                          # time
+id = rep(1:n, e=tp)                                              # group id
+treatment = gl(2, n/2, labels=c('control', 'treatment'))[id]     # cluster level variable
+re_int = rnorm(n, sd=intsd)                                      # random intercepts
+re_time = rnorm(n, sd=timesd)                                    # random slopes
+```
+
+
+Here we create the residual structure, made somewhat easier since the residual variance is set to 1.  For those interested, this is an autoregressive structure of lag 1. This means that when time points are 1 measure apart, the correlation is $\rho$, at two measures apart, $\rho^2$, at three measures $\rho^3$. You get the gist. This structure is the same within each individual.  Once that is set we draw the residuals based on a multivariate normal with mean zero and covariance based on the structure we have provided.
+
+```{r setupData3}
+# create residual 
+ar1 = bandSparse(tp, tp, 0:(tp-1), list(rep(1    , tp), 
+                                        rep(rho  , tp-1), 
+                                        rep(rho^2, tp-2),  
+                                        rep(rho^3, tp-3)), symmetric=T) 
+Sig = kronecker(diag(1, n), ar1)
+Sig[1:10, 1:10]                 # inspect, note that dots are 0s
+
+# e = MASS::mvrnorm(1, mu=rep(0, n*tp), Sigma=sigmasq*Sig)              # residual error
+e = c(replicate(n, MASS::mvrnorm(1, mu=rep(0, tp), Sigma=sigmasq*ar1))) # much faster
+```
+
+
+Now we put it all together and create a data.frame object. A few entries are shown.
+
+```{r setupData4, echo=-6}
+# target variable
+y = (intercept + re_int[id]) + (time_beta + re_time[id])*time + treat_beta*(treatment=='treatment') + e   
+
+d = data.frame(y, time, treatment, id)
+```
+
+```{r, echo=F}
+library(DT)
+datatable(d, rownames=F, fillContainer=F, autoHideNavigation=F,  
+          options=list(pageLength=10, ordering=F, searching=F, lengthChange=F))
+```
+
+<br>
+
+Now we are ready to proceed.
+
+
+[^long]: This will allow us to examine another technique later, growth curve models, that would not apply to the non-longitudinal case.
+
+[^random]: Note there is nothing *random* about them, they merely represent all causes not identified by the model that vary amongst individuals.  They are an additional source of uncertainty.

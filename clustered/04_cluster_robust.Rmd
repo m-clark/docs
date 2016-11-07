@@ -1,0 +1,53 @@
+# Cluster robust variances
+
+As mentioned, if we ignore the clustering, the so-called fixed effects estimates (i.e. coefficients) are correct, but their variances are not.  We can get proper estimates of the standard errors via <span class="emph">cluster robust standard errors</span>, which are very popular in econometrics and fields trained in that fashion, but not widely used elsewhere in my experience.  Essentially, these allow one to fire-and-forget, and treat the clustering as more of a nuisance.
+
+In programs like Stata, obtaining these are basically an option for most modeling procedures. In R, it's not quite as straightforward, but not difficult. There are packages such as <span class="pack">sandwich</span> that can provide heteroscedastic robust standard errors, but won't necessarily take into account clustering. I provide a custom function that will work in this example so that the curtain can be pulled back a little, but the <span class="pack">plm</span> package would be the way to go for cluster robust standard errors.  The <span class="pack">plm</span> package can take into account the serial autocorrelation via the 'arellano' input to the `type` argument.
+
+```{r clusterrobSE}
+resids = resid(lm_mod)                           # residuals
+xvar = solve(crossprod(lm_mod$x))                # (X'X)^-1
+gd0 = data.frame(id=d$id, r=resids, lm_mod$x) 
+
+# custom function to be applied within cluster
+cluscom = function(mat){
+  X = as.matrix(mat)[, 3:5]                      # magic numbers represent int, time and treatment columns
+  crossprod(X, tcrossprod(mat$r)) %*% X
+}
+
+# calculate within cluster variance
+gd = gd0 %>% 
+  group_by(id) %>% 
+  do(xvar = cluscom(.))
+
+
+library(plm)
+t2 = d$time                                      # so plm won't treat time as a factor, time is a reserved name in plm
+clusterrob_mod <- plm(y ~ t2 + treatment, data=d, model='pooling', index='id')
+summary(clusterrob_mod)
+```
+
+The following compares the different robust SEs we could produce at this point.
+
+```{r seComparison}
+vcovHC(clusterrob_mod, method='arellano', cluster='group') %>% diag %>% sqrt      # plm
+(xvar %*% Reduce(`+`, gd$xvar) %*% xvar) %>% diag %>% sqrt                        # custom output
+
+vcov(lm_mod) %>% diag %>% sqrt                                                    # original lm
+vcovHC(lm_mod, type='HC0') %>% diag %>% sqrt                                      # non-clustered 'robust' se
+```
+
+## Pros
+
+- Don't have to think too much about the issues at play
+- Fewer assumptions about the model
+- A general heteroscedastic 'robust' approach
+
+## Cons
+
+- Ignores cluster-specific effects
+- By default, assumes no intracluster correlation
+- Few tools go beyond simple clustering, requiring manual approach
+- Suggests that there are problems in model specification that the method itself does not correct
+
+Gist: if your goal is to simply do a standard GLM approach and essentially ignore the clustering, treating it more or less as a nuisance to overcome, and your grouping structure is simple, then this may be for you. However, note that the [GEE][Generalized Estimating Equations] approach as a possibly more flexible alternative that can still incorporate cluster robust standard errors.  Furthermore, differences between the robust and regular SE may suggest a model misspecification issue. 'Fixing' standard errors won't solve that problem.

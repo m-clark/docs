@@ -1,0 +1,50 @@
+`r if (knitr:::is_html_output()) '# References {-}'`
+
+
+
+These references are a mix of starting points, interesting notes, and more authoritative sources.
+
+## Robust SE
+
+- King & Roberts. (2015). How Robust Standard Errors Expose Methodological Problems They Do Not Fix. *Political Analysis*.
+
+
+## Fixed effects and 'panel' data models
+
+- Wooldridge. (2016). Introductory Econometrics: A Modern Approach (6e). [link](http://www.cengage.com/search/productOverview.do?N=16+4294922239+4294966644+142&Ntk=P_EPI&Ntt=152961460856007931617237609421833777028&Ntx=mode%2Bmatchallpartial)
+- Wooldridge. (2010). Econometric Analysis of Cross Section and Panel Data (2e). [link](https://mitpress.mit.edu/books/econometric-analysis-cross-section-and-panel-data)
+- Baltalgi. (2005). Econometric Analysis of Panel Data (3e). [link](http://www.wiley.com/legacy/wileychi/baltagi3e/)
+
+
+## Mixed models
+
+- [My overview](https://m-clark.github.io/docs/mixedModels/mixedModels.html).
+- Gelman & Hill. (2006). Data Analysis Using Regression and Multilevel/Hierarchical Models. [link](http://www.stat.columbia.edu/~gelman/arm/)
+- Pinheiro & Bates. (2000). Mixed-Effects Models in S and S-PLUS. [link](http://link.springer.com/book/10.1007%2Fb98882)
+- Fahrmeier et al. (2013). Regression. [link](http://www.springer.com/us/book/9783642343322)
+- West et al. (2014). Linear Mixed Models: A Practical Guide Using Statistical Software (2e). [link](http://www-personal.umich.edu/~bwest/almmussp.html) 
+
+
+## GEE
+
+To be honest I can't speak to these directly, though I've read and would recommend Hardin and Hilbe's GLM book, and this is a similar approach (applied with Stata examples).
+
+- Hardin & Hilbe (2013). Generalized Estimating Equations. [link](https://www.crcpress.com/Generalized-Estimating-Equations-Second-Edition/Hardin-Hilbe/p/book/9781439881132) 
+
+
+## Growth Curve Models
+
+- Kline. (2015). Principles and Practice of Structural Equation Modeling. [link](http://www.guilford.com/books/Principles-and-Practice-of-Structural-Equation-Modeling/Rex-Kline/9781462523344)
+
+- [My SEM notes](http://m-clark.github.io/docs/sem/latent-growth-curves.html)
+
+
+## Comparison/Issues
+
+- Gardiner et al. (2009). Fixed effects, random effects, and GEE: What are the differences? *Statistics in Medicine*. [link](https://www.ncbi.nlm.nih.gov/pubmed/19012297)
+
+- Bell & Jones. (2015) Explaining Fixed Effects: Random Effects Modeling of Time-Series Cross-Sectional and Panel Data.  [link](https://www.cambridge.org/core/journals/political-science-research-and-methods/article/explaining-fixed-effects-random-effects-modeling-of-time-series-cross-sectional-and-panel-data/0334A27557D15848549120FE8ECD8D63)
+
+- Bell & Jones. (2016) Fixed and Random effects: making an informed choice.[link](http://seis.bris.ac.uk/~ggmhf/ABMFKJ.FE-REdraft.pdf)
+
+- R mixed list FAQ. Old but still has useful information. [link](http://glmm.wikidot.com/faq)
