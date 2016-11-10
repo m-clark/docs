@@ -1,6 +1,8 @@
 # Other
 
+
 These are other topics that may be covered in varying detail in the future. With possible packages noted. They are roughly in order of importance to me/what I think would be good for this document.
+
 
 - IRT
     - ltm or lavaan
@@ -31,3 +33,12 @@ These are other topics that may be covered in varying detail in the future. With
 - HMM, Linear Dynamical Systems
     - HMM, HiddenMarkov depmixS4
 - Others
+
+
+Extensions to current content that might be added in the future:
+
+To GM chapter: Econometrics related: 2sls, instrumental variables
+To LV chapter: Reliability, omega, bifactor etc.
+To SEM chapter: regression with latent variables comparison
+To Growth chapther: why not to do cross-lagged models.
+To Appendix: cfa via ML R code.
