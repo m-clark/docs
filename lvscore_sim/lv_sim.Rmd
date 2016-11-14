@@ -1,0 +1,405 @@
+---
+title: "Using Latent Variable Scores"
+author: "Michael Clark"
+date: "November 12, 2016"
+output: 
+  html_document:
+    theme: sandstone
+    highlight: pygments
+    toc: true
+    toc_float: true
+css: ../style_for_miles_and_miles_so_much_style_that_its_wasted.css
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=F, warning=F, error=F, 
+                      message=F, R.options=list(width=120), fig.align='center')
+```
+
+```{r libs, include=FALSE}
+source('rfuncs.R')
+library(tidyverse)
+```
+
+# Purpose
+
+In many cases, researchers are interested in what amounts to a latent construct and its effects in a structural/regression model with regard to some target.  If we assume the latent construct is the 'true' score, using a sum or single item will likely not capture the relationship between the construct and the target very well, yet these are far more common the approach in practice.  Unfortunately, doing so makes many assumptions about how well the indicator(s) measure the underlying construct that are likely not to hold.  Even for those that would prefer an SEM approach, too often they will not have adequate sample size to conduct an SEM confidently.
+
+
+The following seeks to investigate how well using estimated factor scores in a regression performs relative to full SEM estimation, sum/mean scores, or single items.  Comparisons will be made across different loadings on the latent variable, sample sizes, effect sizes, and the number of items/indicators.
+
+# Outline
+
+## 1 factor
+
+In all, 54 data situations will be looked at as follows.
+
+- 3 average loading sets (.25, .5, .8) 
+- N indicators = 3 or 6
+- small effect (.15), medium (.3), large (.5)
+- sample size small (100), moderate (500), large (1000)
+
+
+
+### Model comparisons
+
+The primary comparisons include the following:
+
+- compare regression coefficient for estimated factor score to sum score
+- compare regression coefficient for estimated factor score to single (random) item
+- compare lm vs. sem
+
+# Data & Model Generation
+
+The following code represents how the data are created. Given a mean loading score, sample size setting and number of items, both indicators `x` and target `y` are created based on a scaled factor score.
+
+As an example, consider the following 6 item setting where the average loading is .8, and the true effect of the latent variable is .5.  The sample size is set to 1000. For all situations the factor variance is fixed at 1. For easier comparison across settings, I also standardize the scores used in the regression, though on average they'd be close to mean 0, sd 1 anyway.
+
+```{r dataDemo}
+nitems = 6
+loadings = .8
+effect =.5
+sampsize = 1000
+factorvar = 1
+
+# lambda = rnorm(nitems-1, mean=loadings, sd=.1)  # unstandardized
+# lambda = matrix(c(1, lambda), nrow=1)
+
+# lambda = rnorm(nitems, mean=loadings, sd=.1)    # standardized (used in simulations)
+lambda = rep(loadings, nitems)                    # just for this demo
+
+# factors and some noise
+f = matrix(rnorm(sampsize, mean=rep(0), sd=factorvar), ncol=1)
+e = mvtnorm::rmvnorm(sampsize, sigma=diag(1-c(lambda)^2, nitems))
+
+# observed responses
+x = 0 + f%*%lambda + e
+
+y = 2 + effect*scale(f) + rnorm(sampsize)
+```
+
+We can see the results of a regression of `y` on the factor scores `f` is what we'd expect.
+
+```{r demoLM}
+summary(lm(y ~ f))
+```
+
+Now let's look at a factor analysis of the items, as well as the factor scores generated from them. The following unstandardized solution is equivalent to the data generating process. Scores are constructed based on the Thurstone (a.k.a. regression) approach.
+
+```{r demoScores}
+library(psych)
+faout = fa(x, fm='ML')
+s = factor.scores(x, faout, method='Thurstone')$scores
+faout
+describe(s)
+lm(y ~ scale(s))
+cor(s, f)
+
+```
+
+```{r gg_score_factor, echo=F, fig.width=4, fig.height=3}
+ggplot2::qplot(s, f, color=I('#1e90ff'), alpha=I(.1), size=I(3)) + 
+  geom_point(color='#ff5503', alpha=.25)+
+  lazerhawk::theme_trueMinimal()
+```
+
+For each of the 54 cases under consideration, 1000 data sets were generated.
+
+Given this setup, it might be obvious to some that a sum score can't reproduce the result as well as the factor (nor could a random item).  However, this is precisely the point.  Unless the indicators are measured without error, which is always the case, deficits in estimation will occur.
+
+
+```{r dataGenTrue, eval=FALSE, echo=FALSE}
+###########################
+### Create the data set ###
+###########################
+library(psych)
+
+# debugonce(create_data_1factor)
+# create_data_1factor()
+
+# Examine
+test = create_data_1factor()
+#dim(x)
+describe(test$Indicators)
+round(cor(test$Indicators), 3)
+
+#see the factor structure
+lazerhawk::corrheat(cor(test$Indicators))
+
+
+testgrid = expand.grid(loadings = c(.25, .5, .8),
+                       nitems = c(3, 6),
+                       factorvar = 1,
+                       effect = c(.15,.3,.5),
+                       sampsize = c(100,500,1000))
+
+save(testgrid, file='data/testgrid.RData')
+
+library(parallel)
+cl = makeCluster(20)  # set to 20 for flux
+clusterExport(cl, c('create_data_1factor', 'testgrid'))
+datasamples = parApply(cl, testgrid, 1, function(g) 
+  replicate(1000, create_data_1factor(g['loadings'], g['nitems'], g['factorvar'], g['sampsize'], g['effect']), simplify=F))
+save(testgrid, datasamples, file='data/datasamples.RData')
+```
+
+
+## Model Generation
+
+The following results are based on a standard linear model with a single predictor for target $y$ of three types, one using sum score of the items for the predictor, one using a randomly selected item, and one using a factor score generated with standard factor analysis.  In addition, a formal SEM will be run using <span class="pack">lavaan</span> where the items are assumed to regard an underlying latent variable which has some relation to the target $y$.
+
+
+
+# Results: One factor models
+
+As noted, results will focus on different loading sizes, differing number of items, effect size, and sample size.  In addition, we'll start with an examination of reliability in these settings.
+
+```{r primaryResults, eval=F, echo=F}
+# note this was done on flux, so see code there.
+load('data/datasamples.RData')
+
+library(parallel)
+cl = makeCluster(20)
+clusterExport(cl, c('runLM', 'runLavaan', 'summarizeResults'))
+
+finaloutput = vector('list', length=nrow(testgrid))
+rawoutput = vector('list', length=nrow(testgrid))
+laverrors = vector('list', length=nrow(testgrid))
+
+for(i in 1:nrow(testgrid)){
+  lmres_fscore   = parLapply(cl, datasamples[[i]], runLM, type='fscore')
+  lmres_sumscore = parLapply(cl, datasamples[[i]], runLM, type='sumscore')
+  lmres_ranitem  = parLapply(cl, datasamples[[i]], runLM, type='randomitem')
+  lvres          = parLapply(cl, datasamples[[i]], runLavaan)
+  laverrors[[i]] = summary(sapply(lvres, function(x) x$se[1]))
+  finaloutput[[i]]= summarizeResults(lmres_fscore, lmres_sumscore, lmres_ranitem, lvres)
+  rawoutput[[i]]= summarizeResults(lmres_fscore, lmres_sumscore, lmres_ranitem, lvres, raw=T)
+  save(laverrors, finaloutput, file='data/finaloutput_1factor.RData')
+}
+
+reliability_results = vector('list', length=nrow(testgrid))
+library(psych)
+clusterExport(cl, c('alpha'))
+for(i in 1:nrow(testgrid)){
+  reliability_results[[i]] = parLapply(cl, datasamples[[i]], function(x) alpha(x$Indicators, check.keys = F)$total)
+}
+
+save(laverrors, finaloutput, reliability_results, file='data/finaloutput_1factor.RData')
+
+
+stopCluster(cl)
+```
+
+
+## Reliability
+
+To begin with result specifics, we might consider the reliability of the indicators. Not surprisingly, without strong loadings and/or more indicators, the indicators are not very reliable.  For more on these measures, see the help file for <span class="func">alpha</span> in the <span class="pack">psych</span> package.  The alpha displayed is the over-used Cronbach's $\alpha$, but in this demo it's an adequate measure.
+<br>
+
+
+```{r reliability, echo=F}
+load('data/finaloutput_1factor.RData'); load('data/testgrid.RData')
+
+rels = lapply(reliability_results, bind_rows) %>% 
+  lapply(colMeans) %>% 
+  do.call('rbind', .) %>% 
+  data.frame %>% 
+  select(-raw_alpha, -ase)
+
+cbind(testgrid, round(rels, 3)) %>% 
+  arrange(desc(std.alpha), desc(loadings)) %>% 
+  select(-factorvar) %>% 
+  DT::datatable(options=list(searching=F))
+
+```
+
+<br>
+
+## Coefficients
+
+The best that a single item can do in estimating the effect is based on the product of its loading and the factor score regression coefficient. In other words, using a single variable for a measure assumes perfect measurement correspondence with the underlying construct, and without that, it will always underestimate the true effect[^socsci].
+
+The sum score performance is going to reflect the reliability of all the indicators used to create it, such that you can roughly get its estimate as `true score coefficient * sqrt(alpha)`, using the Cronbach $\alpha$ from the above table.  This is the best case scenario as well, as in this demo we are dealing with equal loadings on average, which is essentially how the sum score works, but is not usually not going hold in practice.
+
+With larger data that is more conducive to SEM, it will correctly estimate the true effect even with less reliable measures but more items, while using the two-step approach will still underestimate to some effect. However with poor measures and few items, the SEM consistently ran into problems.
+
+<br>
+```{r 1factorResultsCoef, echo=FALSE}
+coefs = bind_rows(lapply(finaloutput, filter, Parameter=='coef'))[,-1]
+errs = do.call('rbind', laverrors)
+cbind(testgrid, round(coefs, 3), SEM_error_perc=round(100*errs[,7]/1000)) %>% 
+  arrange(sampsize, loadings, nitems, effect) %>% 
+  select(-factorvar) %>% 
+  DT::datatable(options=list(searching=F))
+```
+
+<br>
+
+## Standard errors
+
+Standard errors for the sum score and single item case are going to be optimistic (too low) when loadings are low.
+
+<br>
+
+```{r 1factorResultsSE, echo=FALSE}
+ses = bind_rows(lapply(finaloutput, filter, Parameter=='se'))[,-1]
+cbind(testgrid, round(ses, 3), SEM_error_perc=round(100*errs[,7]/1000)) %>% 
+  arrange(sampsize, loadings, nitems, effect) %>% 
+  select(-factorvar) %>% 
+  DT::datatable(options=list(searching=F))
+```
+
+<br>
+Interestingly, we can compare the average estimated standard errors from models with the raw standard deviation of the estimated coefficients across the 1000 data sets for each scenario.  In general, in the least reliable settings, the estimated standard errors may be a bit low.  In the better scenarios, there is no efficiency gain comparing the two-step and SEM approaches.
+<br>
+
+```{r  1factorResultsSE_part2, echo=FALSE}
+rawcoefs = lapply(rawoutput, `[[`, 'coef')
+ses2 = cbind(lapply(rawcoefs, function(x) apply(x, 2, sd)) %>% do.call('rbind',.), 
+             lapply(finaloutput, filter, Parameter=='se')  %>% do.call('rbind',.)) %>% 
+  data.frame() %>% 
+  select(-Parameter) %>% 
+  select(lmfscore, lmfscore.1, lmsumscore, lmsumscore.1, lmitem, lmitem.1, lav, lav.1) %>% 
+  rename(lmfscore_est=lmfscore.1,
+         lmsumscore_est=lmsumscore.1,
+         lmitem_est=lmitem.1,
+         lav_est=lav.1) %>% 
+  round(3) %>% 
+  data.frame(testgrid, .) %>% select(-factorvar)
+
+ses2 %>% 
+  DT::datatable(options=list(searching=F))
+```
+<br>
+
+With ideal situations, standard errors are identical across the board (maybe a little high for the single item approach).  Thus, all else being equal, you're going to miss some effects in terms of statistical significance.  However, you may come to similar conclusions using SEM, two step, or sum score generally speaking, at least in ideal scenarios.
+
+
+## Bias
+
+There are a couple ways in which we could assess bias. To begin, for each scenario, we can estimate the quantiles of the coefficients generated based on the 1000 data sets.  Then we can see if the true effect lies within that interval.  The following shows such a result.  The sum score and item results are not included due to their inherent bias already discussed.
+
+
+```{r bias, echo=FALSE}
+coefquantiles = lapply(rawcoefs, function(x) apply(x, 2, quantile, prob=c(.025,.975)))
+bias = matrix(NA, 54, 4)
+for (i in 1:nrow(testgrid)){
+  bias[i,] = apply(coefquantiles[[i]], 2, function(x) testgrid[i,'effect'] > x[1] & testgrid[i,'effect'] < x[2])
+}
+colnames(bias) = colnames(rawoutput[[i]]$coef)
+cbind(testgrid, bias) %>% 
+  arrange(sampsize, loadings, nitems, effect) %>% 
+  select(-factorvar, -lmsumscore, -lmitem) %>% 
+  arrange(loadings) %>% 
+  DT::datatable(options=list(searching=F))
+
+```
+
+<br>
+The following instead assumes a normal distribution and uses the average coefficient and estimated standard error across the data sets for each scenario.  In other words, we calculate $\bar{\mathrm{coef}}\pm 1.96*\bar{\mathrm{se}}$ for each of the 54 scenarios.  Here we see more faltering in the poorer scenarios.
+
+<br>
+
+```{r bias2, echo=FALSE}
+bias2 = matrix(NA, 54, 4)
+coefquantiles = lapply(finaloutput, function(x) apply(x[,-1], 2, function(y) rbind(y[1] - 1.96*y[2],
+                                                                                   y[1] + 1.96*y[2])))
+
+for (i in 1:nrow(testgrid)){
+  bias2[i,] = apply(coefquantiles[[i]], 2, function(x) testgrid[i,'effect'] > x[1] & testgrid[i,'effect'] < x[2])
+}
+colnames(bias2) = colnames(rawoutput[[i]]$coef)
+cbind(testgrid, bias2) %>% 
+  arrange(sampsize, loadings, nitems, effect) %>% 
+  select(-factorvar, -lmsumscore, -lmitem) %>% 
+  arrange(loadings) %>% 
+  DT::datatable(options=list(searching=F))
+```
+
+<br>
+And finally, we can use the raw coefficients and standard errors from every model on every data set, and see if the 95% confidence interval would capture the true parameter.  The following shows the proportions in which this is the case. Problems arise with poor measures, and SEM might have a advantage in coverage for the moderate loading situations when the sample size is small.
+
+<br>
+```{r bias3, echo=FALSE}
+bias3 = matrix(NA, 54, 4)
+for (i in 1:nrow(testgrid)){
+  lower = rawoutput[[i]]$coef - 1.96*rawoutput[[i]]$se
+  upper = rawoutput[[i]]$coef + 1.96*rawoutput[[i]]$se
+  bias3[i,] =  colMeans(testgrid[i,'effect'] > lower & testgrid[i,'effect'] < upper, na.rm=T)  # yay vectorization
+}
+
+colnames(bias3) = colnames(rawoutput[[i]]$coef)
+cbind(testgrid, bias3) %>% 
+  arrange(sampsize, loadings, nitems, effect) %>% 
+  select(-factorvar, -lmsumscore, -lmitem) %>% 
+  arrange(loadings) %>% 
+  round(3) %>%
+  DT::datatable(options=list(searching=F))
+```
+
+
+## SEM problems
+
+Full SEM on 100 observations with few items and low loadings consistently resulted in problems fitting the model.  This isn't at all surprising given that SEM is a large sample technique that requires well behaved data.  The NAs are the result of convergence problems, such that no estimate could be provided. If one looks at the [coefficients](#Coefficients), it's clear the estimates that do result are essentially useless in those settings anyway.
+
+```{r 1factorResultsSEM, echo=FALSE}
+cbind(testgrid, 
+      do.call('rbind', laverrors) %>% 
+        round %>% 
+        data.frame %>% 
+        select(7)) %>% 
+  select(-factorvar) %>% 
+  DT::datatable(options=list(searching=F))
+```
+
+## Summary
+
+If you have poor items and a small sample, surprise, your model will do poorly in recovering the true effect.  This may seem obvious, but I've seen many clients and reported results in papers attempt models with unreliable measures on a regular basis.
+
+Without high loadings, randomly using a single item is essentially a problematic endeavor at best. Using the sum score resulted in regularly lower estimates, but this is expected as the indicators used in its construction are not perfectly reliable, and lack of reliability in variables attenuates correlations they have with other variables.  In addition, using a sum/mean assumes that all items are equally useful, which, even if they are in theory they rarely will be in practice.  I can't think of a reason to use either approach relative to a latent variable score, unless you know that the indicators/items are perfectly measured[^hard].  The best one could hope for is equal performance.
+
+Using a two stage approach is apparently quite feasible in low N settings, even with fewer and poorer items.  It would underestimate in the worst settings of few items and low loadings, though not as badly as the non-SEM approaches. With moderate loadings, the two-stage approach slightly underestimated the effect relative to the SEM approach, but was at least in the ballpark. In more ideal settings with strong loadings, it was more or less indistinguishable from SEM. 
+
+In poorer settings standard maximum likelihood SEM struggled, and even when results were obtained, they were unreliable in the worst scenarios.  SEM's ability to estimate the model was a function of size of the loadings, sample size, and number of items, more or less in that order.  With moderate loadings and larger samples, feel free to use SEM for a simple model such as this.
+
+
+
+
+
+# Results: Multiple factor models
+
+Some other time.
+
+```{r echo=F, eval=F}
+create_data_2factors <- function() {
+  set.seed(123)
+  
+  # loading matrix
+  lambda = matrix(c(1,.5,.3,.6,0,0,0,0,
+                    0,0,0,0,1,.7,.4,.5),
+                  nrow=2, byrow=T)
+  
+  # correlation of factors
+  phi = matrix(c(1,.25,.25,1), nrow=2, byrow=T)  
+  
+  # factors and some noise
+  factors = rmvnorm(1000, mean=rep(0,2), sigma=phi, "chol")
+  e = rmvnorm(1000, sigma=diag(8))
+  
+  # observed responses
+  x = 0 + factors%*%lambda + e
+}
+
+```
+
+# Refs
+
+Estabrook & Neale (2013). A Comparison of Factor Score Estimation Methods in the Presence of Missing Data.
+
+Grice (2001). Computing and Evaluating Factor Scores.
+
+
+[^socsci]: Despite this situation, it is by far the most commonly used approach in science. One wonders what's been missed.
+
+[^hard]: Hi 'hard' sciences! Does such a situation ring a bell? Complete the following statement: Imperfect tools + Inexperienced grad/undergrad students = ___ % measurement error. (hint, it's greater than 0).
