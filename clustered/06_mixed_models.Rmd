@@ -4,7 +4,7 @@
 
 For observations $i$ nested within cluster $c$, we can depict the model in a couple of different ways, but the following is fairly straightforward and in keeping with how the data was created. The main idea is that we have cluster specific coefficients for the intercept and time.
 
-$$ y_{ic} = \beta_{0c} + \beta_{1c} * time_{ic} + \epsilon_{ic} $$
+$$ y_{ic} = \beta_{0c} + \beta_{1c} * \mathrm{time}_{ic} + \epsilon_{ic} $$
 $$\beta_{0c} = \beta_0 + \beta_2 * \mathrm{Treat_{c}} + \gamma_c$$
 $$\beta_{1c} = \beta_1 + \nu_c$$
 $$\gamma_c\sim \mathcal{N}(0, \tau^2)$$
@@ -12,18 +12,26 @@ $$\nu_c\sim \mathcal{N}(0, \eta^2)$$
 $$\epsilon_ic \sim N(0, \sigma^2)$$
 Putting the model together we get:
 
-$$ y_{ic} = (\beta_0 + \gamma_c) + (\beta_1 + \nu_c) * time_{ic} + \beta_2 * \mathrm{Treat_{c}} + \epsilon_{ic} $$
+$$ y_{ic} = (\beta_0 + \gamma_c) + (\beta_1 + \nu_c) * \mathrm{time}_{ic} + \beta_2 * \mathrm{Treat_{c}} + \epsilon_{ic} $$
 So what we end up with conceptually is the standard linear model, but with cluster specific deviations/effects.  These effects are *random* in that they are drawn from a specific distribution, in this case normal, with mean 0 and some standard deviation, which is estimated as part of the model.  Recall that we specified these values at the [beginning](#preliminaries) though in terms of standard deviation. In addition, the cluster level effect of treatment enters the model as would any other covariate.
 
 
 To estimate this model we'll use the <span class="pack">nlme</span> package, as it will also allow us to easily estimate the residual correlation structure.  The key part is the `random =` argument, where we note that we want random effects for the intercept and time.
 
-```{r nlme, echo=-(3:5)}
+```{r nlme, echo=1:2}
 library(nlme)
 mixed_mod = lme(y ~ time + treatment, random = ~1+time|id, correlation=corAR1(form=~time|id))
-pander(summary(mixed_mod))
-VarCorr(mixed_mod)[,1:2] %>% as.data.frame() %>% pander
-coef(mixed_mod$modelStruct$corStruct, unconstrained=F) %>% pander  # jesus h
+pander(summary(mixed_mod), round=3, nsmall=3)
+
+# This is ridiculous
+VarCorr(mixed_mod, rdig=3)[,1:2] %>%             # note: you have removed the correlation from display
+  as_data_frame() %>% 
+  mutate(Variance=as.numeric(Variance), StdDev=as.numeric(StdDev)) %>% 
+  mutate_all(round, digits=3) %>% 
+  pander(round=3, nsmall=3)
+
+coef(mixed_mod$modelStruct$corStruct, unconstrained=F) %>% 
+  pander(round=3, nsmall=3)  
 ```
 
 The results show that the primary regression coefficients, known in the mixed model literature as 'fixed effects', are reasonably recovered, as are the standard deviations for the random effects (recall `intsd`, `timesd`, and `sigmasq`). In addition, `Phi` estimates what we were calling `rho`.  Furthermore, there is a low estimated correlation between intercepts and slopes (not shown), in keeping with how the data was generated.

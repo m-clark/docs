@@ -6,7 +6,8 @@ The data will also have a certain correlation structure, an autoregressive struc
  
 Here are the main parameters of interest.
 
-```{r setupData1}
+
+```{r setupData1, code_folding='hide'}
 library(Matrix)
 set.seed(8675309)
 tp = 4             # number of timepoints
@@ -22,6 +23,7 @@ intsd = .5         # intercept standard devation
 timesd = .25       # slope of time variable standard deviation
 ```
 
+
 Now we can create the data. Here are the main components- time, individual id, and treatment. We will also create an individual specific effect for intercepts and the slope for time.  These are our 'random' effects[^random].
 
 ```{r setupData2}
@@ -33,8 +35,10 @@ re_time = rnorm(n, sd=timesd)                                    # random slopes
 ```
 
 
-Here we create the residual structure, made somewhat easier since the residual variance is set to 1.  For those interested, this is an autoregressive structure of lag 1. This means that when time points are 1 measure apart, the correlation is $\rho$, at two measures apart, $\rho^2$, at three measures $\rho^3$. You get the gist. This structure is the same within each individual.  Once that is set we draw the residuals based on a multivariate normal with mean zero and covariance based on the structure we have provided.
+Next we create the residual structure, made somewhat easier since the residual variance is set to 1.  For those interested, this is an autoregressive structure of lag 1. This means that when time points are 1 measure apart, the correlation is $\rho$, at two measures apart, $\rho^2$, at three measures $\rho^3$. You get the gist. This structure is the same within each individual.  Once that is set we draw the residuals based on a multivariate normal with mean zero and covariance based on the structure we have provided.
 
+
+<div class="fold s">
 ```{r setupData3}
 # create residual 
 ar1 = bandSparse(tp, tp, 0:(tp-1), list(rep(1    , tp), 
@@ -47,20 +51,23 @@ Sig[1:10, 1:10]                 # inspect, note that dots are 0s
 # e = MASS::mvrnorm(1, mu=rep(0, n*tp), Sigma=sigmasq*Sig)              # residual error
 e = c(replicate(n, MASS::mvrnorm(1, mu=rep(0, tp), Sigma=sigmasq*ar1))) # much faster
 ```
-
+</div>
 
 Now we put it all together and create a data.frame object. A few entries are shown.
 
-```{r setupData4, echo=-6}
+```{r setupData4}
 # target variable
-y = (intercept + re_int[id]) + (time_beta + re_time[id])*time + treat_beta*(treatment=='treatment') + e   
+y = (intercept + re_int[id]) + 
+    (time_beta + re_time[id])*time + 
+    treat_beta*(treatment=='treatment') + 
+    e   
 
 d = data.frame(y, time, treatment, id)
 ```
 
-```{r, echo=F}
+```{r showData, echo=F}
 library(DT)
-datatable(d, rownames=F, fillContainer=F, autoHideNavigation=F,  
+datatable(mutate(d, y=round(y, 3)), rownames=F, fillContainer=F, autoHideNavigation=F,  
           options=list(pageLength=10, ordering=F, searching=F, lengthChange=F))
 ```
 

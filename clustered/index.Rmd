@@ -12,14 +12,18 @@ output:
       highlight: pygments
       number_sections: false
       config:
+        download: ["Clustered_Data.pdf", "Clustered_Data.epub"]
         sharing:
           facebook: false
           twitter: false
         search: yes
         edit: no
+        epub: yes
         fontsettings:
           family: sans
           size: 2
+      includes:
+        before_body: ../scripts/code_fold.html  # for optional folding of code or output
     # bookdown::tufte_html_book:
     #   toc: yes
     #   css: [toc.css, ../notebooks.css]
@@ -31,6 +35,8 @@ link-citations: yes
 github-repo: m-clark/docs
 description: "A comparison of various approaches to dealing with clustered data situations."
 ---
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=T, message = F, warning=F, 

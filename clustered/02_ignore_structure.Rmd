@@ -4,7 +4,7 @@ The first thing we can do is ignore the situation and just run a standard regres
 
 ```{r SLiM, echo=1}
 lm_mod = lm(y ~ time + treatment, data=d, x=T)
-pander(summary(lm_mod))
+pander(summary(lm_mod), round=2, format=list(nsmall=2, digits=2))
 ```
 
 First be aware that the 'treatmenttreatment' label just tells us that the coefficient refers to moving from the reference group (i.e. 'control') to the treatment group, i.e. considers treatment a binary variable where 1 equals treatment and 0 control.  Note that the coefficients are in the ballpark of where the true values are, save for the estimate of the residual variance, which packs in all sources of variance into one estimate.  As mentioned though, the standard errors for the effects would be problematic.
@@ -17,7 +17,7 @@ First be aware that the 'treatmenttreatment' label just tells us that the coeffi
 ## Cons
 
 - Standard errors are off
-- Ignores the cluster effects, which may be highly interesting
+- Ignores the cluster-specific effects, which may be highly interesting
 
 Gist: Probably not viable for most situations.
 
