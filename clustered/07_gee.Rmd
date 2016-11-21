@@ -16,16 +16,16 @@ And there are many others. The GEE approach is identical to RE intercept-only mo
 
 We'll use the <span class="pack">geepack</span> package in order to conduct the gee approach to the model.  We'll specify an autoregressive correlation structure as we did with the mixed model, and as the data was in fact designed with.
 
-```{r geeMod, echo=-(4:5)}
+```{r geeMod, echo=-(4:6)}
 library(geepack)
 
 gee_mod = geeglm(y ~ time + treatment, data=d, corstr='ar1', id=id, waves=time)
 summary(gee_mod)$coefficients %>% pander(digits=3, round=3)
-summary(gee_mod)$dispersion$Estimate %>% round(3) %>%  pander
+data_frame(`Residual Variance` = summary(gee_mod)$dispersion$Estimate) %>% round(3) %>%  pander
 summary(gee_mod)$corr %>% pander(round=3)
 ```
 
-We should be getting used to the coefficient estimates for the population-average, a.k.a. fixed effects, by now.  We also obtain an estimate for the residual correlation, here noted as alpha.
+We should be getting used to the coefficient estimates for the population-average, a.k.a. fixed effects, by now.  We also obtain an estimate for the residual correlation, here noted as *alpha*.
 
 Note the similarities here compared with the mixed model where there is only a random intercept. A couple of changes are made to keep things as similar as possible.
 
