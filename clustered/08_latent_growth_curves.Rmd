@@ -4,12 +4,17 @@ An alternative approach to mixed models considers the random effects as <span cl
 
 The first thing is that the data has to be in *wide* format, such that we have one column per time point, and thus only one row per individual.  Once the data is ready we specify the model syntax.  By default, the SEM approach also assumes unequal variances across time, so to make it more comparable, we fix that value to be constant.  We'll use <span class="pack">lavaan</span> to estimate the model.
 
-
-```{r lavaan}
+<div class="fold s">
+```{r dataWide}
 dwide = spread(d, key=time, value=y, sep='_') %>% 
   mutate(treatment = treatment=='treatment')  # otherwise converted to numeric directly as 1-2 instead of 1-0
 head(dwide)
+```
+</div>
 
+
+<div class="fold s">
+```{r lavaanSyntax}
 growthmod_syntax = "
 # model for the intercept and slope latent variables
   int   =~ 1*time_0 + 1*time_1 + 1*time_2 + 1*time_3
@@ -21,27 +26,35 @@ growthmod_syntax = "
 # intercept-slope correlation
   int ~~ slope
 
-
 # fix to equal variances (parameter 'res')
   time_0 ~~ res*time_0
   time_1 ~~ res*time_1
   time_2 ~~ res*time_2
   time_3 ~~ res*time_3
 "
+```
+</div>
 
+
+```{r lavMod}
 library(lavaan)
 growth_mod = growth(growthmod_syntax, data=dwide)
 summary(growth_mod, standardized=T)
 ```
 
-The `Intercepts:` section of the output shows what would be the fixed effects in the mixed model, and in this case, they are also 'intercepts' in this latent variable approach, so that is why they are named as such.  The Regression of `i` on treatment depicts the treatment effect, and will make more sense to those who come to mixed models from the <span class="emph">multilevel modeling</span> literature. If you go back to the model depiction for the mixed model, this model more explicitly denotes $\beta_{0c} = \beta_0 + \beta_2*\textrm{Treatment} + \gamma_c$.  The `res` parameter is akin to residual variance, and is roughly equivalent to the square of the residual standard deviation in the mixed model output.  The above model does not allow for correlated residuals, though this is possible[^semnotes].  
+The `Intercepts:` section of the output shows what would be the fixed effects in the mixed model, and in this case, they are in fact 'intercepts' in this latent variable approach, so that is why they are named as such.  The Regression of `int` on treatment depicts the treatment effect, and will make more sense to those who come to mixed models from the <span class="emph">multilevel modeling</span> literature. If you go back to the model depiction for the mixed model, this model more explicitly denotes $\beta_{0c} = \beta_0 + \beta_2*\textrm{Treatment} + \gamma_c$.  The `res` parameter is the arbitray name I've given for the residual variance, and is roughly equivalent to the square of the residual standard deviation in the mixed model output.  The above model does not allow for correlated residuals, though this is possible[^semnotes].  
 
-The primary point here is not to precisely reproduce the correct model but to show the identity between the mixed model and the latent growth curve approach.  Proper specification will lead to identical results. The following creates a mixed model that is the equivalent.
+The primary point here is not to precisely reproduce the correct model but to show the identity between the mixed model and the latent growth curve approach.  Proper specification will lead to identical results between latent growth curve and mixed models. The following creates a mixed model that is the equivalent.
+
 
 ```{r growthMixedCompare, echo=1}
 mixed_mod_nocorr = lme(y ~ time + treatment, data=d, random=~1+time|id, method="ML")
-summary(mixed_mod_nocorr) %>% pander
-VarCorr(mixed_mod_nocorr)[,1:2]  %>% pander(round=3)
+summary(mixed_mod_nocorr) %>% pander(round=3, nsmall=3)
+VarCorr(mixed_mod_nocorr, rdig=3)[,1:2] %>%             # note: you have removed the correlation from display
+  as_data_frame() %>% 
+  mutate(Variance=as.numeric(Variance), StdDev=as.numeric(StdDev)) %>% 
+  mutate_all(round, digits=3) %>% 
+  pander(round=3, nsmall=3)
 ```
 
 
@@ -54,13 +67,13 @@ VarCorr(mixed_mod_nocorr)[,1:2]  %>% pander(round=3)
 ## Cons
 
 - Tedious to specify even the simplest of models
-- Very tedious to specify even common models
+- Very tedious to specify even common extensions (e.g. time-varying covariates)
 - Even worse to get into correlated residuals
 - More complex cluster structure is not dealt with well (if at all)[^mplus]
 - Assumes balanced time points
 - Doesn't deal with many time points well (if also time-varying covariates especially)
 
-Gist: Growth curve models are very flexible, but they are also problematic simply because they are from the SEM world, which is one where models are notoriously misapplied.  Furthermore, there are no common uses of growth curve models that would not be more easily implemented in one of several R packages[^growthtomixed] and various other languages and statistical programs.  While I find the latent variable interpretation very much intriguing, I personally cannot find a reason for the latent variable approach as something I'd normally consider.
+Gist: Growth curve models are very flexible, but they are also problematic simply because they are from the SEM world, which is one where models are notoriously misapplied.  Furthermore, there are no common uses of growth curve models that would not be more easily implemented in one of several R packages[^growthtomixed] and various other languages and statistical programs.  While I find the latent variable interpretation very much intriguing,  the latent variable approach is not something I'd normally consider for this setting.
 
 
 [^semnotes]: See my LGC chapter in this [SEM document](https://m-clark.github.io/docs/sem).  Once you see it there you'll know why I did not do so here.

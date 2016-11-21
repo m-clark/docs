@@ -24,19 +24,22 @@ $$y_i-\bar{y_i} = (X_i-\bar{X_i})\beta + (\epsilon-\bar{\epsilon_i})$$
 
 In other words, we subtract the mean from each covariate and response and run the model that way (this is also known as the within transformation). Note the following produces the same result, although the standard error for time is off[^demean].
 
+<div class="fold s">
 ```{r demean}
 d %>% 
   group_by(id) %>% 
   mutate(ybar = y-mean(y),
-         timebar = time-mean(time)) %>% 
-  lm(ybar ~ timebar, data=.)
+         timebar = time-mean(time)) %$% 
+  lm(ybar ~ timebar) %>% 
+  summary
 ```
+</div>
 
 Because of this, if something is constant within a cluster, it drops out of the model, and this includes anything that has only one observation even if the covariate is normally time-varying.  So, not only do you lose the ability to model cluster level effects, though these are 'controlled for', you also lose data. In this we lose the treatment effect entirely, which would be completely unacceptable in most circumstances[^feinteract].
 
 
 
-There seem to be philosophical reasons why some prefer FE models that go beyond the practical, because I don't understand the often rigid preference over RE models given the drawbacks. I personally have never come across a valid justification for not investigating cluster level covariates if they are available (i.e. almost always in social science, educational, economic, epidemiological and other data, and often would simply include cluster-level averages of available variables). In addition, few of the applications of FE models actually seem interested in the cluster-specific effects, in short treating the clustering as a nuisance, much like the cluster-robust standard error approach[^FEclusterSE].  
+There seem to be philosophical reasons why some prefer FE models that go beyond the practical, because I don't understand the often rigid preference by some adherents over RE models given the drawbacks. I personally have never come across a valid justification for not investigating cluster level covariates if they are available (i.e. almost always in social science, educational, economic, epidemiological and other data, and often would simply include cluster-level averages of available variables). In addition, few of the applications of FE models actually seem interested in the cluster-specific effects, in short treating the clustering as a nuisance, much like the cluster-robust standard error approach[^FEclusterSE].  
 
 ## Pros
 

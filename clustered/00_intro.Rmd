@@ -12,6 +12,8 @@ In such cases standard methods may be applied, just as they can be anywhere, but
 
 No attempt is made at providing too much detail on model specifics. It is assumed that if you're reading this you're already at least conceptually familiar in some sense with a couple of these models.  The primary purpose here is to compare, contrast, and note issues.  Sometimes a little more detail is required, but again, the goal is not to teach the methods themselves. See the references for more detail.
 
+In many cases I hide the code but it is still available for viewing, especially in cases where it involves mostly data setup or wrangling, or involves more detailed technique than I am assuming some readers of this doc will understand.  I prefer this document to be a more conceptual in nature and tool agnostic. Though it relies on R, the tool used doesn't matter, and all the models conducted here could be run using other packages.
+
 In describing some of these approaches I suggest that some are more discipline specific or more common in certain areas. This assessment is based on years of consulting across many, many academic disciplines, as well as reading many discipline-specific texts and articles, but this admittedly is not a random sample, so take that info as you wish.  I just provide it as a means for the reader to understand why they may not be familiar with such a technique, and where they might find more information or examples.
 
 
@@ -28,5 +30,7 @@ Color coding:
 - <span class="objclass">object/class</span>
 - [link]()
 
+
+This doc also available in .epub and .pdf (See the <i class="fa fa-download"></i> icon above), though the doc is automatically converted to those formats, and to be perfectly honest I don't care what may or may not look good or transfer appropriately.
 
 [^blameecon]: Blame the economists.

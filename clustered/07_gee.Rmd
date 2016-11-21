@@ -5,14 +5,14 @@ A <span class="emph">generalized estimating equation</span> is an *estimation pr
 $$ y \sim \mathcal{N}(X\beta,  \Sigma) $$
 
 
-Here the focus is on the 'population average' effects, akin to 'fixed' effects in the RE model, though in some circumstances they are identical.  In addition, one specifies the type of covariance structure thought to underlie the data. Among the more common are:
+Here the focus is on the 'population average' effects, akin to 'fixed' effects in the RE model, and in some circumstances they are identical.  In addition, one specifies the type of covariance structure thought to underlie the data. Among the more common are:
 
 - *independence*: no correlation
 - *autoregressive*: as described previously
 - *exchangeable*: same correlation everywhere (aka 'compound symmetry' or 'spherical')
 - *unstructured*: all possible correlations are estimated as parameters
 
-And there are many others. The GEE approach is identical to RE intercept-only model approach if one conducts a linear Gaussian model, as in this case. In addition, these correlation structures are often available to mixed models tools, so this alone should not be a reason[^lme4] to use the GEE approach.
+And there are many others. The GEE approach is identical to RE intercept-only model approach if one conducts a linear Gaussian model, as in this case. In addition, these correlation structures are often available to mixed models tools, so this extension alone should not be a reason[^lme4] to use the GEE approach.
 
 We'll use the <span class="pack">geepack</span> package in order to conduct the gee approach to the model.  We'll specify an autoregressive correlation structure as we did with the mixed model, and as the data was in fact designed with.
 
@@ -33,11 +33,17 @@ Note the similarities here compared with the mixed model where there is only a r
 mixed_mod_ri_only = lme(y ~ time + treatment, data=d, random = ~1|id, cor=corAR1(form=~time), 
                         control=lmeControl(opt='optim'), method='ML')  # changed opt bc nlminb had issues
 summary(mixed_mod_ri_only) %>% pander(digits=3, round=3)
-VarCorr(mixed_mod_ri_only)[,1:2]  %>% pander(round=3)
-coef(mixed_mod_ri_only$modelStruct$corStruct, unconstrained=F) %>% round(3) %>% pander
+VarCorr(mixed_mod_ri_only, rdig=3)[,1:2] %>%             # note: you have removed the correlation from display
+  as_data_frame() %>% 
+  mutate(Variance=as.numeric(Variance), StdDev=as.numeric(StdDev)) %>% 
+  mutate_all(round, digits=3) %>% 
+  pander(round=3, nsmall=3)
+
+coef(mixed_mod_ri_only$modelStruct$corStruct, unconstrained=F) %>% 
+  pander(round=3, nsmall=3)  
 ```
 
-The population average effects are identical (though the <span class="func">geeglm</span> function automatically does cluster robust standard errors). The estimated correlations for both are similar, and a bit high.  There is essentially no cluster variance, as it is now all residual variance, and both estimated similarly, and similar to the standard linear model we started with.  This makes sense as the variance is equal to the residual variance + the intercept variance + slope variance.
+The population average effects are identical (though the <span class="func">geeglm</span> function automatically does cluster robust standard errors). The estimated correlations for both are similar, and a bit high.  There is essentially no cluster variance in the mixed model, and both estimated residual variances are similar, and similar to the standard linear model we started with.  This makes sense as the variance is equal to the residual variance + the intercept variance + slope variance.
 
 
 ```{r geelmelmvar}
@@ -47,7 +53,7 @@ intsd^2 + timesd^2 + sigmasq              # 'truth'
 ```
 
 
-While GEE models are robust to misspecification of the covariance structure, they are rarely implemented for more than simple clustering[^kerby].
+GEE models are generally robust to misspecification of the covariance structure.  They are rarely implemented for more than simple clustering but some tools allow for it[^kerby].
 
 
 ## Pros
