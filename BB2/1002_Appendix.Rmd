@@ -1,0 +1,287 @@
+# Appendix
+
+NOTE EVAL AND CACHE FALSE UNTIL WE GET TO THIS SECTION. CHange back `startvals[1]` inline to r.
+
+```{r temporary, include=FALSE}
+knitr::opts_chunk$set(eval=F)
+```
+
+## Maximum Likelihood Review
+
+This is a very brief refresher on <span class="emph">maximum likelihood estimation</span> using a standard regression approach as an example, and more or less assumes one hasn't tried to roll their own such function in a programming environment before.  Given the likelihood's role in Bayesian estimation and statistics in general, and the ties between specific Bayesian results and maximum likelihood estimates one typically comes across, I figure one should be comfortable with some basic likelihood estimation.
+
+In the standard model setting we attempt to find parameters $\theta$ that will maximize the probability of the data we actually observe<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">The principle of maximum likelihood.</span>.  We'll start with an observed random target vector $y$ with $i...N$ independent and identically distributed observations and some data-generating process underlying it $f(\cdot|\theta)$.  We are interested in estimating the model parameter(s), $\theta$, that would make the data most likely to have occurred.  The probability density function for $y$ given some particular estimate for the parameters can be noted as $f(y_i|\theta)$.  The joint probability distribution of the (independent) observations given those parameters, $f(y_i|\theta)$, is the product of the individual densities, and is our *likelihood function*.  We can write it out generally as:
+<span class='marginnote'><span class="imgbigger"><img src="figure/maxLikeNormalCompareLLforDifferentMeans.svg" style="display:block; margin: 0 auto; width:90%"></span>
+
+
+$$\mathcal{L}(\theta) = \prod_{i=1}^N f(y_i|\theta)$$
+
+
+
+
+Thus the *likelihood* for one set of parameter estimates given a fixed set of data y, is equal to the probability of the data given those (fixed) estimates.  Furthermore we can compare one set, $\mathcal{L}(\theta_A)$, to that of another, $\mathcal{L}(\theta_B)$, and whichever produces the greater likelihood would be the preferred set of estimates.  We can get a sense of this with the graph to the right, based on a single parameter, Poisson distributed variable. The data is drawn from  a variable with mean $\theta=5$.  We note the calculated likelihood increases as we estimate values for $\theta$ closer to $5$.
+
+```{r maxLikeillustration, cache=FALSE, eval=FALSE, echo=FALSE}
+set.seed(1234)
+y = rpois(100000, lambda=5)
+mus = seq(3, 8, l=100)
+L = sapply(mus, function(mu) sum(dpois(y, lambda=mu, log=T)))
+mus[L==max(L)]
+
+# y = rnorm(100000, mean=50, 10)
+# mus = seq(40,60, l=100)
+# L = sapply(mus, function(mu) sum(dnorm(y, mean=mu, sd=10, log=T)))
+
+# y = rbinom(100000, size=100, p=.5)
+# mus = seq(.3, .7, l=100)
+# L = sapply(mus, function(mu) sum(dbinom(y, size=100, p=mu, log=T)))
+# mus[L==max(L)]
+
+
+library(ggplot2)
+ggplot(data.frame(mus, L)) + 
+  geom_vline(aes(xintercept=5), alpha=.5, lty=2) +
+  geom_hline(aes(yintercept=max(L)), alpha=.5, lty=2) +
+  geom_path(aes(x=mus, y=L), color='#ff5503', lwd=2) + 
+  labs(x=expression(theta), y='Likelihood') +
+  lazerhawk::theme_trueMinimal() +
+  theme(axis.ticks.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_text(color='gray10', size=14),
+        axis.title.x=element_text(color='gray10', size=24),
+        plot.background = element_rect(fill = "transparent",colour = NA))
+ggsave('figure/maxLikeNormalCompareLLforDifferentMeans.svg', bg='transparent')
+```
+
+
+
+For computational reasons we instead work with the sum of the natural log probabilities<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Math refresher on logs: `log(A*B) = log(A)+log(B)`. So summing the log probabilities will result in the same values for $\theta$, but won't result in extremely small values that will break our computer.</span>, and thus the *log likelihood*:
+
+
+$$\ln\mathcal{L}(\theta) = \sum_{i=1}^N \ln[f(y_i|\theta)]$$
+
+
+
+Concretely, we calculate a log likelihood for each observation and then sum them for the total likelihood for parameter(s) $\theta$. 
+
+The likelihood function incorporates our assumption about the sampling distribution of the data given some estimate for the parameters.  It can take on many forms and be notably complex depending on the model in question, but once specified, we can use any number of optimization approaches to find the estimates of the parameter that make the data most likely. As an example, for a normally distributed variable of interest we can write the log likelihood as follows:
+
+$$\ln\mathcal{L}(\theta) = \sum_{i=1}^N \ln[\frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{(y-\mu)^2}{2\sigma^2})]$$
+
+
+### Example
+
+In the following we will demonstrate the maximum likelihood approach to estimation for a simple setting incorporating a normal distribution where we estimate the mean and variance/sd for a set of values $y$<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Of course we could just use the sample estimates, but this is for demonstration.</span>.  First the data is created, and then we create the function that will compute the log likelihood.  Using the built in R distributions<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Type `?Distributions` at the console for some of the basic R distributions available.</span> makes it fairly straightforward to create our own likelihood function and feed it into an optimization function to find the best parameters.  We will set things up to work with the <span class="pack">bbmle</span> package, which has some nice summary functionality and other features.  However, one should take a glance at <span class="func">optim</span> and the other underlying functions that do the work.
+
+```{r bblmDemo1, cache=F}
+# for replication
+set.seed(1234)
+
+# create the data
+y = rnorm(1000, mean=5, sd=2)
+startvals = c(0, 1)
+
+# the log likelihood function
+LL = function(mu=startvals[1], sigma=startvals[2]){
+  ll = -sum(dnorm(y, mean=mu, sd=sigma, log=T))
+  message(paste(mu, sigma, ll))
+  ll
+}
+```
+
+The <span class="func">LL</span> function takes starting points for the parameters as arguments, in this case we call them $\mu$ and $\sigma$, which will be set to `startvals[1]` and `startvals[2]` respectively.  Only the first line (ll = -sum...) is actually necessary, and we use <span class="func">dnorm</span> to get the density for each point<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Much more straightforward than writing the likelihood function as above.</span>.  Since this optimizer is by default minimization, we reverse the sign of the sum so as to minimize the negative log likelihood, which is the same as maximizing the likelihood.  Note that the bit of other code just allows you to see the estimates as the optimization procedure searches for the best values.  I do not show that here but you'll see it in your console.
+
+We are now ready to obtain maximum likelihood estimates for the parameters.  For the <span class="func">mle2</span> function we will need the function we've created, plus other inputs related to that function or the underlying optimizing function used (by default <span class="func">optim</span>).  In this case we will use an optimization procedure that will allow us to set a lower bound for $\sigma$.  This isn't strictly necessary, but otherwise you would get get warnings and possibly lack of convergence if negative estimates for $\sigma$ were allowed<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">An alternative approach would be to work with the log of $\sigma$ which can take on negative values, and then convert it back to the original scale.</span>.
+
+```{r bblmDemo1B, cache=F, dependson=-1}
+library(bbmle)
+# using optim, and L-BFGS-B so as to contrain sigma to be positive by setting the lower bound at zero
+mlnorm =  mle2(LL, method="L-BFGS-B", lower=c(sigma=0)) 
+mlnorm
+
+# compare to an intercept only regression model
+summary(lm(y~1))
+```
+
+We can see that the ML estimates are the same<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Actually there is a difference between the sigma estimates in that OLS estimates are based on a variance estimate divided by $N-1$ while the MLE estimate has a divisor of $N$.</span> as the intercept only model estimates, which given the sample size are close to the true values.
+
+In terms of the parameters we estimate, in the typical case of two or more parameters we can think of a <span class="emph">likelihood surface</span> that represents the possible likelihood values given any particular set of estimates. Given some starting point, the optimization procedure then travels along the surface looking for a minimum/maximum point<label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote">Which is equivalent to finding the point where the slope of the tangent line to some function, i.e. the derivative, to the surface is zero. The derivative, or gradient in the case of multiple parameters, of the likelihood function with respect to the parameters is known as the <span class="emph">score function</span>.</span>. For simpler settings such as this, we can  visualize the likelihood surface and its minimum point. The optimizer travels along this surface until it finds a minimum.  I also plot the the path of the optimizer from a top down view.  The large blue dot noted represents the minimum negative log likelihood. 
+
+
+Please note that there are many other considerations in optimization completely ignored here, but for our purposes and the audience for which this is intended, we do not want to lose sight of the forest for the trees. We now move next to a slightly more complicated regression example.
+<span class='marginnote'><span class="imgbigger"><img src="figure/mlnormLikelihoodSurface.png" style="display:block; margin: 0 auto;"></span>
+
+<span class='marginnote'><span class="imgbigger"><img src="figure/mlnorm.svg" style="display:block; margin: 0 auto;"> <br> A bit of jitter was added to the points to better see what's going on.</span>
+
+```{r plotSurface, eval=FALSE, echo=FALSE}
+mu = seq(4, 6, length=50); sigma=seq(1.5, 3, length=50)
+llsurf = matrix(NA, length(mu), length(sigma))
+
+for (i in 1:length(mu)){
+  for (j in 1:length(sigma)){
+    llsurf[i,j] = -sum(dnorm(y, mean=mu[i], sd=sigma[j], log=T))
+  }
+}
+rownames(llsurf) = mu
+colnames(llsurf) = sigma
+# llsurf
+# # contour(llsurf)
+png('figure/mlnormLikelihoodSurface.png', bg='transparent')
+library(plot3D)
+plotdat = read.csv('data//mleNormEstimates.csv'); colnames(plotdat) = c('mu','sigma', 'll')
+pointdat = subset(plotdat, mu <=6 & mu >=4 & sigma<= 3 & sigma >=1.5)
+
+# note that on col key, placement of legend (dist) will not match doc result so you'll have to play with it.
+persp3D(x=mu, y=sigma, llsurf, zlim=c(2000, 2454),
+        xlab='mu', ylab='sigma', zlab='neg ll', cex.lab=.75, cex.axis=.5, col.axis='gray50',  
+        col=heat.colors(prod(dim(llsurf))), shade=.1, box=T, alpha=.75,
+        contour=list(col=heat.colors(prod(dim(llsurf))), nlevels=20), addbox=F,
+        phi=30, 
+        ticktype='detailed', nticks=5, bty='u', tck=1, 
+        colkey=list(col.box='white', cex.axis=.7, col.ticks=NA,  length=.75, width=.75)) -> res    ####### see this !
+points(trans3d(pointdat[,1], pointdat[,2], pointdat[,3], pmat=res), pch=19, cex=.8, col=scales::alpha('gray',.5))
+points(trans3d(coef(mlnorm)[1], coef(mlnorm)[2], mlnorm@min, pmat=res), pch=19, col=scales::alpha('navy',.85), cex=2)
+dev.off()
+
+
+### alternate via surface
+# pdf('figure/mlnormLikelihoodSurface2.pdf')
+# M = mesh(mu, sigma)
+# llsurf = matrix(NA, length(mu), length(sigma))  
+# for (i in 1:length(mu)){
+#   for (j in 1:length(sigma)){
+#     llsurf[i,j] = -sum(dnorm(y, mean=mu[i], sd=sigma[j], log=T))
+#   }
+# }
+# below = 100
+# # par(mar=c(5, 4, 4, 2) + 0.1)
+# surf3D(x=M$x, y=M$y, z=llsurf, colvar=llsurf, 
+#        xlab='mu', ylab='sigma', zlab='neg ll', cex.lab=.75, cex.axis=.7, tck=1,
+#        col=heat.colors(prod(dim(llsurf))), shade=.1, box=T, 
+#        r=5, phi=10, 
+#        ticktype='detailed', nticks=5, col.axis='gray25', alpha=.5,
+#        colkey=list(col.box='white', cex.axis=.7, col.ticks=NA,  length=.75, width=.75), contour=T) 
+# contour3D(mu, sigma, z=min(llsurf)-below, colvar=llsurf, col=heat.colors(prod(dim(llsurf))), add=T,
+#           colkey=F, nlevels=20, dDepth=5, addbox=F) -> contourres
+# points(trans3d(pointdat[,1], pointdat[,2], min(llsurf)-below, pmat=contourres), pch=19, cex=.8, col=scales::alpha('gray',.5))
+# # lines(trans3d(pointdat[,1], pointdat[,2], min(llsurf)-100, pmat=contourres), pch=19, cex=.8, col=scales::alpha('gray',.5))
+# points(trans3d(coef(mlnorm)[1], coef(mlnorm)[2], min(llsurf)-below, pmat=contourres), pch=19, col=scales::alpha('navy',.85), cex=2)
+# points(trans3d(coef(mlnorm)[1], coef(mlnorm)[2], min(llsurf), pmat=contourres), pch=19, col=scales::alpha('navy',.85), cex=2)
+# dev.off()
+```
+
+```{r plotNormMLEpath, cache=F, message=FALSE, warning=FALSE, eval=FALSE, echo=FALSE}
+plotdat = read.csv('data//mleNormEstimates.csv'); colnames(plotdat) = c('mu','sigma', 'll')
+plotdat$nll = -plotdat$ll
+
+# car::scatter3d(ll~mu + sigma, data=plotdat, fill=F, grid=F, residuals=F, point.col='#FF5500')
+
+library(ggplot2); library(reshape2)
+ggplot(aes(x=mu, y=sigma), data=plotdat) + 
+  geom_point(aes(), size=4, alpha=.15, show.legend=F, position = position_jitter(w = 0.2, h = 0.2)) +
+  scale_size_continuous(range=c(.1,5)) +
+  geom_point(aes(), col='navy', data=data.frame(t(coef(mlnorm))), size=10, alpha=1) + 
+  # geom_path(aes(), col='navy', alpha=.5) +
+  labs(x=expression(mu), y=expression(sigma))+
+  lazerhawk::theme_trueMinimal() +
+  theme(axis.ticks.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_text(color='gray10', size=14),
+        axis.title.x=element_text(color='gray10', size=24),
+        axis.title.y=element_text(color='gray10', size=24),
+        plot.background = element_rect(fill = "transparent",colour = NA))
+ggsave('figure/mlnorm.svg', bg='transparent')
+```
+
+## Linear Model
+In the standard regression context, our expected value for the target comes from our linear predictor, i.e. the weighted combination of our explanatory variables, and we estimate the regression weights/coefficients and possibly other relevant parameters.  We can expand our previous example to the standard linear model without too much change.  In this case we estimate a mean for each observation, but otherwise assume the variance is constant across observations.  Again we first construct some data so that we know exactly what to expect, then write out the likelihood function with starting parameters.  As we need to estimate our intercept and  coefficient for the X predictor (collectively referred to as $\beta$), we can can think of our likelihood  explicitly as before:
+
+$$\ln\mathcal{L}(\beta, \sigma^2) = \sum_{i=1}^N \ln[\frac{1}{\sqrt{2\pi\sigma^2}}\exp(-\frac{(y-X\beta)^2}{2\sigma^2})]$$
+
+
+```{r bblmeReg}
+# for replication
+set.seed(1234)
+
+# predictor
+X = rnorm(1000)
+
+# coefficients for intercept and predictor
+theta = c(5,2) 
+
+# add intercept to X and create y with some noise
+y = cbind(1,X)%*%theta + rnorm(1000, sd=2.5)
+
+regLL = function(sigma=1, Int=0, b1=0){
+  coefs = c(Int, b1)
+  mu = cbind(1,X)%*%coefs
+  ll = -sum(dnorm(y, mean=mu, sd=sigma, log=T))
+  
+  message(paste(sigma, Int, b1, ll))
+  ll
+}
+
+library(bbmle)
+mlopt =  mle2(regLL, method="L-BFGS-B", lower=c(sigma=0)) 
+summary(mlopt)
+# plot(profile(mlopt), absVal=F)
+
+modlm = lm(y~X)
+summary(modlm)
+-2*logLik(modlm)
+```
+
+
+As before, our estimates and final log likelihood value are about where they should be, and reflect the lm output.  The visualization becomes more difficult, but we can examine slices similar to the previous plot. <span class='marginnote'><span class="imgbigger"><img src="figure/mlreg.svg" style="display:block; margin: 0 auto;"></span>
+
+To move to generalized linear models, very little changes of the process outside of the distribution assumed and that we are typically modeling a function of the target variable (e.g. $\log(y)=X\beta; mu = e^{X\beta}$).
+
+```{r mlmisc, eval=FALSE, echo=FALSE}
+plotdat = read.csv('data//mleEstimates.csv'); colnames(plotdat) = c('sigma', 'Intercept', 'beta_x', 'll')
+# plotdat = read.csv('data//mleEstimates.csv'); colnames(plotdat) = c('sigma', 'Int', 'b1', 'll')
+plotdat$nll = -plotdat$ll
+# scatter3d(ll~sigma+b1, data=plotdat, fill=F, grid=F, fit='additive')
+
+
+gdat= melt(plotdat, id=c('sigma', 'll', 'nll'))
+ggplot(aes(x=sigma, y=value), data=gdat) + 
+  geom_point(aes(size=nll), alpha=.15, show.legend=F, position = position_jitter(w = 0.2, h = 0.2)) +
+  facet_wrap(~variable) +
+#   geom_point(aes(y=b1, color=ll, size=-ll), alpha=.5) +
+  scale_size_continuous(range=c(.5,5)) +
+#   scale_color_continuous(limits=c(2310,5000)) +
+#   geom_tile(aes(fill=ll)) +
+#   scale_fill_gradient(low='red1', high='white', limits=c(2314, 2360), na.value='white') +
+#   geom_point(aes(x=coef(mlopt)['Int'], y=coef(mlopt)['b1']), color='darkred', size=3) +
+#   geom_point(aes(x=coef(mlopt)['sigma'], y=coef(mlopt)['b1']), color='darkred', size=3) +
+#   geom_point(aes(x=coef(mlopt)['sigma'], y=coef(mlopt)['Int']), color='darkred', size=3) +
+  labs(x=expression(sigma))+
+  lazerhawk::theme_trueMinimal() +
+  theme(axis.ticks.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_text(color='gray10', size=14),
+        axis.title.x=element_text(color='gray10', size=24),
+        plot.background = element_rect(fill = "transparent",colour = NA))
+  
+ggsave('figure/mlreg.svg', bg='transparent')
+```
+
+
+## Binomial Likelihood Example
+
+This regards the example seen in the early part of the document with the hands-on example.
+
+```{r binomLL, echo=-1}
+set.seed(1234)
+x1 = rbinom(1000, size=10, p=.5)
+x2 = rbinom(1000, size=10, p=.85)
+
+binomLL = function(theta, x) {
+  -sum(dbinom(x, size=10, p=theta, log=T))
+}
+
+optimize(binomLL, x=x1, lower=0, upper=1); mean(x1)
+optimize(binomLL, x=x2, lower=0, upper=1); mean(x2)
+```
+
+

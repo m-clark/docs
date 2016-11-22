@@ -1,0 +1,11 @@
+`r if (knitr:::is_html_output()) '# References {-}'`
+
+
+
+
+
+http://mc-stan.org/ Main website
+
+http://stan.fit/ The Stan Group
+
+More resources [here](http://mc-stan.org/documentation/)
