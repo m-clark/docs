@@ -78,5 +78,13 @@ print(bf, pars=c('b0', 'beta', 'sigma', 'lambda', 'u'))
 # shinystan::launch_shinystan(bf)
 
 cor(cbind(get_posterior_mean(bf, 'f')[,5],  lavPredict(mymod), f))
-head(cbind(get_posterior_mean(bf, 'f')[,5], lavPredict(mymod), f))
+
+library(psych)
+score_comparison  = data.frame(bayes = get_posterior_mean(bf, 'f')[,5],
+                               ML = lavPredict(mymod)[,1],
+                               sapply(c("Thurstone", "Bartlett", "Harman"), function(m) factor.scores(x, fa(x), method=m)$scores[,1]),
+                               True=f[,1])
+head(score_comparison)
+round(cor(score_comparison), 3)
+
 head(cbind(get_posterior_mean(bf, 'lambda')[,5], parTable(mymod)[2:7, 'est']))
