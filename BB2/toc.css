@@ -10,10 +10,11 @@
   line-height: 1;
   border-radius: 5px 5px 0 0;
   /*background: rgb(97,151,213);*/
-  background: #B2001D;   /*stan red*/
+  background: #0085A1;   /*stan red is #B2001D*/
   /*background: linear-gradient(to bottom, #333333 0%, rgb(97,151,213) 100%);   /*141414 is the darker black*/
   border-bottom: 2px solid #B2001D; /* old #0fa1e0 */
   width: 75%;
+  font-size: 50%;
 }
 #TOC:after,
 #TOC ul:after {
@@ -22,7 +23,7 @@
   clear: both;
 }
 #TOC a {
-  background: #B2001D;
+  background: #0085A1;
   /*background: rgb(97,151,213);*/
   /*background: linear-gradient(to bottom, #333333 0%, rgb(97,151,213) 100%);*/
   color: #ffffff;
@@ -41,6 +42,7 @@
 }
 #TOC > ul > li > a {
   color: #ffffff;
+  font-size: 75%;
 }
 #TOC > ul > li:hover:after {
   content: '';

@@ -154,7 +154,7 @@ g = ggplot(aes(x=theta), data=probdat, xlim=c(0,1)) +
   geom_polygon(aes(y=posterior), fill='purple', alpha=.25) +
   annotate('text', x=.4, y=8e-4, label='Posterior', color='purple') +
   ylab('Density') +
-  xlab(paste('θ')) +
+  xlab(substitute('theta')) +
   lazerhawk::theme_trueMinimal() +
   theme(axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
@@ -197,7 +197,7 @@ g = ggplot(aes(x=theta), data=probdat, xlim=c(0,1)) +
   geom_polygon(aes(y=posterior), fill='purple', alpha=.25) +
   annotate('text', x=.4, y=5e-4, label='Posterior', color='purple') +
   ylab('Density') +
-  xlab('θ') +
+  xlab(expression('theta')) +
   lazerhawk::theme_trueMinimal() +
   theme(axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
@@ -242,7 +242,7 @@ g = ggplot(aes(x=theta), data=probdat, xlim=c(0,1)) +
   geom_polygon(aes(y=posterior), fill='purple', alpha=.25) +
   annotate('text', x=.45, y=1e-3, label='Posterior', color='purple') +
   ylab('Density') +
-  xlab('U+03B8') +
+  xlab('theta') +
   lazerhawk::theme_trueMinimal() +
   theme(axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),

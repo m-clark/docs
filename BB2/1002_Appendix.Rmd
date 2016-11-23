@@ -285,3 +285,6 @@ optimize(binomLL, x=x2, lower=0, upper=1); mean(x2)
 ```
 
 
+## Modeling Languages
+
+I will talk only briefly about a couple of the modeling language options available, as you will have to make your own choice among many.
