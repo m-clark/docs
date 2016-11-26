@@ -48,21 +48,25 @@ p, ul, ol {
   font-size: 100%;
 }
 
+ul {
+  list-style-type: none;
+}
+
 pre {
   box-sizing: border-box;
   left: 0; /* This changes where the code chunk box actually starts */
   /* padding: 10px 0 10px 60px; /* Change the last value here to move the text left or right */
   position: relative;
-  width: 100%;                  /* This changes where the code chunk box ends on the right side */
+  width: 55%;                  /* This changes where the code chunk box ends on the right side */
   font-size: 75%;               /*changes output size; and comments*/
   line-height: 1.2em;           /* line spacing; default seems to be about 1.5 or more */
   /*border: 10px solid #ff5500;*/   /*code block and results border*/
-  /*background-color:#ff5500;*/   /* results background*/
+  background-color: #F7F7F7;   /* results background*/
 
 }
 
 pre code.r {
-  line-height: 1.5em;           /* line spacing; default seems to be about 1.5 or more */
+  line-height: 1.25em;           /* line spacing; default seems to be about 1.5 or more */
 }
 
 
@@ -91,7 +95,6 @@ li.tocify-item.list-group-item.active {
 h1, h2, h3, h4, h5 {
   color:rgb(97,151,213);
   /* color:#B2001D; */  /* stan red*/
-
 }
 
 
