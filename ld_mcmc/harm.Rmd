@@ -11,13 +11,13 @@ pander::pander(
 
 <br>
 
-The Hit-And-Run algorithm is a variation of Random-Wlk MetropolisM (RWM) that has been around as long as Gibbs sampling (Gibbs). Hit-And-Run randomly samples a direction on the unit sphere as in Gilks and Roberts (1996), and a proposal is made for each parameter in its randomly-selected direction for a uniformly-distributed distance. This version of Hit-And-Run, called Hit-And-Run Metropolis (HARM), includes multivariate proposals and a Metropolis step for rejection. Introduced by Turchin (1971), along with the original Gibbs sampler, and popularized by Smith (1984), Hit-And-Run was given its name later due to its ability to run across the state-space and arrive at a distant "hit-point". It is related to other algorithms with interesting names, such as Hide-And-Seek and Shake-And-Bake.
+The Hit-And-Run algorithm is a variation of Random-Walk Metropolis (RWM) that has been around as long as Gibbs sampling (Gibbs). Hit-And-Run randomly samples a direction on the unit sphere as in Gilks and Roberts (1996), and a proposal is made for each parameter in its randomly-selected direction for a uniformly-distributed distance. This version of Hit-And-Run, called Hit-And-Run Metropolis (HARM), includes multivariate proposals and a Metropolis step for rejection. Introduced by Turchin (1971), along with the original Gibbs sampler, and popularized by Smith (1984), Hit-And-Run was given its name later due to its ability to run across the state-space and arrive at a distant "hit-point". It is related to other algorithms with interesting names, such as Hide-And-Seek and Shake-And-Bake.
 
 HARM has two optional algorithm specifications: `alpha.star` is the target acceptance rate, and `B` is a list of blocked parameters. When `alpha.star=NULL`, non-adaptive HARM is used. Otherwise, the Robbins-Monro stochastic approximation of Garthwaite et al. (2010) is applied to the proposal distance. `alpha.star=0.234` is recommended. For blockwise sampling, each component of the list is a block and consists of a vector indicating the position of the parameters per block.
 
 HARM is the fastest MCMC algorithm per iteration in the <span class="pack">LaplacesDemon</span> package, because it is very simple. For example, HARM does not use a proposal covariance matrix, and there are no tuning parameters, with one optional exception discussed below. The proposal is multivariate in the sense that all parameters are proposed at once, though from univariate draws. HARM often mixes better than the Gibbs sampler (Gilks and Roberts 1996), especially with correlated parameters (Chen and Schmeiser 1992).
 
-Adaptive HAR (without the Metropolis step) with a multivariate proposal is available in the LaplaceApproximation function.
+Adaptive HAR (without the Metropolis step) with a multivariate proposal is available in the <span class="func">LaplaceApproximation</span> function.
 
 The HARM algorithm is able to traverse complex spaces with bounded sets in one iteration. As such, HARM may work well with multimodal posteriors due to potentially good mode-switching behavior. However, HARM may have difficulty sampling regions of high probability that are spike-shaped or near constraints, and this difficulty is likely to be more problematic in high dimensions. When HARM is non-adaptive, it may be used as a final algorithm.
 
@@ -27,7 +27,7 @@ The HARM algorithm is able to traverse complex spaces with bounded sets in one i
 - Garthwaite P, Fan Y, Sisson S (2010). "Adaptive Optimal Scaling of Metropolis-Hastings Algorithms Using the Robbins-Monro Process."
 - Gilks W, Roberts G (1996). "Strategies for Improving MCMC." In W Gilks, S Richardson, D Spiegelhalter (eds.), Markov Chain Monte Carlo in Practice, p. 89-114. Chapman & Hall, Boca Raton, FL.
 - Smith R (1984). "Efficient Monte Carlo Procedures for Generating Points Uniformly Distributed Over Bounded Region." Operations Research, 32, 1296-1308.
-- Turchin, VF (1971). "On the Computation of Multidimensional Integrals by the Monte Carlo Method", Theory of Probablility and its Applications, 16(4), 720-724.
+- Turchin, VF (1971). "On the Computation of Multidimensional Integrals by the Monte Carlo Method", Theory of Probability and its Applications, 16(4), 720-724.
 
 ## See Also
 

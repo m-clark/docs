@@ -1,0 +1,23 @@
+# Sequential Metropolis-within-Gibbs (<a name='smwg'>SMWG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This algorithm is applicable with state-space models (SSMs), including dynamic linear models (DLMs).','This algorithm is relatively easy for a beginner when the proposal variance has been tuned with the SAMWG algorithm. Otherwise, it may be tedious for the user to tune the proposal variance.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Sequential Metropolis-within-Gibbs (SMWG) algorithm is the non-adaptive version of the Sequential Adaptive Metropolis-within-Gibbs (SAMWG) algorithm, and is used for final sampling of state-space models (SSMs).
+
+## References
+
+- none
+
+## See Also
+
+- [SAMWG](#samwg)
+

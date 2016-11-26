@@ -1,0 +1,37 @@
+# t-walk (<a name='twalk'>twalk</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is easy for a beginner. It has few algorithm specifications, and these are recommended to remain at the default values. This algorithm requires an additional vector of initial values, but is otherwise fully automatic.','Yes.', 'Multivariate. Proposals are multivariate only in the sense that proposals for multiple parameters are generated at once. However, proposals are not generated with a multivariate distribution and a proposal covariance matrix. Proposals are generated for only a subset of parameters at each iteration, and for only one of two sets of initial values. See below.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The t-walk (twalk) algorithm of Christen and Fox (2010) is a general-purpose MCMC algorithm that requires no tuning, is scale-invariant, is technically non-adaptive (but self-adjusting), and can sample from target distributions with arbitrary scale and correlation structures. A random subset of one of two vectors is moved around the state-space to influence one of two chains, per iteration.
+
+twalk has four algorithm specifications: `SIV` is a vector secondary initial values and the default is NULL, `n1` affects the size of the subset of each set of points to adjust and the default is 4, `at` affects the traverse move and the default is 6, and `aw` affects the walk move and the default is 1.5. The vector of secondary initial values may be left to its default, `r NULL`, in which case it is generated with the <span class="func">GIV</span> function and it is recommended that `PGF` is specified. `SIV` should be similar to, but unique from, `Initial.Values`. The secondary initial values are used for a second chain, which is merely used here to help the first chain, and its results are not reported. The `n1` specification relates to the number of parameters. For example, if `n1=4` and a model has $J=100$ parameters, then there is a $p(0.04) = 4 / 100$ probability that a point is moved that affects each parameter, though this affects only one of two chains per iteration. Put another way, there is a 4% chance that each parameter changes each iteration, and a 50% chance each iteration that the observed chain is selected. The traverse specification argument, `at`, affects the traverse move, which helps when some parameters are highly correlated, and the correlation structure may change through the state-space. The traverse move is associated with an acceptance rate that decreases as the number of parameters increases, and is the reason that n1 is used to select a subset of parameters each iteration. Finally, the walk specification argument, `aw`, affects the walk move. The authors recommend keeping these specification arguments in `n1` in [2,20], `at`' in [2,10], and `aw` in [0.3,2]. The 'hop' and 'blow' moves do not have specifications, but help with multimodality, ensure irreducibility, and prevent the two chains from collapsing together. The hop move is centered on the primary chain, and the blow move is centered on the secondary chain.
+
+The authors have provided the t-walk algorithm in R code as well as other languages. It is called the "t-walk" for "traverse" or "thoughtful" walk, as opposed to Random-Walk Metropolis (RWM). Where adaptive algorithms are designed to adapt to the scale and correlation structure of target distributions, the t-walk is invariant to this structure. The step-size and direction continuously "adjust" to the local structure. The t-walk uses one of four proposal distributions or 'moves' per iteration, with the following probabilities: traverse (p=0.4918), walk (p=0.4918), hop (p=0.0082), and blow (p=0.0082).
+
+Testing in <span class="pack">LaplacesDemon</span> with the default specifications suggests the t-walk is very promising, but due to the subset of proposals, it is important to note that the reported acceptance rate indicates the proportion of iterations in which moves were accepted, but that only a subset of parameters changed, and only one chain is selected each iteration. Therefore, a user who updates a high-dimensional model should find that parameter values change much less frequently, and this requires more iterations.
+
+The main advantage of t-walk, like the Hit-And-Run Metropolis (HARM) and Metropolis-within-Gibbs (MWG) families, over multivariate adaptive algorithms such as Adaptive-Mixture Metropolis (AMM) and Robust Adaptive Metropolis (RAM) is that t-walk does not adapt to a proposal covariance matrix, which can be limiting in random-access memory (RAM) and other respects in large dimensions, making t-walk suitable for high-dimensional exploration. Other advantages are that t-walk is invariant to all but the most extreme correlation structures, does not need to burn-in before adapting since it technically is non-adaptive (though it 'adjusts' continuously), and continuous adjustment is an advantage, so `Periodicity` does not need to be adjusted. The advantage of t-walk over componentwise algorithms such as the MWG family, is that the model specification does not have to be evaluated a number of times equal to the number of parameters in each iteration, allowing the t-walk algorithm to iterate significantly faster in high dimension. The disadvantage of t-walk, compared to these algorithms, is that more iterations are required because only a subset of parameters can change at each iteration (though it still updates twice the number of parameters per iteration, on average, than the MWG family).
+
+Since twalk is technically non-adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Christen J, Fox C (2010). "A General Purpose Sampling Algorithm for Continuous Distributions (the t-walk)." Bayesian Analysis, 5(2), 263-282.
+
+## See Also
+
+- [AMM](#amm)
+- [HARM](#harm)
+- [MWG](#mwg)
+- [RAM](#ram)
+- [RWM](#rwm)
+

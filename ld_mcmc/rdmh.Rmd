@@ -1,0 +1,36 @@
+# Random Dive Metropolis-Hastings (<a name='rdmh'>RDMH</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that is especiallly useful with multimodal or fat-tailed target distributions.','This algorithm is easy for a beginner because it is fully automatic; tuning is not required.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Random Dive Metropolis-Hastings (RDMH) was introduced by Dutta (2012). RDMH is a componentwise Metropolis-Hastings algorithm in which the proposal is the product or ratio of a current parameter and a random quantity that does not require any tuning parameters. The random quantity is in the interval (-1,1). Although RDMH is a very simple algorithm, it has excellent convergence and mixing properties. However, if it is reasonable that the origin (0) has positive probability, then the model should be reparameterized, because RDMH fails in the obscure case when the origin has positive probability (which can arise if the state-space is the set of integers).
+
+RDMH does not have any algorithm specifications.
+
+RDMH allows the proposed state to be far away from the current state, and yet has a good acceptance rate. Therefore, RDMH can explore the state space faster than many other MCMC algorithms.
+
+RDMH is geometrically ergodic for a class of densities that is much larger than most other MCMC algorithms. RDMH excels at representing target densities that are multimodal or fat-tailed, and has been compared with Gibbs sampling (Gibbs), Metropolis-Adjusted Langevin Algorithm (MALA), and Metropolis-within-Gibbs (MWG). Each of these other algorithms became stuck at local modes in multimodal target densities with large distances between the modes. RDMH explored the multimodal densities, or the fat tails, with ease.
+
+As a componentwise algorithm, the model specification function is evaluated a number of times equal to the number of parameters, per iteration. The order of the parameters for updating is randomized each iteration (random-scan), as opposed to sequential updating (deterministic-scan).
+
+The advantages of RDMH over MWG are that RDMH does not require tuning, better explores multimodal and fat-tailed target distributions, is better able to find acceptable proposals that are distant, and that it may therefore explore the state-space faster. Compared to multivariate MCMC algorithms, RDMH shares common disadvantages that it is slower per iteration, and correlated parameters are not taken into account. Since RDMH is not adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Dutta S (2012). "Multiplicative Random Walk Metropolis-Hastings on the Real Line." Sankhya B, 74(2), 315-342.
+
+## See Also
+
+- [Gibbs](#gibbs)
+- [MALA](#mala)
+- [MWG](#mwg)
+
+

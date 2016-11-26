@@ -1,0 +1,34 @@
+# Univariate Eigenvector Slice Sampler (<a name='uess'>UESS</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The acceptance rate is 1.', 'This is a widely applicable, general-purpose algorithm.','This algorithm is easy to use.','Yes, when non-adaptive.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Univariate Eigenvector Slice Sampler (UESS) is an adaptive algorithm that approximates the sample covariance matrix in the same manner as Adaptive-Mixture Metropolis (AMM). Described as "Univar Eigen" in Thompson (2011), UESS is a multivariate variation of slice sampling (Slice) that makes univariate updates along the eigenvectors of the sample covariance matrix.
+
+UESS has four algorithm specifications: `A` is the number of adaptive iterations, `B` accepts a list of blocks and defaults to NULL, `m` is the number of steps, and `n` is the number of previous iterations, and defaults to zero. Each iteration, a slice interval is estimated with up to `m` steps. The default is `m=100` steps. The step size is affected by the eigenvectors of the sample covariance matrix. The number of previous iterations, if any, is used to weight the sample covariance matrix.
+
+The contours of the target distribution are approximately ellipsoidal and the eigenvectors of its covariance coincide roughly with the axes of these ellipsoids, provided that the shape of the target distribution is approximately convex. Steps taken along these eigenvectors include steps along the long axes of a slice.
+
+Each iteration, there is a 5% probability that a non-adaptive step is taken, rather than an adaptive step. The first ten iterations or so are non-adaptive. Eigenvectors are estimated no more than every tenth iteration. When adaptive, the sample covariance matrix is updated each iteration.
+
+Once the slice interval is estimated, a sample is drawn uniformly with rejection sampling from within this interval. If rejected, then the interval is shrunk until an acceptable sample is drawn. UESS has a 100% acceptance rate.
+
+The time per iteration varies, since building the slice area requires up to `m` steps, and rejection sampling often requires more than one evaluation. Although UESS is a combination of the AMM and Slice algorithms, it usually performs as well or better than either. When UESS is adaptive, it is not suitable as a final algorithm.
+
+## References
+
+- Thompson MD (2011). "Slice Sampling with Multivariate Steps." http://hdl.handle.net/1807/31955
+
+## See Also
+
+- [AMM](#amm)
+- [Slice](#slice)
+

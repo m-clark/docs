@@ -5,7 +5,7 @@
 pander::pander(
   data.frame(
     Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
-    Description = c('he optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is relatively easy for a beginner. It has three algorithm specifications, which are easy to use. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The MWG algorithm is recommended as the final algorithm, though AMWG may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Componentwise.')),
+    Description = c('The optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is relatively easy for a beginner. It has three algorithm specifications, which are easy to use. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The MWG algorithm is recommended as the final algorithm, though AMWG may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Componentwise.')),
   justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
 ```
 

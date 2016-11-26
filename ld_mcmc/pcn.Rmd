@@ -1,0 +1,29 @@
+# Preconditioned Crank-Nicolson (<a name='pcn'>pCN</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('	The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that is most useful with large-dimensional models.','This algorithm is easy to use, having only one tuning parameter.','Yes.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Preconditioned Crank-Nicolson (pCN) was introduced originally as the PIA algorithm in Beskos et al. (2008), and differs only slightly from Random-Walk Metropolis (RWM). The proposal is a first-order autoregressive process, rather than a centered random-walk. The pCN algorithm has an acceptance probability that is invariant to dimension, making pCN useful for large-dimensional models.
+
+pCN has one algorithm specification, `beta`, which is the autoregressive parameter in (0,1).
+
+As with RWM, the target acceptance rate is 23.4%. pCN seems to perform well only with an identity matrix as the proposal covariance matrix.
+
+Since pCN is not adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Beskos A, Roberts GO, Stuart AM, Voss J (2008). "MCMC Methods for Diffusion Bridges." Stoch. Dyn., 8, 319-350.
+
+## See Also
+
+- [RAM](#ram)
+

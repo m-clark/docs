@@ -1,0 +1,30 @@
+# Refractive Sampler (<a name='refractive'>Refractive</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is between 0.6-0.7.', 'This is a widely applicable, general-purpose algorithm.','This algorithm is moderately difficult because it requires tuning of the number of steps, as well as the step size. However, the step size may be tuned automatically with the adaptive version, leaving only the number of steps to be tuned by the user.','Yes, if non-adaptive, or no if adaptive.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Refractive sampling was introduced by Boyles and Welling (2012) as an alternative to Hamiltonian Monte Carlo (HMC) and the No-U-Turn Sampler (NUTS). While the refractive sampler, HMC, and NUTS all use partial derivatives, the refractive sampler uses partial derivatives only for direction, not magnitude. The partial derivatives always point toward the side with the higher index of refraction. Like HMC and unlike NUTS, the refractive sampler requires tuning.
+
+The Refractive algorithm has four algorithm specifications: `Adaptive`, the number `m` of steps to take per iteration, step size `w`, and `r` is the ratio between indices of refraction. The Adaptive argument does not appear in Boyles and Welling (2012). When Adaptive is less than the number of iterations, an optional Robbins-Monro stochastic approximation of Garthwaite et al. (2010) is applied to step size `w`. All specifications must be scalar, and it is recommended that `r=1.3`. The number of steps `m` is similar to the number of leapfrog steps `L` in HMC, and step size `w` is similar to `epsilon`. Typically, as the number of parameters increases, it is often better for m to be larger and `w` smaller.
+
+Compared to other MCMC algorithms, a higher posterior density is often found. An advantage over NUTS is that iterative speed is consistent. An advantage over HMC is that Refractive is easier to tune. When `Adaptive` is greater than the number of iterations, the Refractive sampler is not adaptive and is suitable as a final algorithm.
+
+## References
+
+- Boyles LB and Welling M (2012). "Refractive Sampling." http://www.ics.uci.edu/~lboyles/publications.html
+- Garthwaite P, Fan Y, Sisson S (2010). "Adaptive Optimal Scaling of Metropolis-Hastings Algorithms Using the Robbins-Monro Process."
+
+## See Also
+
+- [HMC](#hmc)
+- [NUTS](#nuts)
+- [RSS](#rss)
+

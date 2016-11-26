@@ -1,0 +1,25 @@
+# Sequential Adaptive Metropolis-within-Gibbs (<a name='samwg'>SAMWG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This algorithm is applicable with state-space models (SSMs), including dynamic linear models (DLMs).','This algorithm is relatively easy for a beginner. It has few algorithm specifications. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The SMWG algorithm is recommended as the final algorithm, though SAMWG may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Sequential Adaptive Metropolis-within-Gibbs (SAMWG) algorithm is for state-space models (SSMs), including dynamic linear models (DLMs). It is identical to the Adaptive Metropolis-within-Gibbs (AMWG) algorithm, except with regard to the order of updating parameters (and here, sequential does not refer to deterministic-scan). Parameters are grouped into two blocks: static and dynamic. At each iteration, static parameters are updated first, followed by dynamic parameters, which are updated sequentially through the time-periods of the model. The order of the static parameters is randomly selected at each iteration, and if there are multiple dynamic parameters for each time-period, then the order of the dynamic parameters is also randomly selected. The SAMWG algorithm is adapted from Geweke and Tanizaki (2001) for <span class="pack">LaplacesDemon</span>. The SAMWG is a single-site update algorithm that is more efficient in terms of iterations, though convergence can be slow with high intercorrelations in the state vector (Fearnhead 2011). If SAMWG is used for adaptation, then the final, non-adaptive algorithm should be Sequential Metropolis-within-Gibbs (SMWG).
+
+## References
+
+- Fearnhead P (2011). "MCMC for State-Space Models." In S Brooks, A Gelman, G Jones, M Xiao-Li (eds.), Handbook of Markov Chain Monte Carlo, p. 513-530. Chapman & Hall, Boca Raton, FL.
+- Geweke J, Tanizaki H (2001). "Bayesian Estimation of State-Space Models Using the Metropolis-Hastings Algorithm within Gibbs Sampling." Computational Statistics and Data Analysis, 37, 151-170.
+
+## See Also
+
+- [AMWG](#amwg)
+- [SMWG](#smwg)
+

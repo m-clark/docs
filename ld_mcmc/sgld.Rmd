@@ -1,0 +1,35 @@
+# Stochastic Gradient Langevin Dynamics (<a name='sgld'>SGLD</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The acceptance rate is 100%.', 'This is a widely applicable, general-purpose algorithm that is specifically designed for big data.','This algorithm is easy for a beginner, though the step size must be specified and tuned.','Yes.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Stochastic Gradient Langevin Dynamics (SGLD) algorithm of Welling and Teh (2011) is the first MCMC algorithm designed specifically for big data. Traditional MCMC algorithms require the entire data set to be included in the model evaluation each iteration. In contrast, SGLD reads and processes only a small, randomly selected batch of records each iteration. In addition to saving computation time, the entire data set does not need to be loaded into memory at once.
+
+SGLD expands the stochastic gradient descent optimization algorithm to include Gaussian noise with Langevin dynamics. The multivariate proposal is merely the vector of current values plus a step size times the gradient, plus Gaussian noise. The scale of the Gaussian noise is determined by the step size, ε.
+
+SGLD has five algorithm specifications: `epsilon` or ε is the step size, `file` accepts the quoted name of a .csv file that is the big data set, `Nr` is the number of rows in the big data set, `Nc` is the number of columns in the big data set, and `size` is the number of rows to be read and processed each iteration.
+
+Since SGLD is designed for big data, the entire data set is not included in the Data list, but one small batch must be included and named $X$. All data must be included. For example, both the dependent variable $y$ and design matrix $X$ in linear regression are included. The requirement for the small batch to be in `Data` is so that numerous checks may be passed after <span class="func">LaplacesDemon</span> is called and before the SGLD algorithm begins. Each iteration, SGLD uses the scan function, without headers, to read a random block of rows from, say, `X.csv`, stores it in `Data$X`, and passes it to the Model specification function. The Model function must differ from the other examples found in the LaplacesDemon package in that multiple objects, such as $X$ and $y$ must be read from `Data$X`, where usually there is both `Data$X` and `Data$y`.
+
+The user tunes SGLD with step size ε via the `epsilon` argument, which accepts either a scalar for a constant step size or a vector equal in length to the number of iterations for an annealing schedule. The step size must remain in the interval (0,1). The user may define an annealing schedule with any function desired. Examples are given in Welling and Teh (2011) of decreasing schedules, as well as for using a constant. When `ε = 0`, both the stochastic gradient and Langevin dynamics components of the equation are reduced to zero and the algorithm will not move. When ε is too large, degenerate results occur. A good recommendation seems to be to begin with ε set to `1/Nr`. From testing on numerous examples, it seems preferable to perform several short runs and experiment with a constant, rather than using a decreasing schedule, but your mileage may vary.
+
+The SGLD algorithm presented here is the simplest one, which is equation 4 in Welling and Teh (2011). Other components were also proposed such as a preconditioning matrix and covariance matrix, though these are not currently included here.
+
+SGLD does not include a Metropolis step for acceptance and rejection, so the acceptance rate is 100%. SGLD is slower than a componentwise algorithm for two reasons: first it must read data from an external file each iteration, and second, gradients with numerical differencing are computationally expensive, requiring many model evaluations per iteration. At least `Nr / size` iterations are suggested. SGLD has great promise for the application of MCMC to massive data sets.
+
+## References
+
+- Welling M, Teh, Y (2011). "Bayesian Learning via Stochastic Gradient Langevin Dynamics." Proceedings of the 28th International Conference on Machine Learning (ICML), 681-688.
+
+## See Also
+
+- [HMC](#hmc)
+

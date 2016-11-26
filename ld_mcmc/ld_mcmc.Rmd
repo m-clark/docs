@@ -21,11 +21,11 @@ options(htmltools.dir.version = FALSE)
 
 # Preface
 
-The following is a list of mcmc algorithms that was formerly found on the now-defunct website bayesian-inference.com.  That site was also home to the once useful <span class="pack">LaplacesDemon</span> R package, which was evidently abandoned, but has recently been revived [here](https://github.com/LaplacesDemonR/LaplacesDemon), and is even  available on CRAN again ([link](https://cran.r-project.org/web/packages/LaplacesDemon/index.html)).  The ambitious goal of <span class="pack">LaplacesDemon</span> was to provide a complete Bayesian inference environment within R.  When first getting into Bayesian analysis in R, I found its vignettes and website clear and useful. The vignettes are available on CRAN and below.  
+The following is a list of Markov Chain Monte Carlo algorithms that was formerly found on the now-defunct website bayesian-inference.com.  That site was also home to the once useful <span class="pack">LaplacesDemon</span> R package, which was evidently abandoned, but has recently been revived [here](https://github.com/LaplacesDemonR/LaplacesDemon), and is even  available on CRAN again ([link](https://cran.r-project.org/web/packages/LaplacesDemon/index.html)).  The ambitious goal of <span class="pack">LaplacesDemon</span> was to provide a complete Bayesian inference environment within R.  When first getting into Bayesian analysis in R, I found its vignettes clear and thw website a nice resource. The vignettes are available on CRAN and below, and reflect current development.
 
-One of the useful things on the LD website was the list of algorithms that the package could utilize.  While some things might be specific to the package, the considerations and comparsions, as well as relative strengths, weaknesses and other description, as well as references, are useful.  As others might also be interested, I have reproduced that here.  
+One of the useful things on the LD website that I always meant to get back to and spend more time with was the list of algorithms that the package could utilize.  As others might also be interested, I have reproduced that here, culled from the [Wayback Machine](http://www.archive.org).  While some things might be specific to the R package, the considerations and comparisons, as well as relative strengths, weaknesses and other description, as well as references, are informative in my opinion.  
 
-The references are probably dated to around 2014, and may not be entirely as accurate as they were then (see e.g. Hamiltonian MC), but they appear to have been very up to date at that point.  I think descriptions are fine for getting a general sense of the algorithms, but they will obviously not reflect any recent developments.  I tried to keep an eye out for things like subscripts and other notation, but didn't spend a lot of time on that. I also cleaned up any typos etc. I may have come across.  I have no intention of maintaining this once complete, I just provide it out of my own interest.
+The references are probably dated to around 2014, and may not be entirely as accurate as they were then (see e.g. Hamiltonian MC), but they appear to have been very up to date to that point.  I think the descriptions are fine for getting a general sense of the algorithms, but they obviously will not reflect any recent developments.  In reproducing this, I have tried to keep an eye out for things like subscripts and other notation, but didn't spend a lot of time on that. I also cleaned up any typos etc. I may have come across.  I have no intention of maintaining this once complete, I just provide it out of my own interest.
 
 [Bayesian Inference](BayesianInference.pdf)
 
@@ -102,4 +102,58 @@ The references are probably dated to around 2014, and may not be entirely as acc
 ```
 
 ```{r child='mwg.Rmd'}
+```
+
+```{r child='nuts.Rmd'}
+```
+
+```{r child='ohss.Rmd'}
+```
+
+```{r child='pcn.Rmd'}
+```
+
+```{r child='ram.Rmd'}
+```
+
+```{r child='rdmh.Rmd'}
+```
+
+```{r child='refractive.Rmd'}
+```
+
+```{r child='rj.Rmd'}
+```
+
+```{r child='rss.Rmd'}
+```
+
+```{r child='rwm.Rmd'}
+```
+
+```{r child='samwg.Rmd'}
+```
+
+```{r child='sgld.Rmd'}
+```
+
+```{r child='slice.Rmd'}
+```
+
+```{r child='smwg.Rmd'}
+```
+
+```{r child='thmc.Rmd'}
+```
+
+```{r child='twalk.Rmd'}
+```
+
+```{r child='uess.Rmd'}
+```
+
+```{r child='usamwg.Rmd'}
+```
+
+```{r child='usmwg.Rmd'}
 ```

@@ -11,7 +11,7 @@ pander::pander(
 
 <br>
 
-Proposed by Hastings (1970) and popularized by Tierney (1994), the Independence Metropolis (IM) algorithm (also called the independence sampler) is an algorithm in which the proposal distribution does not depend on the previous state or iteration. The proposal distribution must be a good approximation of the target distribution for IM to peform well, and the proposal distribution should have slightly heavier tails than the target distribution. IM is used most often to obtain additional posterior samples given an algorithm that has already converged.
+Proposed by Hastings (1970) and popularized by Tierney (1994), the Independence Metropolis (IM) algorithm (also called the independence sampler) is an algorithm in which the proposal distribution does not depend on the previous state or iteration. The proposal distribution must be a good approximation of the target distribution for IM to perform well, and the proposal distribution should have slightly heavier tails than the target distribution. IM is used most often to obtain additional posterior samples given an algorithm that has already converged.
 
 IM has one algorithm specification: `mu`. The usual approach to IM is to update the model with Laplace Approximation, and then supply the posterior mode and covariance to IM. The posterior mode vector of Laplace Approximation becomes the `mu` argument in the algorithm specifications for IM. The covariance matrix from Laplace Approximation is expanded by multiplying it by 1.1 so that it has heavier tails. Each iteration, IM draws from a multivariate normal distribution as the proposal distribution. Alternatively, posterior means and covariances may be used from other algorithms, such as other MCMC algorithms.
 

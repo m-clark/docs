@@ -1,0 +1,29 @@
+# Reflective Slice Sampler (<a name='rss'>RSS</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The acceptance rate is 1.', 'This is a widely applicable, general-purpose algorithm.','This algorithm is difficult to tune. There are two tuning parameters: the number of steps to take, and the step size.','Yes.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Introduced in Neal (1997), the Reflective Slice Sampler (RSS) is a multivariate slice sampler that uses partial derivatives and reflects into a slice interval. As described in Neal (2003), each iteration, direction and momentum within the slice interval are determined randomly, partial derivatives are taken once, and a number of steps is taken according to a step size. The distance of each step is the product of the step size and momentum. Direction is changed by reflecting off the boundaries of the slice interval. The reflected momentum direction is a function of the incident momentum and the partial derivatives. Random-walk behavior is suppressed, because a large number of steps may be taken in the same direction. The acceptance rate is 100%.
+
+RSS has two algorithm specifications: `m` and `w`. Each iteration, `m` steps are taken with step size `w`. While `m` must be a scalar, `w` may be a scalar or vector equal in length to the number of parameters. A step size that is too small is inefficient, but too small is better than too large, which can entirely avoid the target distribution.
+
+RSS is difficult to tune, but is consistent in time per iteration. Neal (2003) states that Hamiltonian Monte Carlo (HMC) performs better than RSS when both HMC and RSS are optimally tuned. Since RSS is not adaptive, it may be used as a final algorithm.
+
+## References
+
+- Neal R (1997). "Markov Chain Monte Carlo Methods Based on Slicing the Density Function." Technical Report, University of Toronto.
+- Neal R (2003). "Slice Sampling (with Discussion)." Annals of Statistics, 31(3), 705-767.
+
+## See Also
+
+- [HMC](#hmc)
+- [Slice](#slice)
+

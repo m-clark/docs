@@ -1,0 +1,33 @@
+# Oblique Hyperrectangle Slice Sampler (<a name='ohss'>OHSS</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The acceptance rate is 1.', 'This is a widely applicable, general-purpose algorithm.','This algorithm is easy to use and does not require tuning.','Yes, when it is non-adaptive.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Oblique Hyperrectangle Slice Sampler (OHSS) is an adaptive algorithm that approximates the sample covariance matrix. Introduced by Thompson (2011) where it is referred to as "Oblique Hyperrect", OHSS is an extension of the hyperrectangle method in Neal (2003), which in turn is a multivariate extension of the slice sampler (Slice). The initial hyperrectangle is oriented to have edges that are parallel to the eigenvectors of the sample covariance matrix. The initial hyperrectangle is also scaled to have lengths proportional to the square roots of the eigenvalues of the sample covariance matrix. Rejection sampling is performed, and when a sample is rejected, the slice approximation is shrunk. Aside from specifying the initial hyperrectangle, this is the hyperrectangle method in Neal (2003).
+
+OHSS has two algorithm specifications: `A` is the number of adaptive iterations, `n` is the number of previous iterations, and defaults to zero. The number of previous iterations, if any, is used to weight the sample covariance matrix.
+
+Each iteration, there is a 5% probability that a non-adaptive step is taken, rather than an adaptive step. The first ten iterations or so are non-adaptive. Eigenvectors are estimated no more than every tenth iteration. When adaptive, the sample covariance matrix is updated along with the eigenvectors.
+
+Once the slice interval is estimated, a sample is drawn uniformly with rejection sampling from within this interval. If rejected, then the interval is shrunk until an acceptable sample is drawn. OHSS has a 100% acceptance rate.
+
+The time per iteration varies, since rejection sampling often requires more than one evaluation. When OHSS is adaptive, it is not suitable as a final algorithm.
+
+## References
+
+- Thompson MD (2011). "Slice Sampling with Multivariate Steps." http://hdl.handle.net/1807/31955
+- Neal R (2003). "Slice Sampling (with Discussion)." Annals of Statistics, 31(3), 705-767.
+
+## See Also
+
+- [Slice](#slice)
+- [UESS](#uess)
+

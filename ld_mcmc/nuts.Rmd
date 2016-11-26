@@ -1,0 +1,36 @@
+# No-U-Turn Sampler (<a name='nuts'>NUTS</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The user specifies the target acceptance rate as delta (60% is recommended). A recommended, suitable, observed acceptance rate may be in the interval [delta-5%,delta+5%].', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small number of parameters. The number of model evaluations per iteration increases with the number of parameters.','This algorithm is relatively easy for a beginner. It has only a few algorithm specifications. However, since it is adaptive, the user must regard diminishing adaptation.','Yes, if not adaptive, otherwise: User Discretion.', 'Multivariate. Proposals are multivariate only in the sense that proposals for multiple parameters are generated at once. However, proposals are not generated with a multivariate distribution and a proposal covariance matrix. Each iteration involves numerous proposals, due to partial derivatives and L.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The No-U-Turn Sampler (NUTS) is an extension of Hamiltonian Monte Carlo (HMC) that adapts both the scalar step-size ε and scalar number of leapfrog steps L. This is algorithm #6 in Hoffman and Gelman (2012).
+
+NUTS has four algorithm specifications: the number of adaptive iterations `A`, the target acceptance rate `delta` or δ (and 0.6 is recommended), a scalar step-size `epsilon` or ε, and the maximum number of leapfrog steps `Lmax`.
+
+Each iteration $i ≤ A$, NUTS adapts both ε and $L$, and coerces the target acceptance rate δ. $L$ continues to change after adaptation ends, but is not an adaptive parameter in the sense of destroying ergodicity. The adaptive samples are discarded and only the thinned non-adaptive samples are returned.
+
+The main advantage of NUTS over other HMC algorithms is that NUTS is the algorithm most likely to produce approximately independent samples, in the sense of low autocorrelation. Due to computational complexity, NUTS is slower per iteration than HMC, and the HMC family is among the slowest. Despite this, NUTS often produces chains with excellent mixing, and should outperform other adaptive versions of HMC, such as AHMC and HMCDA. Per iteration, NUTS should generally perform better than other HMC algorithms. Per minute, however, is another story.
+
+NUTS has been extended elsewhere to allow for a non-diagonal mass matrix (proposal covariance matrix for momentum). This extension are not yet included here.
+
+In complex and high-dimensional models, NUTS may produce approximately independent samples much more slowly in minutes than other MCMC algorithms, such as Adaptive Metropolis-within-Gibbs (AMWG). This is because the combination of calculating partial derivatives and the search each iteration for L is computationally intensive.
+
+## References
+
+- Hoffman M, Gelman A (2012). "The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo." Journal of Machine Learning Research, 1-30.
+
+## See Also
+
+- [AHMC](#ahmc)
+- [HMC](#hmc)
+- [HMCDA](#hmcda)
+- [MALA](#mala)
+

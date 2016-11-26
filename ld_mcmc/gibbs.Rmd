@@ -13,7 +13,7 @@ pander::pander(
 
 Gibbs sampling was introduced by Turchin (1971), and later by brothers Geman and Geman (1984). The Geman brothers named the algorithm after the physicist J. W. Gibbs, some eight decades after his death, in reference to an analogy between the sampling algorithm and statistical physics. Geman and Geman introduced Gibbs sampling in the context of image restoration.
 
-Gibbs has two algorithm specifications: `FC` accepts a user-specified function to calculate full-conditionals, and `MWG` defaults to `NULL` and otherwise accepts a numeric vector that indicates which parameters are updated with Metropolis-within-Gibbs. FC accepts two arguments, `parm` and `Data`, just like the Model specification function, and returns the full vector of parameters parm. Each iteration, the full-conditional distributions are completed first, then MWG updates, if any.
+Gibbs has two algorithm specifications: `FC` accepts a user-specified function to calculate full-conditionals, and `MWG` defaults to `NULL` and otherwise accepts a numeric vector that indicates which parameters are updated with Metropolis-within-Gibbs. FC accepts two arguments, `parm` and `Data`, just like the Model specification function, and returns the full vector of parameters `parm`. Each iteration, the full-conditional distributions are completed first, then MWG updates, if any.
 
 In its basic version, Gibbs sampling is a special case of the Metropolis-Hastings algorithm. However, in its extended versions, Gibbs sampling can be considered a general framework for sampling from a large set of variables by sampling each variable (or in some cases, each group of variables) in turn, and can incorporate the Metropolis-Hastings algorithm (such as Metropolis-within-Gibbs or similar methods such as Slice sampling) to implement one or more of the sampling steps. Currently, Metropolis-within-Gibbs is included.
 
@@ -28,7 +28,7 @@ The advantage of Gibbs sampling to other MCMC algorithms is that it is often mor
 ## References
 
 - Geman S and Geman D (1984). "Stochastic Relaxation, Gibbs Distributions, and the Bayesian Restoration of Images." IEEE Transactions on Pattern Analysis and Machine Intelligence, 6(6), 721-741.
-- Turchin, VF (1971). "On the Computation of Multidimensional Integrals by the Monte Carlo Method", Theory of Probablility and its Applications, 16(4), 720-724.
+- Turchin, VF (1971). "On the Computation of Multidimensional Integrals by the Monte Carlo Method", Theory of Probability and its Applications, 16(4), 720-724.
 
 ## See Also
 

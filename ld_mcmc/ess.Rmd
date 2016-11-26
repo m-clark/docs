@@ -11,7 +11,7 @@ pander::pander(
 
 <br>
 
-Elliptical Slice Sampling (ESS) was introduced by Murray et al. (2010) as a multivariate extension of componentwise Slice sampling (Slice) that utilizes ellipse ν and angle θ. Each iteration, ellipse ν is drawn from N(0, Σ), where Σ is a user-specified prior covariance for the ellipse. The authors recommend using a form of the covariance of the data. Even though other parameters are not discussed, an identity matrix, or a combination thereof, performs well in practice. The prior covariance matrix is accepted as VarCov in the LaplacesDemon function, rather than the usual proposal covariance matrix.
+Elliptical Slice Sampling (ESS) was introduced by Murray et al. (2010) as a multivariate extension of componentwise Slice sampling (Slice) that utilizes ellipse ν and angle θ. Each iteration, ellipse ν is drawn from N(0, Σ), where Σ is a user-specified prior covariance for the ellipse. The authors recommend using a form of the covariance of the data. Even though other parameters are not discussed, an identity matrix, or a combination thereof, performs well in practice. The prior covariance matrix is accepted as `VarCov` in the <span class="func">LaplacesDemon</span> function, rather than the usual proposal covariance matrix.
 
 ESS has one algorithm specification `B` for blocks of parameters, and defaults to `B=NULL`. For large-dimensional problems, block updating may be used. To specify block updating, the user gives the `B` specification a list in which each component is a block, and each component is a vector of integers pointing to the position of the parameters for that block. Block updating also requires the `Covar` argument to receive a list of prior covariance matrices of the appropriate dimension.
 

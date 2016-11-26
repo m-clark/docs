@@ -19,9 +19,9 @@ As with AM, the proposal covariance matrix is set equal to the historical (or sa
 
 Solonen et al. (2012) found a dramatic reduction in the number of iterations to convergence when INCA used 10 parallel chains, compared against a single-chain AM algorithm. Similar improvements have been noted in the LaplacesDemon package, though more time is required per iteration.
 
-The Gelman.Diagnostic is recommended by Craiu et al. (2009) to determine when the parallel chains have stopped sharing different information about the target distributions. The exchange of information between chains decreases as the number of iterations increases.
+The <span class="func">Gelman.Diagnostic</span> is recommended by Craiu et al. (2009) to determine when the parallel chains have stopped sharing different information about the target distributions. The exchange of information between chains decreases as the number of iterations increases.
 
-This implementation of INCA uses a server function that is built into LaplacesDemon.hpc. If the connection to this server fails, then the user must kill the process and then close all open connections with the closeAllConnections function.
+This implementation of INCA uses a server function that is built into LaplacesDemon.hpc. If the connection to this server fails, then the user must kill the process and then close all open connections with the <span class="func">closeAllConnections</span> function.
 
 Since INCA is an adaptive algorithm, the final algorithm should be Random-Walk Metropolis (RWM).
 
