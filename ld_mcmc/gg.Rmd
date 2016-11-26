@@ -1,0 +1,35 @@
+# Griddy-Gibbs (<a name='gg'>GG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The acceptance rate is 1.', 'This is a widely applicable, general-purpose algorithm.','This algorithm is moderate in difficulty because the user-specified grid may need tuning. With an appropriate grid, the method is fully automatic. There is only one required algorithm specification for defining the grid. Additional optional algorithm specifications control parallelization or allow discrete parameters.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Introduced by Ritter and Tanner (1992), the Griddy-Gibbs (GG) sampler is a componentwise algorithm that approximates the conditional distribution by evaluating the model at a discrete set of points, the user-specified grid for each parameter. The proposal is a random draw from the approximated distribution. In this implementation, splinetic interpolation is used to approximate the distribution for continuous parameters with 1,000 points, given the evaluated points. The acceptance rate is 100%.
+
+GG has five algorithm specifications: `Grid` is a vector or list of evenly-spaced points in the grid, `dparm` is a vector that indicates discrete parameters and defaults to NULL, `CPUs` is the number of available central processing units (CPUs), `Packages` is a vector of package names, and `Dyn.lib` is a vector of shared libraries. The default for `Grid` is `seq(from=-0.1, to=0.1, len=5)`, which creates a grid with the values -0.1, -0.05, 0, 0.05, and 0.1. For each continuous parameter in each iteration, the grid values are added to the latest value of the parameter, and the model is evaluated with the parameter at each point on the grid. For each discrete parameter, the model is evaluated at each grid point and a sample is taken.
+
+At least five grid points are recommended for a continuous parameter, and a grid with more points will better approximate the distribution, but requires more evaluations. However, the approximation in GG may be parallelized (within LaplacesDemon, not LaplacesDemon.hpc), so a large computer environment may approach an excellent approximation with little inefficiency. It is natural to desire a grid with a larger range, but in practice this becomes problematic, so it is recommended to keep the range of the grid relatively small, say within [-0.1,0.1] or [-0.2,0.2], and may require experimentation. After observing a Markov chain, the user may adjust the range of the grid to decrease autocorrelation in a future update.
+
+When an odd number of grid points is used for a continuous parameter, the current position is evaluated. If there are too few grid points, then the current point may be the only point with appreciable density, and the parameter may never move. This can be checked afterward with the AcceptanceRate function. If the acceptance rate is less than one for any parameter, then there are too few grid points. This failure may be harder to find when there are numerous parameters, an even number of grid points, and too few grid points, because the acceptance rate may be 100% for a parameter, yet it may be oscillating between two values.
+
+GG is one of the slower algorithms per iteration, since the model must be evaluated multiple times per parameter per iteration. This may mostly be alleviated in a parallel environment. GG seems appropriate when the problem must be solved with a componentwise algorithm, and excessive thinning is required. GG may help reduce thinning by making proposals from the approximated conditional distribution, though parameter correlation may increase autocorrelation.
+
+Advantages of parallelized GG over most componentwise algorithms is that it yields a 100% acceptance rate, and draws from the approximated distribution should be less autocorrelated. A disadvantage is that more model evaluations are required, and even if a parallel environment had zero overhead, GG would be twice as slow per iteration as other componentwise algorithms. However, if the user tunes the grid, it may be more efficient than other componentwise algorithms. The Adaptive Griddy-Gibbs (AGG) sampler is available so the user can avoid tuning the grid. Since GG is not adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Ritter C, Tanner M (1992). "Facilitating the Gibbs Sampler: the Gibbs Stopper and the Griddy-Gibbs Sampler." Journal of the American Statistical Association, 87, 861-868.
+
+## See Also
+
+- [AGG](#agg)
+- [Gibbs](#gibbs)
+- [MTM](#mtm)
+- [Slice](#slice)

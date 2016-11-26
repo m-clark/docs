@@ -1,0 +1,29 @@
+# Independence Metropolis (<a name='im'>IM</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small to medium number of parameters. The proposal covariance matrix must be solved, and this matrix grows with the number of parameters.','This algorithm is relatively easy for a beginner. It has few algorithm specifications, and these are easy to specify.','Yes.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Proposed by Hastings (1970) and popularized by Tierney (1994), the Independence Metropolis (IM) algorithm (also called the independence sampler) is an algorithm in which the proposal distribution does not depend on the previous state or iteration. The proposal distribution must be a good approximation of the target distribution for IM to peform well, and the proposal distribution should have slightly heavier tails than the target distribution. IM is used most often to obtain additional posterior samples given an algorithm that has already converged.
+
+IM has one algorithm specification: `mu`. The usual approach to IM is to update the model with Laplace Approximation, and then supply the posterior mode and covariance to IM. The posterior mode vector of Laplace Approximation becomes the `mu` argument in the algorithm specifications for IM. The covariance matrix from Laplace Approximation is expanded by multiplying it by 1.1 so that it has heavier tails. Each iteration, IM draws from a multivariate normal distribution as the proposal distribution. Alternatively, posterior means and covariances may be used from other algorithms, such as other MCMC algorithms.
+
+Since IM is non-adaptive and uses a proposal distribution that remains fixed for all iterations, it may be used as a final algorithm.
+
+## References
+
+- Hastings, W.K. (1970). "Monte Carlo Sampling Methods Using Markov Chains and Their Applications." Biometrika, 57(1), 97-109.
+- Tierney, L. (1994). "Markov Chains for Exploring Posterior Distributions." The Annals of Statistics, 22(4), 1701-1762.
+
+
+## See Also
+
+- none
+

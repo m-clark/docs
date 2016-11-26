@@ -1,0 +1,29 @@
+# Hamiltonian Monte Carlo with Dual-Averaging (<a name='hmcda'>HMCDA</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The user specifies the target acceptance rate as delta (65% is recommended). A recommended, suitable, observed acceptance rate may be in the interval [delta-5%,delta+5%].', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small number of parameters. The number of model evaluations per iteration increases with the number of parameters.','This algorithm is relatively difficult for a beginner. It has several algorithm specifications. Since it is an adaptive algorithm, the user must regard diminishing adaptation.','Yes, when non-adaptive, otherwise: User Discretion.', 'Multivariate. Proposals are multivariate only in the sense that proposals for multiple parameters are generated at once. However, proposals are not generated with a multivariate distribution and a proposal covariance matrix. Each iteration involves numerous proposals, due to partial derivatives and L.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Hamiltonian Monte Carlo with Dual-Averaging (HMCDA) algorithm is an extension of Hamiltonian Monte Carlo (HMC) that adapts the scalar step-size parameter, ε, according to dual-averaging. This is algorithm #5 in Hoffman and Gelman (2012).
+
+HMCDA has five algorithm specifications: the number of adaptive iterations `A`, the target acceptance rate `delta` or δ (and 0.65 is recommended), a scalar step-size `epsilon` or ε, and the trajectory length `lambda` or λ. The trajectory length is scalar λ = εL, where $L$ is the unspecified number of leapfrog steps that is determined from ε and λ. Each iteration i ≤ A, HMCDA adapts and coerces the target acceptance rate δ.
+
+As with HMC, the HMCDA algorithm is slower per iteration than many other algorithms, but often produces chains with good mixing. HMCDA should outperform Adaptive Hamiltonian Monte Carlo (AHMC), and iterates faster as well, unless L becomes large. When mixing is inadequate, consider switching to the MALA or NUTS algorithm. When parameters are highly correlated, another algorithm should be preferred in which correlation is taken into account, such as AMM, or in which the algorithm is generally invariant to correlation, such as twalk. When adaptive, it is not suitable as a final algorithm.
+
+## References
+
+- Hoffman M, Gelman A (2012). "The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo." Journal of Machine Learning Research, 1-30.
+
+## See Also
+
+- [AHMC](#ahmc)
+- [HMC](#hmc)
+- [MALA](#mala)
+- [NUTS](#nuts)

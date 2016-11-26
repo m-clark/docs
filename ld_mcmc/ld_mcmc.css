@@ -1,0 +1,32 @@
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/zN7GBFwfMP4uA6AR0HCoLQ.ttf) format('truetype');
+}
+
+
+body, p {
+  color: #595959;
+  background-color: #fefefe;
+  font-family: Roboto;
+}
+
+a {
+  text-decoration: none;
+  color: #1e90ff;
+}
+
+h1, h2, h3, h4 {
+
+}
+
+#TOC{
+  font-size: 70%;
+  text-decoration: none;
+  /* width: 400px; */
+}
+
+ul {
+  font-size: 1em;
+}

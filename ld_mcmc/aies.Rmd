@@ -1,0 +1,35 @@
+# Affine-Invariant Ensemble Sampler (<a name='aies'>AIES</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is relatively easy for a beginner. The user must select the number of walkers, though the recommended default is suitable, must supply a vector of initial values for each walker, and specify a scale parameter, which again has a suggested default. If the user experiences difficulty, the recommendation is to increase the number of walkers.','Yes.', 'Multivariate by Walker.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Affine-Invariant Ensemble Sampler (AIES) of Goodman and Weare (2010) uses a complmentary ensemble of at least 2J walkers for J parameters. Each walker receives J initial values, and initial values must differ for each walker. At each iteration, AIES makes a multivariate proposal for each walker, given a scaled difference in position by parameter between the current walker and another randomly-selected walker.
+
+AIES has six algorithm specifications: `Nc` is the number of walkers, `Z` is a $N_c$ x $J$ matrix of initial values, `β` is a scale parameter, `CPUs` is the number of central processing units (CPUs), `Packages` is a vector of package names, and `Dyn.lib` is a vector of shared libraries. The recommended number of walkers is at least $2J$. If separate sets of initial values are not supplied in `Z`, since `Z` defaults to NULL, then the <span class="func">GIV</span> function is used to generate initial values. The original article referred to the scale parameter as α, though it has been renamed here to β to avoid a conflict with the acceptance probability α in the Metropolis step. The β parameter may be manipulated to affect the desired acceptance rate, though in practice, the acceptance rate may potentially be better affected by increasing the number of walkers. It is recommended to specify `CPUs=1` and leave the remaining arguments to `r NULL`, unless needed.
+
+This version returns the samples from one walker, and the other walkers assist the main walker. A disadvantage of this approach is that all samples from all walkers are not returned. An advantage of this approach is that if a particular walker is an outlier, then it does not affect the main walker, unless of course it is the main walker! Multiple sets of samples are best returned in a list, such as with parallel chains in the <span class="func">LaplacesDemon.hpc</span> function, though it is not applicable in <span class="func">LaplacesDemon</span>.
+
+AIES has been parallelized by Foreman-Mackey et al. (2012), and this style of parallelization is available here as well. The user is cautioned to prefer CPUs=1, because parallelizing may result in a slower algorithm due to communication between the master and slave CPUs each iteration. This communication is costly, and is best overcome with a large number of CPUs available, and when the Model function is slow to evaluate in comparison to network communication time.
+
+Both the parallelized (CPUs > 1) and un-parallelized (CPUs=1) versions should be called from <span class="func">LaplacesDemon</span>, not <span class="func">LaplacesDemon.hpc</span>. When parallelized, the number of walkers must be an even number (odd numbers are not permitted), and the walkers are split into two equal-sized batches. Each iteration, each walker moves in relation to a randomly-selected walker in the other batch. This retains detailed balance.
+
+AIES is attractive for offering affine-invariance, and therefore being generally robust to badly scaled posteriors, such as with highly correlated parameters. It is also attractive for making a multivariate proposal without a proposal covariance matrix. However, since at least 2J walkers are recommended, the number of model evaluations per iteration exceeds most componentwise algorithms by at least twice, making AIES a slow algorithm per iteration, and computation scales poorly with model dimension. Large-scale computing environments may overcome this limitation with parallelization, but parallelization is probably not very helpful (and may be detrimental) in small-scale computing environments when evaluating the model function is not slow in comparison with network communication time. AIES is not an adaptive algorithm, and is therefore suitable as a final algorithm.
+
+
+## References
+
+- Foreman-Mackey D, Hogg D, Lang D, Goodman J (2012). "emcee: The MCMC Hammer." Upcoming in Publications of the Astronomical Society of the Pacific, http://arxiv.org/ abs/1202.3665.
+- Goodman J, Weare J (2010). "Ensemble Samplers with Affine Invariance." Communications in Applied Mathematics and Computational Science, 5(1), 6-80.
+ 
+
+## See Also
+
+- [twalk](#twalk)

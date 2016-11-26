@@ -1,0 +1,43 @@
+# Metropolis-Coupled Markov Chain Monte Carlo (<a name='mcmcmc'>MCMCMC</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that specializes in representing multimodal distributions.','This algorithm is moderately difficult for a beginner, because the proposal covariance must be tuned, the swap acceptance rate should be tuned, and the number of CPUs selected.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Metropolis-Coupled Markov Chain Monte Carlo (MCMCMC) algorithm -- also referred to as MC3, (MC)3, Metropolis-Coupled MCMC, Parallel Tempering, or Replica Exchange -- was introduced by Geyer (1991) for multimodal distributions. The name "parallel tempering" was introduced in Earl and Deem (2005).
+
+MCMCMC consists of parallel chains that use different temperatures and combine to form a mixture distribution, where each chain is a mixture component. The chains or mixture components are updated in parallel, each with a Metropolis step that is adjusted by temperature. After this first set of Metropolis steps, two parallel chains are selected at random, and another adjusted Metropolis step is used to accept or reject a swap between chains. The act of swapping is referred to as coupling. Each swap may be a jump between modes. MCMCMC has both within-chain and between-chain proposals each iteration, but only the coolest chain is retained.
+
+MCMCMC has four algorithm specifications: `lambda` is either a positive-only scalar that controls the temperature spacing or a vector of temperature spacings, `CPUs` is the number of central processing units in the computer, `Packages` is a vector of any package names that are required, and `Dyn.libs` are any dynamic libaries that are required. A larger scalar value of λ results in greater differences in temperature between chains, and often a lower swap acceptance rate (see below). Given a scalar λ and m=1,...,M CPUs, the current or proposal distribution is exponentiated to this power: 1/[1 + λ(m - 1)]. The number of CPUs must be at least two; as programmed, MCMCMC will not function on a single-core computer.
+
+MCMCMC must be called with <span class="func">LaplacesDemon</span>, not <span class="func">LaplacesDemon.hpc</span>, even though MCMCMC requires parallel chains. Each iteration, LaplacesDemon communicates with all CPUs, collects the latest for all the chains, and then the master process calculates the Metropolis steps for each chain, as well as the swap.
+
+As with Random-Walk Metropolis (RWM), the proposal covariance matrix must be tuned. When nothing is known about this matrix, as is often the case, it is suggested to begin with an identity matrix with small-scale diagonal values, such as 1e-3. After a short run that hopefully has some acceptances, another short run can begin with the observed historical covariance matrix. Eventually, the proposal covariance matrix is usually satisfactory.
+
+Atchade et al. (2011) demonstrate that MCMCMC performance improves as the acceptance rate of proposed swaps approaches 0.234. In LaplacesDemon, the swap acceptance rate is printed to the console at the end of each update. The swap acceptance rate is affected by the temperature spacing between parallel chains. If the default temperature spacing that results from a scalar λ is unacceptable, then a different scalar value may be attempted, or the user may enter their own temperature spacing directly as a vector for λ.
+
+Coupling induces dependence among the chains, and the chains are no longer Markovian. The whole stochastic process of m chains together does form a Markov chain.
+
+Along with the J-walking algorithm of Frantz et al. (1990), MCMCMC was one of the first extensions of Metropolis-Hastings for multimodal distributions. Many additional MCMC algorithms, such as serial tempering or simulated tempering, were influenced by or variations of MCMCMC.
+
+The advantage of MCMCMC over RWM is that MCMCMC is better able to approximate multimodal distributions, and that successful coupling (swaps) improves mixing. A disadvantage is that most of the information in the warmer chains is lost, speed per iteration is slower than RWM due to communication with CPUs, and distributions with many modes require at least as many CPUs. Since MCMCMC is not adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Atchade YF, Roberts GO, Rosenthal JS (2011). "Towards Optimal Scaling of Metropolis-Coupled Markov Chain Monte Carlo." Statistics and Computing, 21(4), 555-568.
+- Earl, DJ and Deem, MW (2005). "Parallel Tempering: Theory, Applications, and New Perspectives." Physical Chmeistry Chemical Phyiscs, 7, 3910-3916.
+- Frantz DD, Freeman JD and Doll JL (1990). "Reducing Quasi-Ergodic Behavior in Monte Carlo Simulations by J-Walking: Applications to Atomic Clusters." Journal of Chemical Physics, 93, 2769-2784.
+- Geyer CJ (1991). "Markov Chain Monte Carlo Maximum Likelihood." In Keramidas, E.M. Computing Science and Statistics: Proceedings of the 23rd Symposium of the Interface. Fairfax Station VA: Interface Foundation. p. 156-163.
+
+## See Also
+
+- [RWM](#rwm)
+
+

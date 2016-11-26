@@ -1,0 +1,42 @@
+# Hamiltonian Monte Carlo (<a name='hmc'>HMC</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is 65% when L > 1, or 57.4% when L = 1. The observed acceptance rate may be suitable in the interval [60%,70%] when L > 1, or [40%,80%] when L = 1.', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small number of parameters. The number of model evaluations per iteration increases with the number of parameters.','This algorithm is difficult for a beginner. It has three algorithm specifications, all require tuning, and tuning is difficult.','Yes.', 'Multivariate. Proposals are multivariate only in the sense that proposals for multiple parameters are generated at once. Each iteration involves numerous proposals, due to partial derivatives and L.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Introduced under the name of hybrid Monte Carlo (Duane, Kennedy, Pendleton, and Roweth 1987), the name Hamiltonian Monte Carlo (HMC) surpasses it in popularity in statistics literature. HMC introduces auxiliary momentum variables with independent, Gaussian proposals. Momentum variables receive alternate updates, from simple updates to Metropolis updates. Metropolis updates result in the proposal of a new state by computing a trajectory according to Hamiltonian dynamics, from physics. Hamiltonian dynamics is discretized with the leapfrog method. In this way, distant jumps can be proposed and random-walk behavior avoided.
+
+HMC has three algorithm specifications: a vector of the step size of the leapfrog steps, `epsilon` (ε), that is equal in length to the number of parameters, the number of leapfrog steps, `L`, and an optional mass matrix `M`. When `L=1`, HMC reduces to Langevin Monte Carlo (LMC), also called the Metropolis-Adjusted Langevin Algorithm (MALA), introduced by Rossky, Doll, and Friedman (1978). These tuning parameters must be adjusted until the acceptance rate is appropriate. The optimal acceptance rate of HMC is 65%, or in the case of LMC or MALA 57.4% is optimal. Tuning ε and L, however, is very difficult. The trajectory length, εL must also be considered.
+
+Suggestions for tuning ε and L are found in Neal (2011). When ε is too large, the algorithm becomes unstable and suffers from a low acceptance rate. When ε is too small, the algorithm takes too many small steps and is inefficient. When L is too large, trajectory lengths (εL) result in double-back behavior and become computationally self-defeating. When L is too small, more random-walk behavior occurs and mixing becomes slower. Even if ε and L are tuned optimally, a well-tuned mass matrix may be necessary for efficient sampling.
+
+If a user is new to tuning HMC algorithms, then good advice may be to leave `L = 1` and begin with small values for ε, say 0.1 or smaller. It is easy to experience problems when inexperienced, but HMC is a rewarding algorithm once proficiency is acquired. As can be expected, the adaptive extensions (AHMC, HMCDA, and NUTS), will also be easier, since ε is adapted and does not require tuning (and in the case of NUTS, $L$ does not require tuning).
+
+Although HMC generates multivariate proposals, parameter correlation is not taken into account unless a mass matrix is used. Some sources refer to a mass matrix in HMC as a covariance matrix, and some as a precision matrix. Here, the mass matrix is a covariance matrix. It is difficult to tune for several reasons. The optimal mass matrix is different with different configurations of the parameters, so what was optimal at one point is sub-optimal at another. It is not recommended to substitute the historical covariance matrix of samples while pursuing equilibrium.
+
+Partial derivatives are required, and hence the parameters must be differentiable everywhere the algorithm explores. Partial derivatives are computationally intensive, and computational expense increases with the number of parameters. For $K$ parameters and $L$ leapfrog steps, there are $L$ + KL evaluations of the model specification function per iteration. In practice, starting any of the algorithms in the HMC family (AHMC, HMC, HMCDA, or THMC) in a region that is distant from density may result in failure due to differentiation, unless manipulated with priors.
+
+Since HMC requires the approximation of partial derivatives, it is slower per iteration than most algorithms, and much slower in higher dimensions. Tuned well, HMC is an excellent algorithm, but tuning can be very difficult. The AHMC algorithm and HMCDA are adaptive versions of HMC in which ε is adapted based on recent history of acceptance and rejection. The NUTS algorithm is a fully adaptive version that does not require tuning of ε or $L$. Since HMC is not adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Duane S, Kennedy AD, Pendleton BJ, Roweth D (1987). "Hybrid Monte Carlo." Physics Letters, B(195), 216-222.
+- Neal R (2011). "MCMC for Using Hamiltonian Dynamics." In S Brooks, A Gelman, G Jones, M Xiao-Li (eds.), Handbook of Markov Chain Monte Carlo, p. 113-162. Chapman & Hall, Boca Raton, FL.
+- Rossky P, Doll J, Friedman H (1978). "Brownian Dynamics as Smart Monte Carlo Discrete Approximations." Journal of Chemical Physics, 69, 4628-4633.
+
+
+## See Also
+
+- [AHMC](#ahmc)
+- [HMCDA](#hmcda)
+- [MALA](#mala)
+- [NUTS](#nuts)
+- [THMC](#thmc)
+

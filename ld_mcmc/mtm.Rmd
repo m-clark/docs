@@ -1,0 +1,30 @@
+# Multiple-Try Metropolis (<a name='mtm'>MTM</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is above 44%, and increases with the number of tries. The observed acceptance rate may be suitable in the interval [10%,90%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is moderate in difficulty because the number of proposals and user-specified proposal variance may need tuning. Additional optional algorithm specifications control parallelization.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Multiple-Try Metropolis (MTM) algorithm was introduced in Liu et al. (2000) as a componentwise Metropolis algorithm with an improved acceptance rate due to an increased proposal variance and number of proposals. The user specifies that K proposals will be made. For each parameter at each iteration, K normally-distributed proposals are made around the current parameter, scaled according to the user-specified proposal variance. Each proposal is weighted according to its unnormalized joint posterior density. One proposal is selected randomly, with probability proportional to the weights. A reference set of length K is created, in which the first K-1 elements are draws from a normal distribution centered around the selected proposal, again according to proposal variance. The last element, K, is the selected proposal itself. A Metropolis step is performed for the weighted reference set. If the weighted reference set is accepted, then the selected proposal becomes the new value for the parameter.
+
+MTM has four algorithm specifications: `K` is the number of proposals, `CPUs` is the number of central processing units, `Packages` accepts any package required for the model function, and `Dyn.libs` accepts dynamic libraries for parallelization, if required.
+
+Liu (2000) demonstrate the combination of MTM with the Snooker algorithm from Adaptive Directional Sampling (ADS), Conjugate Gradient Monte Carlo (CGMC), Hit-And-Run modified as Random-Ray Monte Carlo (RRMC), and Griddy-Gibbs (GG). MTM has since been extended to multivariate proposals, proposals with different scales, and more.
+
+Advantages of MTM over Metropolis-within-Gibbs (MWG) is that the acceptance rate is higher, and multiple evaluations of the model specification function are parallelized each iteration. The advantage of MTM over Griddy-Gibbs (GG) is exact rather than approximate estimation and that an equilibrium distribution cannot be guaranteed from an approximation of the conditional such as in GG. A disadvantage of MTM compared to MWG is that MTM must evaluate the model specification function multiple times per parameter per iteration, resulting in an algorithm that is slower per iteration. Since MTM is not adaptive, it is suitable as a final algorithm.
+
+## References
+
+- Liu J, Liang F, and Wong W (2000). "The Multiple-Try Method and Local Optimization in Metropolis Sampling." Journal of the American Statistical Association, 95, 121-134.
+
+## See Also
+
+- [GG](#gg)
+- [MWG](#mwg)
+

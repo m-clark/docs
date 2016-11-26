@@ -1,0 +1,423 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs" lang="cs">
+<head>
+
+
+<script type="text/javascript" src="/static/js/analytics.js"></script>
+<script type="text/javascript">archive_analytics.values.server_name="wwwb-app12.us.archive.org";archive_analytics.values.server_ms=121;</script>
+<link type="text/css" rel="stylesheet" href="/static/css/banner-styles.css"/>
+
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="Statisticat, LLC." />
+<meta name="copyright" content="Statisticat, LLC. - Statistical Consulting and Support" />
+<meta name="description" content="The No-U-Turn Sampler (NUTS) is an extension of HMC that adapts both the scalar step-size epsilon and scalar number of leapfrog steps L." />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No-U-Turn Sampler</title>
+<link rel="stylesheet" type="text/css" href="/web/20150313130211cs_/http://www.bayesian-inference.com/css/default.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="/web/20150313130211cs_/http://www.bayesian-inference.com/css/print.css" media="print" />
+<link rel="shortcut icon" href="/web/20150313130211im_/http://www.bayesian-inference.com/favicon.ico" />
+<script type="text/javascript">
+function bookmarksite(title,url){
+if (window.sidebar) // firefox
+	window.sidebar.addPanel(title, url, "");
+else if(window.opera && window.print){ // opera
+	var elem = document.createElement('a');
+	elem.setAttribute('href',url);
+	elem.setAttribute('title',title);
+	elem.setAttribute('rel','sidebar');
+	elem.click();
+} 
+else if(document.all) // ie
+	window.external.AddFavorite(url, title);
+}
+</script>
+<script type="text/javascript">
+var linktext=new Array()
+linktext[0]="<center>Go to Home Page</center>"
+linktext[1]="<center>Add to Favorites (Bookmark this Page)</center>"
+linktext[2]="<center>Send Email to a Friend</center>"
+linktext[3]="<center>Make a Suggestion</center>"
+var ns6=document.getElementById&&!document.all
+var ie=document.all
+function show_text(thetext, whichdiv){
+if (ie) eval("document.all."+whichdiv).innerHTML=linktext[thetext]
+else if (ns6) document.getElementById(whichdiv).innerHTML=linktext[thetext]
+}
+function resetit(whichdiv){
+if (ie) eval("document.all."+whichdiv).innerHTML=' '
+else if (ns6) document.getElementById(whichdiv).innerHTML=' '
+}
+</script>
+<script type="text/javascript">
+function mailpage()
+{
+mail_str = "mailto:?subject=Check out this webpage: " + document.title;
+mail_str += "&body=I thought you might be interested in this webpage: " + document.title;
+mail_str += ". You can view it here: " + location.href;
+location.href = mail_str;
+}
+</script>
+</head>
+<body>
+
+
+<!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script type="text/javascript" src="/static/js/disclaim-element.js" ></script>
+<script type="text/javascript" src="/static/js/graph-calc.js" ></script>
+<script type="text/javascript">//<![CDATA[
+var __wm = (function(imgWidth,imgHeight,yearImgWidth,monthImgWidth){
+var wbPrefix = "/web/";
+var wbCurrentUrl = "http://www.bayesian-inference.com/mcmcnuts";
+
+var firstYear = 1996;
+var displayDay = "13";
+var displayMonth = "Mar";
+var displayYear = "2015";
+var prettyMonths = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var $D=document,$=function(n){return document.getElementById(n)};
+var trackerVal,curYear = -1,curMonth = -1;
+var yearTracker,monthTracker;
+function showTrackers(val) {
+  if (val===trackerVal) return;
+  var $ipp=$("wm-ipp");
+  var $y=$("displayYearEl"),$m=$("displayMonthEl"),$d=$("displayDayEl");
+  if (val) {
+    $ipp.className="hi";
+  } else {
+    $ipp.className="";
+    $y.innerHTML=displayYear;$m.innerHTML=displayMonth;$d.innerHTML=displayDay;
+  }
+  yearTracker.style.display=val?"inline":"none";
+  monthTracker.style.display=val?"inline":"none";
+  trackerVal = val;
+}
+function trackMouseMove(event,element) {
+  var eventX = getEventX(event);
+  var elementX = getElementX(element);
+  var xOff = Math.min(Math.max(0, eventX - elementX),imgWidth);
+  var monthOff = xOff % yearImgWidth;
+
+  var year = Math.floor(xOff / yearImgWidth);
+  var monthOfYear = Math.min(11,Math.floor(monthOff / monthImgWidth));
+  // 1 extra border pixel at the left edge of the year:
+  var month = (year * 12) + monthOfYear;
+  var day = monthOff % 2==1?15:1;
+  var dateString = zeroPad(year + firstYear) + zeroPad(monthOfYear+1,2) +
+    zeroPad(day,2) + "000000";
+
+  $("displayYearEl").innerHTML=year+firstYear;
+  $("displayMonthEl").innerHTML=prettyMonths[monthOfYear];
+  // looks too jarring when it changes..
+  //$("displayDayEl").innerHTML=zeroPad(day,2);
+  var url = wbPrefix + dateString + '/' +  wbCurrentUrl;
+  $("wm-graph-anchor").href=url;
+
+  if(curYear != year) {
+    var yrOff = year * yearImgWidth;
+    yearTracker.style.left = yrOff + "px";
+    curYear = year;
+  }
+  if(curMonth != month) {
+    var mtOff = year + (month * monthImgWidth) + 1;
+    monthTracker.style.left = mtOff + "px";
+    curMonth = month;
+  }
+}
+function hideToolbar() {
+  $("wm-ipp").style.display="none";
+}
+function bootstrap() {
+  var $spk=$("wm-ipp-sparkline");
+  yearTracker=$D.createElement('div');
+  yearTracker.className='yt';
+  with(yearTracker.style){
+    display='none';width=yearImgWidth+"px";height=imgHeight+"px";
+  }
+  monthTracker=$D.createElement('div');
+  monthTracker.className='mt';
+  with(monthTracker.style){
+    display='none';width=monthImgWidth+"px";height=imgHeight+"px";
+  }
+  $spk.appendChild(yearTracker);
+  $spk.appendChild(monthTracker);
+
+  var $ipp=$("wm-ipp");
+  $ipp&&disclaimElement($ipp);
+}
+return{st:showTrackers,mv:trackMouseMove,h:hideToolbar,bt:bootstrap};
+})(525, 27, 25, 2);//]]>
+</script>
+<style type="text/css">
+body {
+  margin-top:0 !important;
+  padding-top:0 !important;
+  min-width:800px !important;
+}
+</style>
+<div id="wm-ipp" lang="en" style="display:none;">
+
+<div style="position:fixed;left:0;top:0;width:100%!important">
+<div id="wm-ipp-inside">
+   <table style="width:100%;"><tbody><tr>
+   <td id="wm-logo">
+       <a href="/web/" title="Wayback Machine home page"><img src="/static/images/toolbar/wayback-toolbar-logo.png" alt="Wayback Machine" width="110" height="39" border="0" /></a>
+   </td>
+   <td class="c">
+       <table style="margin:0 auto;"><tbody><tr>
+       <td class="u" colspan="2">
+       <form target="_top" method="get" action="/web/form-submit.jsp" name="wmtb" id="wmtb"><input type="text" name="url" id="wmtbURL" value="http://www.bayesian-inference.com/mcmcnuts" style="width:400px;" onfocus="this.focus();this.select();" /><input type="hidden" name="type" value="replay" /><input type="hidden" name="date" value="20150313130211" /><input type="submit" value="Go" /><span id="wm_tb_options" style="display:block;"></span></form>
+       </td>
+       <td class="n" rowspan="2">
+           <table><tbody>
+           <!-- NEXT/PREV MONTH NAV AND MONTH INDICATOR -->
+           <tr class="m">
+           	<td class="b" nowrap="nowrap">
+		
+		    <a href="/web/20131121161345/http://www.bayesian-inference.com/mcmcnuts" title="21 Nov 2013">NOV</a>
+		
+		</td>
+		<td class="c" id="displayMonthEl" title="You are here: 13:02:11 Mar 13, 2015">MAR</td>
+		<td class="f" nowrap="nowrap">
+		
+		    <a href="/web/20150601052011/http://www.bayesian-inference.com/mcmcnuts" title="1 Jun 2015"><strong>JUN</strong></a>
+		
+                </td>
+	    </tr>
+           <!-- NEXT/PREV CAPTURE NAV AND DAY OF MONTH INDICATOR -->
+           <tr class="d">
+               <td class="b" nowrap="nowrap">
+               
+                   <a href="/web/20131121161345/http://www.bayesian-inference.com/mcmcnuts" title="16:13:45 Nov 21, 2013"><img src="/static/images/toolbar/wm_tb_prv_on.png" alt="Previous capture" width="14" height="16" border="0" /></a>
+               
+               </td>
+               <td class="c" id="displayDayEl" style="width:34px;font-size:24px;" title="You are here: 13:02:11 Mar 13, 2015">13</td>
+	       <td class="f" nowrap="nowrap">
+               
+		   <a href="/web/20150601052011/http://www.bayesian-inference.com/mcmcnuts" title="5:20:11 Jun 1, 2015"><img src="/static/images/toolbar/wm_tb_nxt_on.png" alt="Next capture" width="14" height="16" border="0" /></a>
+	       
+	       </td>
+           </tr>
+           <!-- NEXT/PREV YEAR NAV AND YEAR INDICATOR -->
+           <tr class="y">
+	       <td class="b" nowrap="nowrap">
+               
+                   <a href="/web/20131121161345/http://www.bayesian-inference.com/mcmcnuts" title="21 Nov 2013"><strong>2013</strong></a>
+               
+               </td>
+               <td class="c" id="displayYearEl" title="You are here: 13:02:11 Mar 13, 2015">2015</td>
+	       <td class="f" nowrap="nowrap">
+               
+                   2016
+               
+	       </td>
+           </tr>
+           </tbody></table>
+       </td>
+       </tr>
+       <tr>
+       <td class="s">
+           <a class="t" href="/web/20150313130211*/http://www.bayesian-inference.com/mcmcnuts" title="See a list of every capture for this URL">6 captures</a>
+           <div class="r" title="Timespan for captures of this URL">15 Aug 13 - 1 Jun 15</div>
+       </td>
+       <td class="k">
+       <a href="" id="wm-graph-anchor">
+       <div id="wm-ipp-sparkline" title="Explore captures for this URL">
+	 <img id="sparklineImgId" alt="sparklines"
+		 onmouseover="__wm.st(1)" onmouseout="__wm.st(0)"
+		 onmousemove="__wm.mv(event,this)"
+		 width="525"
+		 height="27"
+		 border="0"
+		 src="/web/jsp/graph.jsp?graphdata=525_27_1996:-1:000000000000_1997:-1:000000000000_1998:-1:000000000000_1999:-1:000000000000_2000:-1:000000000000_2001:-1:000000000000_2002:-1:000000000000_2003:-1:000000000000_2004:-1:000000000000_2005:-1:000000000000_2006:-1:000000000000_2007:-1:000000000000_2008:-1:000000000000_2009:-1:000000000000_2010:-1:000000000000_2011:-1:000000000000_2012:-1:000000000000_2013:-1:000000011110_2014:-1:000000000000_2015:2:001001000000_2016:-1:000000000000" />
+       </div>
+       </a>
+       </td>
+       </tr></tbody></table>
+   </td>
+   <td class="r">
+       <a href="#close" onclick="__wm.h();return false;" style="background-image:url(/static/images/toolbar/wm_tb_close.png);top:5px;" title="Close the toolbar">Close</a>
+       <a href="http://faq.web.archive.org/" style="background-image:url(/static/images/toolbar/wm_tb_help.png);bottom:5px;" title="Get some help using the Wayback Machine">Help</a>
+   </td>
+   </tr></tbody></table>
+</div>
+</div>
+</div>
+<script type="text/javascript">__wm.bt();</script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-36140535-1', 'bayesian-inference.com');
+  ga('require','displayfeatures');
+  ga('send', 'pageview');
+
+</script>
+
+<div id="view">
+  <div id="head">
+    <div id="logo">
+      <a href="index" class="block"></a>
+      <h1><a href="index"></a></h1>
+      <h2><a href="index"></a></h2>
+    </div>
+    <hr class="hidden" />
+    <div id="mainMenu">
+      <ul>
+  <li class="active"><a href="bayesian">Bayesian<span></span></a></li>
+  <li><a href="computers">Computers<span></span></a></li>
+  <li><a href="consulting">Consulting<span></span></a></li>
+  <li><a target="_blank" href="forum/">Forum<span></span></a></li>
+  <li><a href="merchandise">Merchandise<span></span></a></li>
+  <li><a href="software">Software<span></span></a></li>
+  <li><a href="support">Support<span></span></a></li>
+</ul>
+<form action="search" method="get" id="search" />
+  <fieldset>
+     <input type="text" name="search" value="Search" onfocus="if(this.value=='Search')this.value=''" class="button" />
+    <input type="submit" value="" class="submit" />
+  </fieldset>
+</form>
+    </div>
+    <hr class="hidden" />
+  </div>
+  <div id="content">
+    <div id="contentBlock">
+      <div class="item last">
+        <center><img src="/web/20150313130211im_/http://www.bayesian-inference.com/images/ban-mcmcnuts.png" alt="No U-Turn Sign" style="border: none;" /></center>
+        <h2>No-U-Turn Sampler (NUTS)</h2>
+
+        <br>
+        <table border="1" bordercolor="#454545">
+        <!-- Elements in Row 1 -->
+        <tr>
+        <td><center><b>Aspect</b></center></td>
+        <td><center><b>Description</b></center></td>
+        <tr>
+        <!-- Elements in Row 2 -->
+        <tr>
+        <td>Acceptance Rate</td>
+        <td>The user specifies the target acceptance rate as &delta; (60% is recommended). A recommended, suitable, observed acceptance rate may be in the interval [&delta;-5%,&delta;+5%].</td>
+        <tr>
+        <!-- Elements in Row 3 -->
+        <tr>
+        <td>Applications</td>
+        <td>This is a widely applicable, general-purpose algorithm that is best suited to models with a small number of parameters. The number of model evaluations per iteration increases with the number of parameters.</td>
+        <tr>
+        <!-- Elements in Row 4 -->
+        <tr>
+        <td>Difficulty</td>
+        <td>This algorithm is relatively easy for a beginner. It has only a few algorithm specifications. However, since it is adaptive, the user must regard diminishing adaptation.</td>
+        <tr>
+        <!-- Elements in Row 5 -->
+        <tr>
+        <td>Final Algorithm?</td>
+        <td>Yes, if not adaptive, otherwise &apos;User Discretion&apos;.</td>
+        <tr>
+        <!-- Elements in Row 6 -->
+        <tr>
+        <td>Proposal</td>
+        <td>Multivariate. Proposals are multivariate only in the sense that proposals for multiple parameters are generated at once. However, proposals are not generated with a multivariate distribution and a proposal covariance matrix. Each iteration involves numerous proposals, due to partial derivatives and <i>L</i>.</td>
+        <tr>
+        </tr>
+        </table>
+        <br>
+
+        <p>The No-U-Turn Sampler (NUTS) is an extension of <a href="mcmchmc">Hamiltonian Monte Carlo</a> (HMC) that adapts both the scalar step-size &epsilon; and scalar number of leapfrog steps <i>L</i>. This is algorithm #6 in Hoffman and Gelman (2012).</p>
+
+        <p>NUTS has four algorithm specifications: the number of adaptive iterations <code>A</code>, the target acceptance rate <code>delta</code> or &delta; (and 0.6 is recommended), a scalar step-size <code>epsilon</code> or &epsilon;, and the maximum number of leapfrog steps <code>Lmax</code>.</p>
+
+        <p>Each iteration <i>i</i> &le; <i>A</i>, NUTS adapts both &epsilon; and <i>L</i>, and coerces the target acceptance rate &delta;. <i>L</i> continues to change after adaptation ends, but is not an adaptive parameter in the sense of destroying ergodicity. The adaptive samples are discarded and only the thinned non-adaptive samples are returned.</p>
+
+        <p>The main advantage of NUTS over other HMC algorithms is that NUTS is the algorithm most likely to produce approximately independent samples, in the sense of low autocorrelation. Due to computational complexity, NUTS is slower per iteration than HMC, and the HMC family is among the slowest. Despite this, NUTS often produces chains with excellent mixing, and should outperform other adaptive versions of HMC, such as <a href="mcmcahmc">AHMC</a> and <a href="mcmchmcda">HMCDA</a>. Per iteration, NUTS should generally perform better than other HMC algortihms. Per minute, however, is another story.</p>
+
+        <p>NUTS has been extended elsewhere to allow for a non-diagonal mass matrix (proposal covariance matrix for momentum). This extension are not yet included here.</p>
+
+        <p>In complex and high-dimensional models, NUTS may produce approximately independent samples much more slowly in minutes than other MCMC algorithms, such as <a href="mcmcamwg">Adaptive Metropolis-within-Gibbs</a> (AMWG). This is because the combination of calculating partial derivatives and the search each iteration for <i>L</i> is computationally intensive.</p>
+
+        <h3>References</h3>
+
+        <ul>
+          <li>Hoffman M, Gelman A (2012). &quot;The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo.&quot; <i>Journal of Machine Learning Research</i>, 1-30.</li>
+        </ul>
+
+      </div>
+    </div>
+    <hr class="hidden" />
+      <br><center>
+
+<a href="index"><img src="/web/20150313130211im_/http://www.bayesian-inference.com/images/button-home.png" style="border: none;" onmouseover="show_text(0,'div1')" onmouseout="resetit('div1')" /></a>
+
+<img src="/web/20150313130211im_/http://www.bayesian-inference.com/images/button-favorites.png" alt="Bookmark this page" style="border: none;" onclick="javascript:bookmarksite('Bayesian Inference', '/web/20150313130211/http://www.bayesian-inference.com')" onmouseover="show_text(1,'div1')" onmouseout="resetit('div1')" />
+
+<img src="/web/20150313130211im_/http://www.bayesian-inference.com/images/button-email.png" style="border: none;" onclick="javascript:mailpage()" onmouseover="show_text(2,'div1')" onmouseout="resetit('div1')" /> 
+
+<a href="suggestionbox"><img src="/web/20150313130211im_/http://www.bayesian-inference.com/images/button-suggestion.png" style="border: none;" onmouseover="show_text(3,'div1')" onmouseout="resetit('div1')" /></a>
+
+<g:plusone annotation="none"></g:plusone>
+
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = '/web/20150313130211/https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+</center>
+
+<span id="div1"> </span>
+    <div id="menuBlock">
+      <div class="box firstBox subMenu">
+        <h3>See Also:</h3>
+        <ul>
+          <li><a href="bayesian">Bayesian</a></li>
+          <li><a href="mcmc">MCMC</a></li>
+          <li><a href="mcmcahmc">MCMC: AHMC</a></li>
+          <li><a href="mcmchmc">MCMC: HMC</a></li>
+          <li><a href="mcmchmcda">MCMC: HMCDA</a></li>
+          <li><a href="mcmcmala">MCMC: MALA</a></li>
+          <li><a href="numericalapproximation">Numerical Approximation</a></li>
+          <li><a href="siteindex">Site Index</a></li>
+          <li><a href="software">Software</a></li>
+        </ul>
+      </div>
+      <div class="box boxText" itemscope itemtype="http://schema.org/LocalBusiness">
+        <h3>Contact Information:</h3>
+        <p><b><span itemprop="legalname">Statisticat, LLC.</span></b>
+        <br><span itemprop="description">Statistical Consulting and Support</span>
+        <div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+          <span itemprop="addressLocality">Hot Springs</span>, <span itemprop="addressRegion">SD</span> <span itemprop="postalCode">57747</span> <span itemprop="addressCountry">USA</span></div>
+        Status: Available <del>Booked</del>
+        <br><span itemprop="email"><a href="mailto:webmaster@bayesian-inference.com">webmaster@bayesian-inference.com</a>
+</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="foot">
+  <p class="fl">&copy; Statisticat, LLC., All Rights Reserved</p>
+  <p class="fr"><a href="privacypolicy">Privacy Policy</a></p>
+</div>
+
+</div>
+
+</body>
+</html>
+
+
+
+
+
+<!--
+     FILE ARCHIVED ON 13:02:11 Mar 13, 2015 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 21:36:21 Oct 30, 2016.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

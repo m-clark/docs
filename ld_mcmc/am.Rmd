@@ -1,0 +1,33 @@
+# Adaptive Metropolis (<a name='am'>AM</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small to medium number of parameters. The proposal covariance matrix must be solved, and this matrix grows with the number of parameters.','This algorithm is relatively easy for a beginner. It has few algorithm specifications, and these are easy to specify. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The RWM algorithm is recommended as the final algorithm, though AM may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Adaptive Metropolis (AM) algorithm of Haario et al. (2001) is an extension of Random-Walk Metropolis (RWM) that adapts based on the observed covariance matrix from the history of the chains. AM is historically significant as the first adaptive MCMC algorithm.
+
+AM has two algorithm specifications: `Adaptive` is the iteration at which adaptation begins, and `Periodicity` is the frequency in iterations of adaptation. The user should not allow AM to adapt immediately, since AM adapts based on the observed covariance matrix of historical and accepted samples. Since enough samples are needed to obtain a valid covariance matrix before adaptation, a small covariance matrix is often used initially to encourage a high acceptance rate.
+
+As recommended by Haario et al. (2001), there are two tricks that may be used to assist the AM algorithm in the beginning. Although the suggested "greedy start" method is not used here, the second suggested trick is used, which is to shrink the proposal as long as the acceptance rate is less than 5%, and there have been at least five acceptances. Haario et al. (2001) suggest loosely that if "it has not moved enough during some number of iterations, the proposal could be shrunk by a constant factor". For each iteration that the acceptance rate is less than 5% and that the AM algorithm is used but the current iteration is prior to adaptation, Laplace's Demon multiplies the proposal covariance or variance by (1 - 1/Iterations). Over pre-adaptive time, this encourages a smaller proposal covariance or variance to increase the acceptance rate so that when adaptation begins, the observed covariance or variance of the chains will not be constant, and then shrinkage will cease and adaptation will take it from there.
+
+AM is best suited for a model with small or medium dimensions (number of parameters). The Adaptive-Mixture Metropolis (AMM) of Roberts and Rosenthal (2009) and Robust Adaptive Metropolis (RAM) of Vihola (2011) are extensions of the AM algorithm. If AM is used for adaptation, then the final, non-adaptive algorithm should be RWM.
+
+## References
+
+- Haario H, Saksman E, Tamminen J (2001). "An Adaptive Metropolis Algorithm." Bernoulli, 7(2), 223-242.
+- Roberts G, Rosenthal J (2009). "Examples of Adaptive MCMC." Computational Statistics and Data Analysis, 18, 349-367.
+- Vihola M (2011). "Robust Adaptive Metropolis Algorithm with Coerced Acceptance Rate." In Forthcoming (ed.), Statistics and Computing, 1-12. Springer, Netherlands.
+
+## See Also
+
+- [AMM](#amm)
+- [INCA](#inca)
+- [RAM](#ram)
+- [RWM](#rwm)

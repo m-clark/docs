@@ -1,0 +1,35 @@
+
+# Adaptive Directional Metropolis-within-Gibbs (<a name='admg'>ADMG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is relatively easy for a beginner. It has only two algorithm specifications. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The MWG algorithm is recommended as the final algorithm, though ADMG may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+
+The Adaptive Directional Metropolis-within-Gibbs (ADMG) algorithm was proposed by Bai (2009) as an extension of the Adaptive Metropolis-within-Gibbs (AMWG) algorithm in which the direction and jumping distance of the componentwise proposal is affected by an estimate of the historical covariance matrix.
+
+ADMG has two algorithm specifications: `n` is the number of previous iterations and `Periodicity` is the frequency in iterations of adaptation. The minimum Periodicity is equal to the number of parameters, and should probably be greater.
+
+Although ADMG is a componentwise algorithm, it does not ignore correlation of parameters, as is typical with componentwise algorithms. ADMG makes each componentwise proposal based on an estimate of the historical covariance matrix. Adaptation is based on the singular value decomposition (SVD) of the estimate of the historical covariance matrix. In large dimensions, SVD is computationally expensive, and larger integers are recommended for the algorithm specifications. If SVD results in a singularity, then the algorithm defaults to a simple Metropolis-within-Gibbs MWG proposal. Otherwise, when SVD is successful, then MWG is performed under the rotated coordinates.
+
+The author notes that the MWG part of the algorithm may proceed by deterministic-scan (which he refers to as system-scan) and random-scan. The algorithm implemented here uses random-scan, and is denoted by the author as ADRSMG. Random-scan updates means that the order of the update of the parameters is randomized each iteration.
+
+Compared to other adaptive algorithms with multivariate proposals, a disadvantage is the time to complete each iteration increases as a function of parameters and model complexity, as noted in MWG. For example, in a 100-parameter model, ADMG completes its first iteration as the AMM algorithm completes its 100^th^. However, ADMG is more efficient with information per iteration.
+
+The advantage of ADMG to other componentwise algorithms (such as AMWG, MWG, RDMH, and Slice) is that ADMG makes each proposal while accounting for parameter correlation, while other componentwise algorithms traditionally ignore parameter correlation. The author asserts that SVD-based adaptation is more efficient than adapting directly to the historical covariance matrix or an estimate thereof. The disadvantage of ADMG to other componentwise algorithms is that SVD becomes computationally expensive in large dimensions. Since ADMG is adaptive, MWG should be used as the final algorithm.
+
+## References
+
+- Bai Y (2009). "An Adaptive Directional Metropolis-within-Gibbs Algorithm." Technical Report in Department of Statistics at the University of Toronto.
+
+## See also
+
+- [AMWG](#amwg)
+- [MWG](#mwg)

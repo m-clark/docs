@@ -1,0 +1,31 @@
+# Adaptive Griddy-Gibbs (<a name='agg'>AGG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The acceptance rate is 1.', 'This is a widely applicable, general-purpose algorithm.','This algorithm is easy to use because the scale of the grid is adaptively tuned. There is only one required algorithm specification for defining the grid. Additional optional algorithm specifications control parallelization, allow discrete parameters, or prevent extreme values.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+
+The Adaptive Griddy-Gibbs (AGG) sampler is an extension of the Griddy-Gibbs (GG) sampler in which the scale of the centered grid is tuned each iteration for continuous parameters. The scale is calculated as the standard deviation of the conditional distribution. If discrete parameters are used, then the grid of discrete parameters is not tuned, since all discrete values are evaluated.
+
+AGG has six algorithm specifications: `Grid` is a vector or list of points in the grid, `dparm ` is a vector that indicates discrete parameters and defaults to NULL, `smax` is the maximum allowable conditional standard deviation, `CPUs` is the number of available central processing units (CPUs), `Packages` is a vector of package names, and `Dyn.lib` is a vector of shared libraries. The default for Grid is GaussHermiteQuadRule(3)$nodes. For each continuous parameter in each iteration, the scaled grid values are added to the latest value of the parameter, and the model is evaluated with the parameter at each point on the grid and a sample is taken. For each discrete parameter, the model is evaluated at each grid point and a sample is taken.
+
+The points in the grid for continuous parameters are selected by the user as the nodes of a Gauss-Hermite quadrature rule (with the GaussHermiteQuadRule function), and these points are not evenly-spaced. Many problems require as few as 3 nodes, while others require perhaps as many as 99 nodes. When the number of nodes is larger than necessary, time is wasted in computation, fewer points occur within most of the density, and occasional extreme values of LP are observed, but the chains reach the target distributions in fewer iterations due to the wider grid. When the number of nodes is too small, it may not converge on the correct distribution. It is therefore suggested to begin with a small, odd number of grid points, such as 3, to reduce computation time. An odd number of grid points is preferred. If occasional extreme values of LP are observed, set `smax` to something reasonable. If `smax` is too small, then higher autocorrelation will occur and more thinning is necessary.
+
+Advantages of parallelized AGG over most componentwise algorithms is that it yields a 100% acceptance rate, and draws from the approximated distribution should be less autocorrelated. A disadvantage is that more model evaluations are required, and even if a parallel environment had zero overhead, AGG would be twice as slow per iteration as other componentwise algorithms. AGG is adaptive in the sense of self-adjusting, but not in the sense of being non-Markovian, so it is suitable as a final algorithm.
+
+
+## References
+
+- none listed
+
+## See Also
+
+- [GG](#gg)
+- [Slice](#slice)

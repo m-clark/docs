@@ -1,0 +1,37 @@
+# Adaptive Metropolis-within-Gibbs (<a name='amwg'>AMWG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('he optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is relatively easy for a beginner. It has three algorithm specifications, which are easy to use. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The MWG algorithm is recommended as the final algorithm, though AMWG may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Adaptive Metropolis-within-Gibbs (AMWG) algorithm is presented in (Roberts and Rosenthal 2009; Rosenthal 2007). It is an adaptive version of Metropolis-within-Gibbs (MWG).
+
+AMWG has three algorithm specifications: `B` is optional and allows blockwise sampling. It defaults to NULL, but may accept a list in which each list component is a block of parameters. If blockwise sampling is used, then blocks are updated sequentially, and the order of parameters within blocks is randomized. The `n` specification defaults to 0 and is used to keep track of how many previous adaptive iterations were run. The `Periodicity` specification indicates the frequency in iterations at which the algorithm adapts. If Periodicity is set too low, such as `Periodicity=1`, the algorithm may adapt too quickly to poor information in the beginning, and become unstable. `Periodicity=50` is recommended.
+
+In AMWG, the standard deviation of the proposal of each parameter is manipulated to optimize the associated acceptance rate toward 0.44. This is much simpler than other adaptive methods that adapt based on sample covariance in large dimensions. Large covariance matrices require a large number of elements to adapt, which takes exponentially longer to adapt as the dimension increases. Regardless of dimension, the AMWG optimizes each parameter to a univariate acceptance rate, and a sample covariance matrix does not need to be estimated for adaptation, which consumes time and memory. The order of the parameters for updating is randomized each iteration (random-scan AMWG), as opposed to sequential updating (deterministic-scan AMWG).
+
+Compared to other adaptive algorithms with multivariate proposals, a disadvantage is the time to complete each iteration increases as a function of parameters and model complexity, as noted in MWG. For example, in a 100-parameter model, AMWG completes its first iteration as the Adaptive-Mixture Metropolis (AMM) algorithm completes its 100^th^. However, to adapt accurately, the AMM algorithm must correctly estimate 5,050 elements of a sample covariance matrix, while AMWG must correctly estimate only 100 proposal standard deviations. Roberts and Rosenthal (2009) have shown an example model with 500 parameters that had a burn-in of around 25,000 iterations.
+
+The advantages of AMWG over AMM are that AMWG does not require a burn-in period before it can begin to adapt, and that AMWG does not need to estimate a covariance matrix to adapt properly. The disadvantages of AMWG compared to AMM are that correlation can be problematic since it is not taken into account with a proposal covariance matrix, and AMWG solves the model function once per parameter per iteration, which can be unacceptably slow with large or complicated models. The advantage of AMWG over Robust Adaptive Metropolis (RAM) is that AMWG does not need to estimate a covariance matrix to adapt properly. The disadvantages of AMWG compared to RAM are AMWG is less likely to handle multimodal or heavy-tailed targets, and AMWG solves the model function once per parameter per iteration, which can be unacceptably slow with large or complicated models. If AMWG is used for adaptation, then the final, non-adaptive algorithm should be MWG.
+
+Bai (2009) extended AMWG to the Adaptive Directional Metropolis-within-Gibbs (ADMG) algorithm.
+
+## References
+
+- Bai Y (2009). "An Adaptive Directional Metropolis-within-Gibbs Algorithm." Technical Report in Department of Statistics at the University of Toronto.
+- Roberts G, Rosenthal J (2007). "Coupling and Ergodicity of Adaptive Markov Chain Monte Carlo Algorithms." Journal of Applied Probability, 44, 458-475.
+- Roberts G, Rosenthal J (2009). "Examples of Adaptive MCMC." Computational Statistics and Data Analysis, 18, 349-367.
+
+
+## See Also
+
+- [ADMG](#admg)
+- [MWG](#mwg)
+

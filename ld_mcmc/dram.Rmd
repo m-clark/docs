@@ -1,0 +1,30 @@
+# Delayed Rejection Adaptive Metropolis (<a name='dram'>DRAM</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small to medium number of parameters. The proposal covariance matrix must be solved, and this matrix grows with the number of parameters.','This algorithm is relatively easy for a beginner. It has few algorithm specifications, and these are easy to specify. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The RWM algorithm is recommended as the final algorithm, though DRAM may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Multivariate. Whenever a proposal is rejected, an alternate proposal is attempted.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Delayed Rejection Adaptive Metropolis (DRAM) algorithm is merely the combination of both Delayed Rejection Metropolis (DRM) and Adaptive Metropolis (AM) (Haario, Laine, Mira, and Saksman 2006). DRAM has been demonstrated to be robust in extreme situations where DRM or AM fail separately. Haario et al. (2006) present an example involving ordinary differential equations in which least squares could not find a stable solution, and DRAM did well.
+
+DRAM has two algorithm specifications: `Adaptive` is the iteration in which DRAM becomes adaptive, and `Periodicity` is the frequency in iterations of adaptation.
+
+The DRAM algorithm is useful to assist AM when the acceptance rate is low. As an alternative, the Adaptive-Mixture Metropolis (AMM) is an extension of the AM algorithm that includes a mixture of proposals, and one mixture component has a small proposal standard deviation to assist in overcoming initially low acceptance rates. If DRAM is used for adaptation, then the final algorithm should be Random-Walk Metropolis (RWM).
+
+## References
+
+- Haario H, Laine M, Mira A, Saksman E (2006). "DRAM: Efficient Adaptive MCMC." Statistical Computing, 16, 339-354.
+
+## See Also
+
+- [AM](#am)
+- [AMM](#amm)
+- [DRM](#drm)
+- [RWM](#rwm)
+

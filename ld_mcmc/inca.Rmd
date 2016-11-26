@@ -1,0 +1,38 @@
+# Interchain Adaptation (<a name='inca'>INCA</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm for parallel chains only. It is best suited to models with a small to medium number of parameters. The proposal covariance matrix must be solved, and this matrix grows with the number of parameters.','This algorithm is relatively easy for a beginner. It has few algorithm specifications, and these are easy to specify. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The RWM algorithm is recommended as the final algorithm, though INCA may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Interchain Adaptation (INCA) algorithm of Craiu et al. (2009) is an extension of the Adaptive Metropolis (AM) algorithm of Haario et al. (2001). Craiu et al. (2009) refer to INCA as inter-chain adaptation and inter-chain adaptive MCMC. INCA uses parallel chains that are independent, except that they share the adaptive component, and this sharing speeds convergence. Since parallel chains are a defining feature of INCA, in the <span class="pack">LaplacesDemon</span> package this algorithm works only with the function for high performance computing, <span class="func">LaplacesDemon.hpc</span>, not <span class="func">LaplacesDemon</span>.
+
+INCA has two algorithm specifications: `Adaptive` is the iteration in which it becomes adaptive, and `Periodicity` is the frequency in iterations of adaptation.
+
+As with AM, the proposal covariance matrix is set equal to the historical (or sample) covariance matrix. Ample pre-adaptive iterations are recommended (Craiu et al., 2009), and initial values should be dispersed to aid in discovering multimodal marginal posterior distributions. After adaptation begins, INCA combines the historical covariance matrices from all parallel chains during each adaptation. Each chain learns from experience as in AM, and in INCA, each chain also learns from the other parallel chains.
+
+Solonen et al. (2012) found a dramatic reduction in the number of iterations to convergence when INCA used 10 parallel chains, compared against a single-chain AM algorithm. Similar improvements have been noted in the LaplacesDemon package, though more time is required per iteration.
+
+The Gelman.Diagnostic is recommended by Craiu et al. (2009) to determine when the parallel chains have stopped sharing different information about the target distributions. The exchange of information between chains decreases as the number of iterations increases.
+
+This implementation of INCA uses a server function that is built into LaplacesDemon.hpc. If the connection to this server fails, then the user must kill the process and then close all open connections with the closeAllConnections function.
+
+Since INCA is an adaptive algorithm, the final algorithm should be Random-Walk Metropolis (RWM).
+
+## References
+
+- Craiu R, Rosenthal J, Yang C (2009). "Learn From Thy Neighbor: Parallel-Chain and Regional Adaptive MCMC." Journal of the American Statistical Association, 104(488), 1454-1466.
+- Haario H, Saksman E, Tamminen J (2001). "An Adaptive Metropolis Algorithm." Bernoulli, 7(2), 223-242.
+- Solonen A, Ollinaho P, Laine M, Haario H, Tamminen J, Jarvinen H (2012). "Efficient MCMC for Climate Model Parameter Estimation: Parallel Adaptive Chains and Early Rejection." Bayesian Analysis, 7(2), 1-22.
+
+## See Also
+
+- [AM](#am)
+- [RWM](#rwm)
+

@@ -1,0 +1,52 @@
+# Metropolis-within-Gibbs (<a name='mwg'>MWG</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is 44%, and is based on the univariate normality of each marginal posterior distribution. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm.','This algorithm is easy for a beginner when the proposal variance has been tuned with another algorithm. Otherwise, it may be tedious for the user to tune the proposal variance.','Yes.', 'Componentwise.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+Metropolis-within-Gibbs (MWG) is the original MCMC algorithm, introduced in Metropolis et al. (1953). Since it was the original MCMC algorithm, it pre-dated Gibbs sampling (Gibbs), and was not known as Metropolis-within-Gibbs. MWG was later proposed as a hybrid algorithm that combines Metropolis-Hastings and Gibbs sampling, and was suggested in Tierney (1994). The idea was to substitute a Metropolis step when Gibbs sampling fails. MWG is available in this respect in the Gibbs sampling algorithm. However, Gibbs sampling is not included in this particular version in LaplacesDemon (or most versions), making it an algorithm with a misleading name. Without Gibbs sampling, the more honest name would be componentwise random-walk Metropolis, but the more common name is MWG. MWG is also referred to as Metropolis within Gibbs, Metropolis-in-Gibbs, Random-Walk Metropolis-within-Gibbs, single-site Metropolis, the Metropolis algorithm, or Variable-at-a-Time Metropolis.
+
+#### Componentwise
+
+MWG is a componentwise algorithm, meaning that each parameter is updated indvidually each iteration. This implies that the model specification function is evalulated a number of times equal to the number of parameters, per iteration. Componentwise sampling usually ignores parameter correlation. The order of the parameters for updating is randomized each iteration (random-scan MWG), as opposed to sequential updating (deterministic-scan MWG). MWG often uses blocks, and blockwise sampling may be specified with the algorithm specification B, in which a list is supplied, and each list component consists of a vector of parameters. Blocks are updated sequentially, but the order of parameters is randomized within each block.
+
+#### Metropolis Step
+
+The update of each parameter occurs in a Metropolis step, otherwise called an accept/reject step or a Metropolis accept/reject step. A componentwise proposal is generated randomly and the model is evaluated with the proposed parameter. If the proposal is an improvement in the logarithm of the unnormalized joint posterior density, then the proposal is accepted. If the proposal is not an improvement, then the proposal is accepted or rejected according to a probability.
+
+#### Acceptance Rate
+
+The acceptance rate is the total number of proposals accepted in the Metropolis step divided by the total number of iterations. If the acceptance rate is too high, then the proposal variance is too small. In this case, the algorithm will take longer than necessary to find the target distribution and the samples will be highly autocorrelated. If the acceptance rate is too low, then the proposal variance is too large, and the algorithm is ineffective at exploration. In the worst case scenario, no proposals are accepted and the algorithm fails to move. Under theoretical conditions, the optimal acceptance rate for a sole, independent and identically distributed (IID), Gaussian, marginal posterior distribution is 0.44 or 44%. The optimal acceptance rate for an infinite number of distributions that are IID and Gaussian is 0.234 or 23.4%. Since MWG is a componentwise algorithm, it is most efficient when the acceptance rate of each parameter is 0.44.
+
+#### Random-Walk Behavior
+
+MWG is a componentwise Random-Walk Metropolis (RWM) algorithm. Random-walk behavior is desirable because it allows the algorithm to explore, and hopefully avoid getting trapped in undesirable regions. On the other hand, random-walk behavior is undesirable because it takes longer to converge to the target distribution while the algorithm explores. The algorithm generally progresses in the right direction, but may periodically wander away. Such exploration may uncover multimodal target distributions, which other algorithms may fail to recognize, and then converge incorrectly. With enough iterations, MWG is guaranteed theoretically to converge to the correct target distribution, regardless of the starting point of each parameter, provided the proposal variance for each proposal of a target distribution is sensible.
+
+Historically, MWG first ran on an early computer that was built specifically for it, called MANIAC I. Metropolis discarded the first 16 iterations as burn-in, and updated an additional 48-64 iterations, which required 4-5 hours on MANIAC I.
+
+Roberts and Rosenthal (2007) introduced an adaptive version of Metropolis-within-Gibbs, called Adaptive Metropolis-within-Gibbs (AMWG). Bai (2009) extended this to the Adaptive Directional Metropolis-within-Gibbs (ADMG) algorithm.
+
+The advantage of MWG over the multivariate version, RWM, is that it is more efficient with information per iteration, so convergence is faster in iterations. The disadvantages of MWG are that covariance is not included in proposals, and it is more time-consuming due to the evaluation of the model specification function for each parameter per iteration. As the number of parameters increases, and especially as model complexity increases, the run-time per iteration increases. Since fewer iterations are completed in a given time-interval, the possible amount of thinning is also at a disadvantage. MWG is non-adaptive, and is suitable as a final algorithm.
+
+## References
+
+- Bai Y (2009). "An Adaptive Directional Metropolis-within-Gibbs Algorithm." Technical Report in Department of Statistics at the University of Toronto.
+- Metropolis N, Rosenbluth A, MN R, Teller E (1953). "Equation of State Calculations by Fast Computing Machines." Journal of Chemical Physics, 21, 1087-1092.
+- Roberts G, Rosenthal J (2007). "Coupling and Ergodicity of Adaptive Markov Chain Monte Carlo Algorithms." Journal of Applied Probability, 44, 458-475.
+- Tierney L (1994). "Markov Chains for Exploring Posterior Distributions." The Annals of Statistics, 22(4), 1701-1762. With discussion and a rejoinder by the author.
+
+
+## See Also
+
+- [ADMG](#admg)
+- [AMWG](#amwg)
+- [Gibbs](#gibbs)
+- [RWM](#rwm)
+

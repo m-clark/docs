@@ -1,0 +1,31 @@
+# Adaptive-Mixture Metropolis (<a name='amm'>AMM</a>)
+
+<br>
+```{r, echo=FALSE}
+pander::pander(
+  data.frame(
+    Aspect = c('Acceptance Rate', 'Applications', 'Difficulty', 'Final Algorithm?', 'Proposal'),
+    Description = c('The optimal acceptance rate is based on the multivariate normality of the marginal posterior distributions, and ranges from 44% for one parameter to 23.4% for five or more parameters. The observed acceptance rate may be suitable in the interval [15%,50%].', 'This is a widely applicable, general-purpose algorithm that is best suited to models with a small to medium number of parameters, or a larger number of blocked parameters. The proposal covariance matrix must be solved, and this matrix grows with the number of parameters.','This algorithm is relatively easy for a beginner. The algorithm specifications are easy to specify. However, since it is adaptive, the user must regard diminishing adaptation.','User Discretion. The RWM algorithm is recommended as the final algorithm, though AMM may be used if diminishing adaptation occurs and adaptation ceases effectively.', 'Blockwise or Multivariate.')),
+  justify='left', style='multiline', split.cells=c(17,83), split.tables=Inf)
+```
+
+<br>
+
+The Adaptive-Mixture Metropolis (AMM) algorithm is an extension by Roberts and Rosenthal (2009) of the Adaptive Metropolis (AM) algorithm of Haario et al. (2001). AMM differs from the AM algorithm in two respects. First, AMM updates a scatter matrix based on the cumulative current parameters and the cumulative associated outer-products, and these are used to generate a multivariate normal proposal. This is more efficient with large numbers of parameters adapting over many iterations, especially with frequent adaptations, and results in a much faster algorithm. The second (and main) difference, is that the proposal is a mixture. The two mixture components are adaptive multivariate and static/symmetric univariate proposals. The mixture is determined at each iteration with a mixture weight. The mixture weight must be in the interval (0,1], and it defaults to 0.05, as in Roberts and Rosenthal (2009). A higher value of the mixture weight is associated with more static/symmetric univariate proposals, and a lower weight is associated with more adaptive multivariate proposals. The algorithm will be unable to include the multivariate mixture component until it has accumulated some history, and models with more parameters will take longer to be able to use adaptive multivariate proposals.
+
+AMM has five algorithm specifications: `Adaptive` is the iteration in which adaptation begins, ``B`` optionally accepts a list of blocked parameters and defaults to NULL, `n` is the number of previous iterations, `Periodicity` is the frequency in iterations of adaptation, and `w` is the weight of the small-variance mixture component. `B` allows the user to organize parameters into blocks. `B` accepts a list, in which each component is a block and accepts a vector that consists of numbers that point to the associated parameters in `parm.names`. `B` defaults to NULL, in which case blocking does not occur. When blocking does occur, the proposal covariance matrix may be either NULL or a list in which each component is the covariance matrix for a block. As more blocks are added, the algorithm becomes closer to Adaptive Metropolis-within-Gibbs (AMWG).
+
+The advantages of AMM over AMWG (when `B`=NULL) are that it takes correlation into account as it adapts, and is much faster to update each iteration. The disadvantages are that AMWG does not require a burn-in period before it can begin to adapt, and more information must be learned in the covariance matrix to adapt properly. Disadvantages of AMM compared to Robust Adaptive Metropolis (RAM) are that RAM does not require a burn-in period before it can begin to adapt, RAM is more likely to better handle multimodal or heavy-tailed targets, and RAM also adapts to the shape of the target distributions and coerces the acceptance rate. If AMM is used for adaptation, then the final, non-adaptive algorithm should be Random-Walk Metropolis (RWM).
+
+
+## References
+
+- Haario H, Saksman E, Tamminen J (2001). "An Adaptive Metropolis Algorithm." Bernoulli, 7(2), 223-242.
+- Roberts G, Rosenthal J (2009). "Examples of Adaptive MCMC." Computational Statistics and Data Analysis, 18, 349-367.
+
+## See Also
+
+- [AM](#am)
+- [AMWG](#amwg)
+- [RAM](#ram)
+- [RWM](#rwm)
