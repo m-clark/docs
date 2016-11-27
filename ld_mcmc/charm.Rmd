@@ -1,4 +1,6 @@
-# Componentwise Hit-And-Run Metropolis (<a name='charm'>CHARM</a>)
+# <a name='charm'>Componentwise Hit-And-Run Metropolis</a>
+
+(<a name='charm'>CHARM</a>)
 
 <br>
 ```{r, echo=FALSE}

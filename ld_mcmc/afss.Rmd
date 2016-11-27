@@ -1,4 +1,6 @@
-# Automated Factor Slice Sampler (<a name='afss'>AFSS</a>)
+# <a name='afss'>Automated Factor Slice Sampler</a>
+
+(<a name='afss'>AFSS</a>)
 
 <br>
 ```{r, echo=FALSE}

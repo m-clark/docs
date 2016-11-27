@@ -1,4 +1,6 @@
-# Metropolis-Coupled Markov Chain Monte Carlo (<a name='mcmcmc'>MCMCMC</a>)
+# <a name='mcmcmc'>Metropolis-Coupled Markov Chain Monte Carlo</a>
+
+(<a name='mcmcmc'>MCMCMC</a>)
 
 <br>
 ```{r, echo=FALSE}

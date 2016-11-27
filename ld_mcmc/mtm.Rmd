@@ -1,4 +1,6 @@
-# Multiple-Try Metropolis (<a name='mtm'>MTM</a>)
+# <a name='mtm'>Multiple-Try Metropolis</a>
+
+(<a name='mtm'>MTM</a>)
 
 <br>
 ```{r, echo=FALSE}

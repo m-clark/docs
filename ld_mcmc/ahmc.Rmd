@@ -1,4 +1,6 @@
-# Adaptive Hamiltonian Monte Carlo (<a name='ahmc'>AHMC</a>)
+# <a name='ahmc'>Adaptive Hamiltonian Monte Carlo</a>
+
+(<a name='ahmc'>AHMC</a>)
 
 <br>
 ```{r, echo=FALSE}

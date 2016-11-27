@@ -1,4 +1,6 @@
-# Elliptical Slice Sampler (<a name='ess'>ESS</a>)
+# <a name='ess'>Elliptical Slice Sampler</a>
+
+(<a name='ess'>ESS</a>)
 
 <br>
 ```{r, echo=FALSE}

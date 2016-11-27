@@ -1,4 +1,6 @@
-# Tempered Hamiltonian Monte Carlo (<a name='thmc'>THMC</a>)
+# <a name='thmc'>Tempered Hamiltonian Monte Carlo</a>
+
+(<a name='thmc'>THMC</a>)
 
 <br>
 ```{r, echo=FALSE}
@@ -15,7 +17,7 @@ The Tempered Hamiltonian Monte Carlo (THMC) algorithm is an extension of Hamilto
 
 THMC has four algorithm specifications: step-size `epsilon`, the number `L` of leapfrog steps, an optional mass matrix `M`, and `Temperature`. Algorithm specifications are the same as for HMC, with the exception of temperature, which is described below.
 
-There are a variety of ways to include tempering in HMC, and this algorithm, named here as THMC, uses "tempered trajectory", as described by Neal (2011). When L > 1 and during the first half of the leapfrog steps, the momentum is increased (heated) by multiplying it by √T , where T is temperature, each leapfrog step. In the last half of the leapfrog steps, the momentum decreases (is cooled down) by dividing it by √T. The momentum is largest in the middle of the leapfrog steps, where mode-switching behavior becomes most likely to occur. This preserves the trajectory, εL.
+There are a variety of ways to include tempering in HMC, and this algorithm, named here as THMC, uses "tempered trajectory", as described by Neal (2011). When L > 1 and during the first half of the leapfrog steps, the momentum is increased (heated) by multiplying it by √T, where T is temperature, each leapfrog step. In the last half of the leapfrog steps, the momentum decreases (is cooled down) by dividing it by √T. The momentum is largest in the middle of the leapfrog steps, where mode-switching behavior becomes most likely to occur. This preserves the trajectory, εL.
 
 As with HMC, THMC is a difficult algorithm to tune. Since THMC is non-adaptive, it is sufficient as a final algorithm.
 

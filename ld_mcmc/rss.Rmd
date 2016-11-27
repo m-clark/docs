@@ -1,4 +1,6 @@
-# Reflective Slice Sampler (<a name='rss'>RSS</a>)
+# <a name='rss'>Reflective Slice Sampler</a>
+
+(<a name='rss'>RSS</a>)
 
 <br>
 ```{r, echo=FALSE}

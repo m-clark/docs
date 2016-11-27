@@ -1,4 +1,6 @@
-# Metropolis-within-Gibbs (<a name='mwg'>MWG</a>)
+# <a name='mwg'>Metropolis-within-Gibbs</a> 
+
+(<a name='mwg'>MWG</a>)
 
 <br>
 ```{r, echo=FALSE}

@@ -1,4 +1,6 @@
-# Reversible-Jump (<a name='rj'>RJ</a>)
+# <a name='rj'>Reversible-Jump</a>
+
+(<a name='rj'>RJ</a>)
 
 <br>
 ```{r, echo=FALSE}

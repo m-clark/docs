@@ -1,4 +1,6 @@
-# Robust Adaptive Metropolis (<a name='ram'>RAM</a>)
+# <a name='ram'>Robust Adaptive Metropolis</a>
+
+(<a name='ram'>RAM</a>)
 
 <br>
 ```{r, echo=FALSE}

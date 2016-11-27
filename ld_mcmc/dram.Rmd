@@ -1,4 +1,6 @@
-# Delayed Rejection Adaptive Metropolis (<a name='dram'>DRAM</a>)
+# <a name='dram'>Delayed Rejection Adaptive Metropolis</a>
+
+(<a name='dram'>DRAM</a>)
 
 <br>
 ```{r, echo=FALSE}

@@ -1,4 +1,6 @@
-# Hamiltonian Monte Carlo (<a name='hmc'>HMC</a>)
+# <a name='hmc'>Hamiltonian Monte Carlo</a>
+
+(<a name='hmc'>HMC</a>)
 
 <br>
 ```{r, echo=FALSE}

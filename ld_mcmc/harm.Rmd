@@ -1,4 +1,6 @@
-# Hit-And-Run Metropolis (<a name='harm'>HARM</a>)
+# <a name='harm'>Hit-And-Run Metropolis</a>
+
+(<a name='harm'>HARM</a>)
 
 <br>
 ```{r, echo=FALSE}

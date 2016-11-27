@@ -1,4 +1,6 @@
-# Stochastic Gradient Langevin Dynamics (<a name='sgld'>SGLD</a>)
+# <a name='sgld'>Stochastic Gradient Langevin Dynamics</a>
+
+(<a name='sgld'>SGLD</a>)
 
 <br>
 ```{r, echo=FALSE}
@@ -17,7 +19,7 @@ SGLD expands the stochastic gradient descent optimization algorithm to include G
 
 SGLD has five algorithm specifications: `epsilon` or ε is the step size, `file` accepts the quoted name of a .csv file that is the big data set, `Nr` is the number of rows in the big data set, `Nc` is the number of columns in the big data set, and `size` is the number of rows to be read and processed each iteration.
 
-Since SGLD is designed for big data, the entire data set is not included in the Data list, but one small batch must be included and named $X$. All data must be included. For example, both the dependent variable $y$ and design matrix $X$ in linear regression are included. The requirement for the small batch to be in `Data` is so that numerous checks may be passed after <span class="func">LaplacesDemon</span> is called and before the SGLD algorithm begins. Each iteration, SGLD uses the scan function, without headers, to read a random block of rows from, say, `X.csv`, stores it in `Data$X`, and passes it to the Model specification function. The Model function must differ from the other examples found in the LaplacesDemon package in that multiple objects, such as $X$ and $y$ must be read from `Data$X`, where usually there is both `Data$X` and `Data$y`.
+Since SGLD is designed for big data, the entire data set is not included in the Data list, but one small batch must be included and named $X$. All data must be included. For example, both the dependent variable $y$ and design matrix $X$ in linear regression are included. The requirement for the small batch to be in `Data` is so that numerous checks may be passed after <span class="func">LaplacesDemon</span> is called and before the SGLD algorithm begins. Each iteration, SGLD uses the <span class="func">scan</span> function, without headers, to read a random block of rows from, say, `X.csv`, stores it in `Data$X`, and passes it to the Model specification function. The Model function must differ from the other examples found in the <span class="pack">LaplacesDemon</span> package in that multiple objects, such as $X$ and $y$ must be read from `Data$X`, where usually there is both `Data$X` and `Data$y`.
 
 The user tunes SGLD with step size ε via the `epsilon` argument, which accepts either a scalar for a constant step size or a vector equal in length to the number of iterations for an annealing schedule. The step size must remain in the interval (0,1). The user may define an annealing schedule with any function desired. Examples are given in Welling and Teh (2011) of decreasing schedules, as well as for using a constant. When `ε = 0`, both the stochastic gradient and Langevin dynamics components of the equation are reduced to zero and the algorithm will not move. When ε is too large, degenerate results occur. A good recommendation seems to be to begin with ε set to `1/Nr`. From testing on numerous examples, it seems preferable to perform several short runs and experiment with a constant, rather than using a decreasing schedule, but your mileage may vary.
 

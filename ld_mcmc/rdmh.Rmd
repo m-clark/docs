@@ -1,4 +1,6 @@
-# Random Dive Metropolis-Hastings (<a name='rdmh'>RDMH</a>)
+# <a name='rdmh'>Random Dive Metropolis-Hastings</a>
+
+(<a name='rdmh'>RDMH</a>)
 
 <br>
 ```{r, echo=FALSE}

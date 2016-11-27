@@ -1,4 +1,6 @@
-# Oblique Hyperrectangle Slice Sampler (<a name='ohss'>OHSS</a>)
+# <a name='ohss'>Oblique Hyperrectangle Slice Sampler</a>
+
+(<a name='ohss'>OHSS</a>)
 
 <br>
 ```{r, echo=FALSE}

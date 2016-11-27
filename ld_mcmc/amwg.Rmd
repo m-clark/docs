@@ -1,4 +1,6 @@
-# Adaptive Metropolis-within-Gibbs (<a name='amwg'>AMWG</a>)
+# <a name='amwg'>Adaptive Metropolis-within-Gibbs</a>
+
+(<a name='amwg'>AMWG</a>)
 
 <br>
 ```{r, echo=FALSE}

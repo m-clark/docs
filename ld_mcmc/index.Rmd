@@ -25,14 +25,23 @@ options(htmltools.dir.version = FALSE)
 
 The following is a list of Markov Chain Monte Carlo algorithms that was formerly found on the now-defunct website bayesian-inference.com.  That site was also home to the once useful <span class="pack">LaplacesDemon</span> R package, which was evidently abandoned, but has recently been revived [here](https://github.com/LaplacesDemonR/LaplacesDemon), and is even  available on CRAN again ([link](https://cran.r-project.org/package=LaplacesDemon)).  The ambitious goal of <span class="pack">LaplacesDemon</span> was to provide a complete Bayesian inference environment within R.  When first getting into Bayesian analysis in R, I found its vignettes clear and the website a nice resource. The vignettes are available on CRAN and below, and reflect current development.
 
-One of the useful things on the LD website that I always meant to get back to and spend more time with was the list of algorithms that the package could utilize.  As others might also be interested, I have reproduced that here, culled from the depths of the [Wayback Machine](http://www.archive.org).  While some things might be specific to the R package, the considerations and comparisons, as well as relative strengths, weaknesses and other description, as well as references, are informative in my opinion.  The references are probably dated to around 2014, and may not be entirely as accurate as they were then (see e.g. Hamiltonian MC), but they appear to have been very up to date to that point.  I also appreciate the historical context provided here and there, and while I think the descriptions will be fine for getting a general sense of the algorithms for some time, they obviously will not reflect any recent developments.  
+One of the useful things on the LD website that I always meant to get back to and spend more time with was the list of algorithms that the package could utilize.  As others might also be interested, I have reproduced that here, culled from the depths of the [Wayback Machine](http://www.archive.org).  While some things might be specific to the R package, the considerations and comparisons, as well as relative strengths, weaknesses and other description, as well as references, are informative in my opinion.  The references are probably dated to around 2014, and may not be entirely as accurate as they were then, but they appear to have been very up to date to that point.  I also appreciate the historical context provided here and there, and while I think the descriptions will be fine for getting a general sense of the algorithms for some time, they obviously will not reflect any recent developments.  
 
-In reproducing this, I have tried to keep an eye out for things like subscripts and other notation, but didn't spend a lot of time on that. I also cleaned up any typos and other issues I may have come across.  I have no real intention of maintaining this once complete, I just provide it out of my own interest.
+In reproducing this, I have tried to keep an eye out for things like subscripts and other notation, but didn't spend a lot of time on that. I also cleaned up any typos and other issues I may have come across.  I have no real intention doing much more with this, I just provide it out of my own interest.  All credit beyond this preface goes to Byron Hall and Statisticat LLC.
 
 [Bayesian Inference](BayesianInference.pdf)
 
 [Model Examples](Examples.pdf)
 
+[Single Page version](index_onepage.html) (easier to search; possibly better for small screens)
+
+[Originals](LaplacesDemonDescriptions.7z) (zipped html files; rmd files for this document can be found [here](https://github.com/m-clark/docs/tree/master/ld_mcmc))
+
+<br><br>
+<img src="LaplacesDemon.png" style="display:block; margin: 0 auto;">
+
+```{r child='mcmc.Rmd'}
+```
 
 ```{r child='admg.Rmd'}
 ```

@@ -1,4 +1,6 @@
-# Delayed Rejection Metropolis (<a name='drm'>DRM</a>)
+# <a name='drm'>Delayed Rejection Metropolis</a>
+
+(<a name='drm'>DRM</a>)
 
 <br>
 ```{r, echo=FALSE}

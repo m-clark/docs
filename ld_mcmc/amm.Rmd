@@ -1,4 +1,6 @@
-# Adaptive-Mixture Metropolis (<a name='amm'>AMM</a>)
+# <a name='amm'>Adaptive-Mixture Metropolis</a>
+
+(<a name='amm'>AMM</a>)
 
 <br>
 ```{r, echo=FALSE}

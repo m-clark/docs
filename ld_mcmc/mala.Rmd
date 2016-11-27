@@ -1,4 +1,6 @@
-# Metropolis-Adjusted Langevin Algorithm (<a name='mala'>MALA</a>)
+# <a name='mala'>Metropolis-Adjusted Langevin Algorithm</a>
+
+(<a name='mala'>MALA</a>)
 
 <br>
 ```{r, echo=FALSE}

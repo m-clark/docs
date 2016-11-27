@@ -1,4 +1,6 @@
-# Slice Sampler (<a name='slice'>Slice</a>)
+# <a name='slice'>Slice Sampler</a>
+
+(<a name='slice'>Slice</a>)
 
 <br>
 ```{r, echo=FALSE}

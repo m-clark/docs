@@ -1,4 +1,6 @@
-# Hamiltonian Monte Carlo with Dual-Averaging (<a name='hmcda'>HMCDA</a>)
+# <a name='hmcda'>Hamiltonian Monte Carlo with Dual-Averaging</a>
+
+(<a name='hmcda'>HMCDA</a>)
 
 <br>
 ```{r, echo=FALSE}

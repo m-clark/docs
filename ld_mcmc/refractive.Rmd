@@ -1,4 +1,6 @@
-# Refractive Sampler (<a name='refractive'>Refractive</a>)
+# <a name='refractive'>Refractive Sampler</a>
+
+(<a name='refractive'>Refractive</a>)
 
 <br>
 ```{r, echo=FALSE}

@@ -1,5 +1,7 @@
 
-# Adaptive Directional Metropolis-within-Gibbs (<a name='admg'>ADMG</a>)
+# <a name='admg'>Adaptive Directional Metropolis-within-Gibbs</a>
+
+(<a name='admg'>ADMG</a>)
 
 <br>
 ```{r, echo=FALSE}

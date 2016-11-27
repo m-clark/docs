@@ -1,4 +1,6 @@
-# Random-Walk Metropolis (<a name='rwm'>RWM</a>)
+# <a name='rwm'>Random-Walk Metropolis</a>
+
+(<a name='rwm'>RWM</a>)
 
 <br>
 ```{r, echo=FALSE}

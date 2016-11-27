@@ -1,4 +1,6 @@
-# Preconditioned Crank-Nicolson (<a name='pcn'>pCN</a>)
+# <a name='pcn'>Preconditioned Crank-Nicolson</a>
+
+(<a name='pcn'>pCN</a>)
 
 <br>
 ```{r, echo=FALSE}

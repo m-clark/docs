@@ -1,4 +1,6 @@
-# Griddy-Gibbs (<a name='gg'>GG</a>)
+# <a name='gg'>Griddy-Gibbs</a>
+
+(<a name='gg'>GG</a>)
 
 <br>
 ```{r, echo=FALSE}
@@ -17,7 +19,7 @@ GG has five algorithm specifications: `Grid` is a vector or list of evenly-space
 
 At least five grid points are recommended for a continuous parameter, and a grid with more points will better approximate the distribution, but requires more evaluations. However, the approximation in GG may be parallelized (within LaplacesDemon, not LaplacesDemon.hpc), so a large computer environment may approach an excellent approximation with little inefficiency. It is natural to desire a grid with a larger range, but in practice this becomes problematic, so it is recommended to keep the range of the grid relatively small, say within [-0.1,0.1] or [-0.2,0.2], and may require experimentation. After observing a Markov chain, the user may adjust the range of the grid to decrease autocorrelation in a future update.
 
-When an odd number of grid points is used for a continuous parameter, the current position is evaluated. If there are too few grid points, then the current point may be the only point with appreciable density, and the parameter may never move. This can be checked afterward with the AcceptanceRate function. If the acceptance rate is less than one for any parameter, then there are too few grid points. This failure may be harder to find when there are numerous parameters, an even number of grid points, and too few grid points, because the acceptance rate may be 100% for a parameter, yet it may be oscillating between two values.
+When an odd number of grid points is used for a continuous parameter, the current position is evaluated. If there are too few grid points, then the current point may be the only point with appreciable density, and the parameter may never move. This can be checked afterward with the <span class="func">AcceptanceRate</span> function. If the acceptance rate is less than one for any parameter, then there are too few grid points. This failure may be harder to find when there are numerous parameters, an even number of grid points, and too few grid points, because the acceptance rate may be 100% for a parameter, yet it may be oscillating between two values.
 
 GG is one of the slower algorithms per iteration, since the model must be evaluated multiple times per parameter per iteration. This may mostly be alleviated in a parallel environment. GG seems appropriate when the problem must be solved with a componentwise algorithm, and excessive thinning is required. GG may help reduce thinning by making proposals from the approximated conditional distribution, though parameter correlation may increase autocorrelation.
 

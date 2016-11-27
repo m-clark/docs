@@ -1,4 +1,6 @@
-# Sequential Metropolis-within-Gibbs (<a name='smwg'>SMWG</a>)
+# <a name='smwg'>Sequential Metropolis-within-Gibbs</a>
+
+(<a name='smwg'>SMWG</a>)
 
 <br>
 ```{r, echo=FALSE}

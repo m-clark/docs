@@ -1,4 +1,6 @@
-# Updating Sequential Metropolis-within-Gibbs (<a name='usmwg'>USMWG</a>)
+# <a name='usmwg'>Updating Sequential Metropolis-within-Gibbs</a>
+
+(<a name='usmwg'>USMWG</a>)
 
 <br>
 ```{r, echo=FALSE}

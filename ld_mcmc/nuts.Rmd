@@ -1,4 +1,6 @@
-# No-U-Turn Sampler (<a name='nuts'>NUTS</a>)
+# <a name='nuts'>No-U-Turn Sampler</a>
+
+(<a name='nuts'>NUTS</a>)
 
 <br>
 ```{r, echo=FALSE}

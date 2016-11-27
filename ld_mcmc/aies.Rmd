@@ -1,4 +1,6 @@
-# Affine-Invariant Ensemble Sampler (<a name='aies'>AIES</a>)
+# <a name='aies'>Affine-Invariant Ensemble Sampler</a>
+
+(<a name='aies'>AIES</a>)
 
 <br>
 ```{r, echo=FALSE}
@@ -13,11 +15,11 @@ pander::pander(
 
 The Affine-Invariant Ensemble Sampler (AIES) of Goodman and Weare (2010) uses a complementary ensemble of at least 2J walkers for J parameters. Each walker receives J initial values, and initial values must differ for each walker. At each iteration, AIES makes a multivariate proposal for each walker, given a scaled difference in position by parameter between the current walker and another randomly-selected walker.
 
-AIES has six algorithm specifications: `Nc` is the number of walkers, `Z` is a $N_c$ x $J$ matrix of initial values, `β` is a scale parameter, `CPUs` is the number of central processing units (CPUs), `Packages` is a vector of package names, and `Dyn.lib` is a vector of shared libraries. The recommended number of walkers is at least $2J$. If separate sets of initial values are not supplied in `Z`, since `Z` defaults to NULL, then the <span class="func">GIV</span> function is used to generate initial values. The original article referred to the scale parameter as α, though it has been renamed here to β to avoid a conflict with the acceptance probability α in the Metropolis step. The β parameter may be manipulated to affect the desired acceptance rate, though in practice, the acceptance rate may potentially be better affected by increasing the number of walkers. It is recommended to specify `CPUs=1` and leave the remaining arguments to `r NULL`, unless needed.
+AIES has six algorithm specifications: `Nc` is the number of walkers, `Z` is a $N_c$ x $J$ matrix of initial values, `β` is a scale parameter, `CPUs` is the number of central processing units (CPUs), `Packages` is a vector of package names, and `Dyn.lib` is a vector of shared libraries. The recommended number of walkers is at least $2J$. If separate sets of initial values are not supplied in `Z`, since `Z` defaults to NULL, then the <span class="func">GIV</span> function is used to generate initial values. The original article referred to the scale parameter as α, though it has been renamed here to β to avoid a conflict with the acceptance probability α in the Metropolis step. The β parameter may be manipulated to affect the desired acceptance rate, though in practice, the acceptance rate may potentially be better affected by increasing the number of walkers. It is recommended to specify `CPUs=1` and leave the remaining arguments to `NULL`, unless needed.
 
 This version returns the samples from one walker, and the other walkers assist the main walker. A disadvantage of this approach is that all samples from all walkers are not returned. An advantage of this approach is that if a particular walker is an outlier, then it does not affect the main walker, unless of course it is the main walker! Multiple sets of samples are best returned in a list, such as with parallel chains in the <span class="func">LaplacesDemon.hpc</span> function, though it is not applicable in <span class="func">LaplacesDemon</span>.
 
-AIES has been parallelized by Foreman-Mackey et al. (2012), and this style of parallelization is available here as well. The user is cautioned to prefer CPUs=1, because parallelizing may result in a slower algorithm due to communication between the master and slave CPUs each iteration. This communication is costly, and is best overcome with a large number of CPUs available, and when the Model function is slow to evaluate in comparison to network communication time.
+AIES has been parallelized by Foreman-Mackey et al. (2012), and this style of parallelization is available here as well. The user is cautioned to prefer CPUs=1, because parallelizing may result in a slower algorithm due to communication between the master and slave CPUs each iteration. This communication is costly, and is best overcome with a large number of CPUs available, and when the `Model` function is slow to evaluate in comparison to network communication time.
 
 Both the parallelized (CPUs > 1) and un-parallelized (CPUs=1) versions should be called from <span class="func">LaplacesDemon</span>, not <span class="func">LaplacesDemon.hpc</span>. When parallelized, the number of walkers must be an even number (odd numbers are not permitted), and the walkers are split into two equal-sized batches. Each iteration, each walker moves in relation to a randomly-selected walker in the other batch. This retains detailed balance.
 
@@ -26,7 +28,7 @@ AIES is attractive for offering affine-invariance, and therefore being generally
 
 ## References
 
-- Foreman-Mackey D, Hogg D, Lang D, Goodman J (2012). "emcee: The MCMC Hammer." Upcoming in Publications of the Astronomical Society of the Pacific, http://arxiv.org/ abs/1202.3665.
+- Foreman-Mackey D, Hogg D, Lang D, Goodman J (2012). "emcee: The MCMC Hammer." Upcoming in Publications of the Astronomical Society of the Pacific, http://arxiv.org/abs/1202.3665.
 - Goodman J, Weare J (2010). "Ensemble Samplers with Affine Invariance." Communications in Applied Mathematics and Computational Science, 5(1), 6-80.
  
 

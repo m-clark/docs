@@ -1,4 +1,6 @@
-# Univariate Eigenvector Slice Sampler (<a name='uess'>UESS</a>)
+# <a name='uess'>Univariate Eigenvector Slice Sampler</a>
+
+(<a name='uess'>UESS</a>)
 
 <br>
 ```{r, echo=FALSE}

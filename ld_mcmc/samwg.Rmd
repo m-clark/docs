@@ -1,4 +1,6 @@
-# Sequential Adaptive Metropolis-within-Gibbs (<a name='samwg'>SAMWG</a>)
+# <a name='samwg'>Sequential Adaptive Metropolis-within-Gibbs</a>
+
+(<a name='samwg'>SAMWG</a>)
 
 <br>
 ```{r, echo=FALSE}

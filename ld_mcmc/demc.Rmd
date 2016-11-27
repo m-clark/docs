@@ -1,4 +1,6 @@
-# Differential Evolution Markov Chain (<a name='demc'>DEMC</a>)
+# <a name='demc'>Differential Evolution Markov Chain</a>
+
+(<a name='demc'>DEMC</a>)
 
 <br>
 ```{r, echo=FALSE}

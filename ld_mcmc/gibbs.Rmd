@@ -1,4 +1,6 @@
-# Gibbs Sampler (<a name='gibbs'>Gibbs</a>)
+# <a name='gibbs'>Gibbs Sampler</a> 
+
+(<a name='gibbs'>Gibbs</a>)
 
 <br>
 ```{r, echo=FALSE}

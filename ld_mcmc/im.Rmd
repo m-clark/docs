@@ -1,4 +1,6 @@
-# Independence Metropolis (<a name='im'>IM</a>)
+# <a name='im'>Independence Metropolis</a>
+
+(<a name='im'>IM</a>)
 
 <br>
 ```{r, echo=FALSE}
