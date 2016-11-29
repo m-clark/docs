@@ -37,13 +37,13 @@ We can see the means are roughly around $N*p$ as we expect with the binomial.
 
 For our current situation, we don't know $\theta$ and are trying to estimate it.  We will start by supplying some possible values.
 
-```{r binomTextStart }
+```{r binomGoalStart }
 theta = seq(from=1/(N+1), to=N/(N+1), length=10)
 ```
 
 For the Bayesian approach we must choose a <span class="emph">prior distribution</span> representing our initial beliefs about the estimate.  I provide three possibilities and note that any one of them would work just fine for this situation. We'll go with a triangular distribution, which will put most of the weight toward values around $.5$. While we will talk more about this later, I will go ahead and mention that this is where some specifically have taken issue with Bayesian estimation in the past, because this part of the process is too *subjective* for their tastes.  Setting aside the fact that subjectivity is an inherent part of the scientific process, and that ignoring prior information (if explicitly available from prior research) would be blatantly unscientific, the main point to make here is that this choice *is not an arbitrary one*.  There are many distributions we might work with, but some will be better for us than others.  Again, we'll revisit this topic later. <span class="marginnote">Choose the prior that makes most sense to you.  If I were thinking logically, I might choose a prior that reflects that all advantage is to a person that spends their entire life kicking a ball, and if they can simply kick to the upper right or left of the goal, even with only moderate pace, simple physics (i.e. that the goalie can never reach the ball) would mean they score 95% of the time under perfect conditions. We might revise it downward to account for unspecified things, e.g. how tired they are, weather etc. A prior based on a beta distribution `beta(9,1)` would be about right.  Of course the *data* would eventually suggest something much lower.</span>
 
-```{r binomTextPrior}
+```{r binomGoalPrior}
 ### prior distribution
 # uniform
 # pTheta = dunif(theta)
@@ -68,9 +68,9 @@ Next we will compute the <span class="emph">likelihood</span> of the data given 
 $$p(y|\theta) = {N \choose k}\, \theta^k\,  (1-\theta)^{N-k}$$
 
 
-where $N$ is the total number of possible times in which the event  of interest could occur, and $k$ number of times the event of interest occurs. Our maximum likelihood estimate in this simple setting would simply be the proportion of events witnessed out of the total number of samples[^binomll]. We'll use the formula presented above<span class="marginnote">Note that if we had covariates as in a regression model, we would have different estimates of theta for each observation, and thus would calculate each observation's likelihood and then take their product or sum their log values, see the [Maximum Likelihhood Review][Maximum Likelihood Review] for further details). Even here, if you turn this into binary logistic regression with 10 outcomes of texting vs. not, the 'intercept only' model would be identical to our results here. </span>.  Technically, the first term is not required, but it serves to normalize the likelihood as we did with the prior.  
+where $N$ is the total number of possible times in which the event  of interest could occur, and $k$ number of times the event of interest occurs. Our maximum likelihood estimate in this simple setting would simply be the proportion of events witnessed out of the total number of samples[^binomll]. We'll use the formula presented above<span class="marginnote">Note that if we had covariates as in a regression model, we would have different estimates of theta for each observation, and thus would calculate each observation's likelihood and then take their product or sum their log values, see the [Maximum Likelihhood Review][Maximum Likelihood Review] for further details). Even here, if you turn this into binary logistic regression with 10 outcomes of goal scored vs. not, the 'intercept only' model would be identical to our results here.</span>.  Technically, the first term is not required, but it serves to normalize the likelihood as we did with the prior.  
 
-```{r binomTextlikelihood, echo=2}
+```{r binomGoallikelihood, echo=2}
 # use the formula
 pDataGivenTheta = choose(N, nGoal) * theta^nGoal * (1-theta)^nMiss
 
@@ -93,7 +93,7 @@ pDataGivenTheta = choose(N, nGoal) * theta^nGoal * (1-theta)^nMiss
 
 Given the prior and likelihood, we can now compute the <span class="emph">posterior distribution</span> via Bayes theorem.
 
-```{r binomTextPosterior, }
+```{r binomGoalPosterior, }
 # first we calculate the denominator from Bayes theorem; this is the marginal
 # probability of y
 pData = sum(pDataGivenTheta*pTheta)
@@ -103,12 +103,12 @@ pThetaGivenData = pDataGivenTheta*pTheta  / pData  # Bayes theorem
 
 Now lets examine what all we've got.
 
-```{r binomTextResult, eval=F, echo=FALSE}
+```{r binomGoalResult, eval=F, echo=FALSE}
 data.frame(theta, prior=pTheta, likelihood=pDataGivenTheta, posterior=pThetaGivenData)
 ```
 
 
-```{r binomTextResultPander, echo=F}
+```{r binomGoalResultPander, echo=F}
 out = data.frame(theta, prior=pTheta, likelihood=pDataGivenTheta, posterior=pThetaGivenData)
 # htmlTable::htmlTable(format(round(out, 3), nsmall = 3), rnames=F)
 pander::pander(format(round(out, 3), nsmall = 3))

@@ -1,8 +1,8 @@
 # Introduction
 
-Bayesian analysis is now fairly common in applied work. It is no longer a surprising thing to see it utilized in non-statistical journals, though it is still fresh enough that many researchers feel they have to put 'Bayesian' in the title of their papers when they implement it.  However, one should be clear that one doesn't conduct a Bayesian analysis per se.  A Bayesian logistic regression is still just logistic regression.  The *Bayesian* part comes into play with the perspective on probability that one uses to interpret the results, and in how the estimates are arrived at.  
+Bayesian analysis is now fairly common in applied work. It is no longer a surprising thing to see it utilized in non-statistical journals, though it is still fresh enough that many researchers feel they have to put 'Bayesian' in the title of their papers when they implement it.  However, to be clear, one doesn't conduct a Bayesian analysis per se.  A Bayesian logistic regression is still just logistic regression.  The *Bayesian* part comes into play with the perspective on probability that one uses to interpret the results, and in how the estimates are arrived at.  
 
-The Bayesian approach itself is very old at this point. Bayes and Laplace started the whole shebang in the 18^th^ and 19^th^ centuries, and even the modern implementation of it has its foundations in the 30s, 40s and 50s of last century[^old]. So while it may still seem somewhat newer to applied researchers, much of the groundwork has long since been hashed out, and there is no more need to justify a Bayesian analysis any more than there is to use the standard maximum likelihood approach[^justify].  While there are perhaps many reasons why the Bayesian approach to analysis did not catch on until relatively recently, perhaps the biggest is simply computational power.  Bayesian analysis requires an iterative and time-consuming approach that simply wasn't viable for most applied researchers until modern computers.  But nowadays, one can conduct such analysis even on their laptop very easily.
+The Bayesian approach itself is very old at this point. Bayes and Laplace started the whole shebang in the 18^th^ and 19^th^ centuries[^evenolder], and even the modern implementation of it has its foundations in the 30s, 40s and 50s of last century[^old]. So while it may still seem somewhat newer to applied researchers, much of the groundwork has long since been hashed out, and there is no more need to justify a Bayesian analysis any more than there is to use the standard maximum likelihood approach[^justify].  While there are perhaps many reasons why the Bayesian approach to analysis did not catch on until relatively recently, perhaps the biggest is simply computational power.  Bayesian analysis requires an iterative and time-consuming approach that simply wasn't viable for most applied researchers until modern computers.  But nowadays, one can conduct such analysis even on their laptop very easily.
 
 The Bayesian approach to data analysis requires a different way of thinking about things, but its implementation can be seen as an extension of traditional approaches. In fact, as we will see later, it incorporates the very likelihood one uses in traditional statistical techniques.  The key difference regards the notion of probability, which, while different than Fisherian or frequentist statistics, is actually more akin to how the average Joe thinks about probability.  Furthermore, p-values and intervals will have the interpretation that many applied researchers incorrectly think their current methods provide.  On top of this one gets a very flexible toolbox that can handle many complex analyses.  In short, the reason to engage in Bayesian analysis is that it has a lot to offer and can potentially handle whatever you throw at it.
 
@@ -10,6 +10,7 @@ As we will see shortly, one must also get used to thinking about distributions r
 
 
 ## Bayesian Probability
+
 This section will have about all the math there is going to be in this handout and will be very minimal even then.  The focus will be on the conceptual understanding though, and subsequently illustrated with a by-hand example in the next section.
 
 
@@ -43,8 +44,10 @@ To summarize conceptually, we have some belief about the state of the world, exp
 $$\text{updated belief} = \text{current evidence} * \text{prior belief or evidence}$$
 
 
+[^evenolder]: Bayes theorem possibly [predates](https://en.wikipedia.org/wiki/Nicholas_Saunderson) Bayes by some accounts.
+
 [^old]: Jeffreys, Metropolis etc.
 
-[^justify]: Though some Bayesians might suggest the latter would need *more*.
+[^justify]: Though some might suggest that the typical practice of hypothesis testing that comes with standard methods would need *more*.
 
 [^credible]: More on this later.
