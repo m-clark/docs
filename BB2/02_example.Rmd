@@ -4,18 +4,18 @@
 
 The following is an attempt to provide a small example to show the connection between prior distribution, likelihood and posterior distribution.  Let's say we want to estimate the probability that a soccer/football player[^football] will score a penalty kick in a shootout.  We will employ the binomial distribution to model this.
 
-Our goal is to estimate a parameter $\theta$, the probability that the random knucklehead from your favorite football team will score the penalty in a overtime shootout.  Let's say it takes 10 shots per team before the game is decided.
+Our goal is to estimate a parameter $\theta$, the probability that the random knucklehead from your favorite football team will score the penalty in a overtime shootout.  Let's say that for this match takes 10 shots per team before the game is decided.
 
-We can represent this in R as follows, as well as setup some other things for later.
+We can represent the following data for your team in R as follows, as well as setup some other things for later.
 
-```{r textdrivedat}
+```{r goaldat}
 shots = c('goal','goal','goal','miss','miss',
           'goal','goal','miss','miss','goal')
 
 # convert to numeric, arbitrarily picking goal=1, miss=0
 shotsNum = ifelse(shots=='goal', 1, 0)
 N = length(shots)                      # sample size
-nGoal = sum(shots=='goal')             # number of shotsrs goal
+nGoal = sum(shots=='goal')             # number of shots made
 nMiss = sum(shots=='miss')             # number of those miss
 ```
 
@@ -262,9 +262,9 @@ For an interactive demonstration of the above visuals, [see this](https://micl.s
 
 At this point it is hoped you have a better understanding of the process of Bayesian estimation.  Conceptually, one starts with prior beliefs about the state of the world and adds evidence to one's understanding, ultimately coming to a conclusion that serves as a combination of evidence and prior belief.  More concretely, we have a prior distribution regarding parameters, a distribution regarding the data given those parameters, and finally a posterior distribution that is the weighted combination of the two.
 
-However there is yet another distribution of interest to us- the <span class="emph">posterior predictive distribution</span>.  Stated simply, once we have the posterior distribution for $\theta$, we can then feed new or unobserved data into the process and get distributions for $\tilde{y}$ <label for="sn-demo" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-demo" class="margin-toggle"/><span class="sidenote"> Mathematically represented as: $p(\tilde{y}|y) = \int p(\tilde{y}|\theta)p(\theta|y)\mathrm{d}\theta$ <br><br> We can get a sense of the structure of this process via the following table, taken from Gelman: <br><br> <img src="img/gelmanTable.png" style="display:block; margin: 0 auto;"> </span>
+However there is yet another distribution of interest to us- the <span class="emph">posterior predictive distribution</span>.  Stated simply, once we have the posterior distribution for $\theta$, we can then feed new or unobserved data into the data generating process and get distributions for $\tilde{y}$[^postpred].
 
-As in Gelman, we can implement the simulation process given the data and model at hand. Where $\tilde{y}$ can regard \emph{any} potential observation, we can distinguish $y^{\textrm{Rep}}$ as the case where we keep to the current data (if a model had explanatory variables \emph{X}, the explanatory variables are identical for producing $y^{\textrm{Rep}}$ as they were in modeling y, where $\tilde{y}$ might be based on any values $\tilde{X}$).  In other words, $y^{\textrm{Rep}}$ is an attempt to replicate the observed data based on the parameters $\theta$. We can then compare our simulated data to the observed data to see how well they match.
+As in Gelman, we can implement the simulation process given the data and model at hand[^yreppostpred]. In other words, $y^{\textrm{Rep}}$ is an attempt to replicate the observed data based on the parameters $\theta$. We can then compare our simulated data to the observed data to see how well they match.
 
 
 When using typical Bayesian programming languages, we could have simulated values of the posterior predictive distribution given the actual values of $\theta$ we draw from the posterior.  <span class="marginnote"><span class="imgbigger"><img src="img/histofyrepBinom.svg" style="display:block; margin: 0 auto; width=20%"></span></span>
@@ -435,5 +435,11 @@ ggsave('figure/priorlikepost3.png', width=8, height=8, bg = "transparent") # png
 
 
 [^football]: Don't even start, it's always been both 'football' and 'soccer'.
+
 [^binom]: See for yourself in the [binmoial likelihood][Binomial Likelihood Example] section in the appendix.
+
 [^betaunif]: $\beta(1,1)$ is a uniform distribution.
+
+[^postpred]: Mathematically represented as: $p(\tilde{y}|y) = \int p(\tilde{y}|\theta)p(\theta|y)\mathrm{d}\theta$ <br><br> We can get a sense of the structure of this process via the following table, taken from Gelman: <br><br> <img src="img/gelmanTable.png" style="display:block; margin: 0 auto;">
+
+[^yreppostpred]: Where $\tilde{y}$ can regard \emph{any} potential observation, we can distinguish $y^{\textrm{Rep}}$ as the case where we keep to the current data. For example, if a model had predictor variables \emph{X}, the predictor variables are identical for producing $y^{\textrm{Rep}}$ as they were in modeling y.  Conversely, $\tilde{y}$ might be based on any values $\tilde{X}$ that might be feasible or interesting, whether actually observed in the data or not.
