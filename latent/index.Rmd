@@ -13,14 +13,14 @@ output:
       highlight: pygments
       number_sections: false
       config:
-        sharing:
-          facebook: false
-          twitter: false
         search: yes
-        edit: no
+        # edit: false
         fontsettings:
           family: serif
           size: 2
+        sharing:
+          facebook: false
+          twitter: false
     # bookdown::tufte_html_book:
     #   toc: yes
     #   css: [toc.css, ../notebooks.css]

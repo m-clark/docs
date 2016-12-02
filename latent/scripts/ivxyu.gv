@@ -1,0 +1,13 @@
+digraph iv {
+graph [rankdir=LR]
+
+node [shape = rectangle, style=filled, fillcolor=white, color=gray, width=.75]
+
+node [fontcolor=gray25, fontname=Helvetica, fixedsize=true, fontsize='5%']
+X; Y; U;
+
+edge [color=gray50]
+U -> X;
+X -> Y;
+U -> Y;
+}

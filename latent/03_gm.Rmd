@@ -326,9 +326,59 @@ This document will not get into models that have *moderated mediation* and *medi
 Too often investigators will merely throw in these indirect effects and simply report whether the effect is significant or not. If you hide their results and ask if the indirect effect is positive or negative, I suspect they might not even know.  Even if not used, I think the perspective of the potential outcomes framework can help one think appropriately about the situation, and avoid unnecessary complications. If one wants to explore indirect paths there are better approaches, which we'll see shortly.  In addition, a mediation model should always be compared to a simpler model with no mediation (e.g. via AIC).
 
 
+#### Aside: Instrumental variables
+
+Path analysis of a different sort has a long history in econometrics.  A very common approach one may see utilized is <span class="emph">instrumental variable</span> analysis. The model can be depicted graphically as follows:
+
+```{r ivmodel, echo=FALSE, eval=TRUE, cache=FALSE, fig.align='center'}
+tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%",
+         DiagrammeR::grViz('scripts/iv.gv', width=500, height=250, engine = 'twopi'))
+```
+
+In the graph, `Y` is our target variable, `X` is the causal variable of interest, and `Z` the instrument. The instrumental variable must not be correlated with disturbance of the target variable `Y`, and only has an indirect relation to it through `X`.  Neither target nor causal variable are allowed to effect the instrument directly or indirectly.  In graph theory, this involves the notion of conditional independence, where `Z` is conditionally independent of Y given X, or in other words, if we remove the X -> Y path, Z and Y are independent.  Furthemore Z is *not* conditionally independent of X with the removal of that path[^direct].
+
+The motivating factor for such a model is that the simple X -> Y path may not provide a means for determining a causal relationship, particularly if X is correlated with the error. With error U we can show the following diagram that depicts the problem.
+
+```{r ivmodel2, echo=FALSE, eval=TRUE, cache=FALSE, fig.align='center'}
+tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%",
+         DiagrammeR::grViz('scripts/ivxyu.gv', width=500, height=250, engine = 'twopi'))
+```
+
+
+Such models were commonly fit with a technique known two-stage least squares, which is demonstrated here.  I use a subset of the <span class="objclass">CigarettesSW</span> data set and <span class="func">ivreg</span> function from the <span class="pack">AER</span> package.
+
+```{r ivreg, echo=-(1:6)}
+library(AER)
+data("CigarettesSW")
+CigarettesSW$rprice <- with(CigarettesSW, price/cpi)
+CigarettesSW$rincome <- with(CigarettesSW, income/population/cpi)
+CigarettesSW$tdiff <- with(CigarettesSW, (taxs - tax)/cpi)
+Cigarettes = select(CigarettesSW, rprice, rincome, tdiff, tax, cpi, packs, year) %>% 
+  filter(year=='1995')
+
+mod0 = lm(log(rprice) ~  log(rincome) + tdiff + I(tax/cpi), data = Cigarettes)
+lm(log(packs) ~ fitted(mod0) + log(rincome), data = Cigarettes)
+
+## model 
+fm <- ivreg(log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff + I(tax/cpi),
+  data = Cigarettes)
+summary(fm)
+
+
+mod0 = lm(log(rprice) ~  log(rincome) , data = Cigarettes)
+lm(log(packs) ~ fitted(mod0), data = Cigarettes)
+
+## model 
+fm <- ivreg(log(packs) ~ log(rprice) | log(rincome),
+  data = Cigarettes)
+summary(fm)
+```
+
+
+
 #### Aside: Tracing rule
 
-In a recursive model, <span class="emph">implied correlations</span> between two variables, X1 and X2, can be found using *tracing rules*. Implied correlations between variables in a model are equal to the sum of the product of all standardized coefficients for the paths between them. Valid tracings are all routes between X1 and X2 that a) do not enter the same variable twice and b) do not enter a variable through an arrowhead and leave through an arrowhead. The following examples assume the variables have been standardized (variance values equal to 1), if standardization has not occurred the variance of variables passed through should be included in the product of tracings.
+In a recursive model, <span class="emph">implied correlations</span> between two variables, X1 and X2, can be found using <span class="emph">tracing rules</span>. Implied correlations between variables in a model are equal to the sum of the product of all standardized coefficients for the paths between them. Valid tracings are all routes between X1 and X2 that a) do not enter the same variable twice and b) do not enter a variable through an arrowhead and leave through an arrowhead. The following examples assume the variables have been standardized (variance values equal to 1), if standardization has not occurred the variance of variables passed through should be included in the product of tracings.
 
 Consider the following variables, A, B, and C (in a dataframe called <span class="objclass">abc</span>) with a model seen in the below diagram. We are interested in identifying the implied correlation between x and z by decomposing the relationship into its different components and using tracing rules.
 
@@ -681,3 +731,5 @@ Graphical models are a general way to formulate and visualize statistical models
 [^time_cause]: Note that if this approach were able to uncover causal relations via statistical means, a blacklist would not be necessary. If you actually tried it here, you'd find adoption status influenced by early adult scholastic abilties.
 
 [^nonrecursiveName]: No, 'non'-recursive as a name for these models makes no sense to me either.
+
+[^direct]: In Pearl's language, Z is d-separated from Y if the X -> Y path is removed, but not d-separated from X.  The *d* stands for *directional*.
