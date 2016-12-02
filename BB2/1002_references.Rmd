@@ -1,5 +1,6 @@
 `r if (knitr:::is_html_output()) '# References {-}'`
 
+## Texts
 
 Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data
 Analysis. 3rd edition.
@@ -18,6 +19,11 @@ New York.
 
 McElreath, R. *Statistical Rethinking*.  A good modeling book in general, by one who has contributed a lot to helping others learn Stan.  Comes with its own R package too. (intro to moderate)
 
+
+
+## Other
+
+Statisticat, LLC. *Bayesian Inference*. A quick overview from the original author's of the <span class="pack">LaplacesDemon</span> package.
 
 http://mc-stan.org/ Main website
 
