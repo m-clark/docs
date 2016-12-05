@@ -101,7 +101,7 @@ pDataGivenTheta = choose(N, nGoal) * theta^nGoal * (1-theta)^nMiss
 
 ## Posterior
 
-Given the prior and likelihood, we can now compute the <span class="emph">posterior distribution</span> via Bayes theorem.
+Given the prior and likelihood, we can now compute the <span class="emph">posterior distribution</span> via Bayes theorem. 
 
 ```{r binomGoalPosterior, }
 # first we calculate the denominator from Bayes theorem; this is the marginal
