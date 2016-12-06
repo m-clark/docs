@@ -49,7 +49,7 @@ DiagrammeR::DiagrammeR("scripts/condindie.gv", type='grViz', width=500, height=2
 # <img src="img/conditionalIndependence.png" style="display:block; margin: 0 auto; width:25%">
 ```
 
-
+<br>
 In this graph, X is *conditionally independent* of Z given Y- there is no correlation between X and Z once Y is accounted for[^condind].  We will revisit this concept when discussing path analysis and latent variable models.  Graphs can be *directed*, *undirected*, or *mixed*. Directed graphs have arrows, sometimes implying a causal flow (a difficult endeavor to demonstrate explicitly) or noting a time component. Undirected graphs merely denote relations among the nodes, while mixed graphs might contain both directional and symmetric relationships.  Most of the models discussed in this course will be directed or mixed.
 
 
@@ -309,46 +309,47 @@ Path analysis of a different sort has a long history in econometrics.  A very co
 
 ```{r ivmodel, echo=FALSE, eval=TRUE, cache=FALSE, fig.align='center'}
 tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%",
-         DiagrammeR::grViz('scripts/iv.gv', width=500, height=250, engine = 'twopi'))
+         DiagrammeR::grViz('scripts/iv.gv', width=500, height=250))
 ```
 
-In the graph, `Y` is our target variable, `X` is the causal variable of interest, and `Z` the instrument. The instrumental variable must not be correlated with disturbance of the target variable `Y`, and only has an indirect relation to it through `X`.  Neither target nor causal variable are allowed to effect the instrument directly or indirectly.  In graph theory, this involves the notion of conditional independence, where `Z` is conditionally independent of Y given X, or in other words, if we remove the X -> Y path, Z and Y are independent.  Furthemore Z is *not* conditionally independent of X with the removal of that path[^direct].
+In the graph, $\mathcal{Y}$ is our target variable, $\mathcal{X}$ is the causal variable of interest, and $\mathcal{Z}$ the instrument. The instrumental variable must not be correlated with disturbance of the target variable $\mathcal{Y}$, and only has an indirect relation to it through $\mathcal{X}$.  Neither target nor causal variable are allowed to effect the instrument directly or indirectly.  In graph theory, this involves the notion of conditional independence, where $\mathcal{Z}$ is conditionally independent of Y given X, or in other words, if we remove the X -> Y path, $\mathcal{Z}$ and Y are independent.  Furthemore Z is *not* conditionally independent of X with the removal of that path[^direct].
 
-The motivating factor for such a model is that the simple X -> Y path may not provide a means for determining a causal relationship, particularly if X is correlated with the error. With error U we can show the following diagram that depicts the problem.
+The motivating factor for such a model is that the simple $\mathcal{X}$ -> $\mathcal{Y}$ path may not provide a means for determining a causal relationship, particularly if $\mathcal{X}$ is correlated with the error. With error $\mathcal{U}$ we can show the following diagram that depicts the problem.
 
 ```{r ivxyu, echo=FALSE, eval=TRUE, cache=FALSE, fig.align='center'}
 tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%",
-         DiagrammeR::grViz('scripts/ivxyu.gv', width=500, height=250, engine = 'dot'))
+         DiagrammeR::grViz('scripts/ivxyu.gv', width=500, height=250))
 ```
 
-When X is endogenous, that is not the case. Changes in X are associated with Y, but also U.
+When $\mathcal{X}$ is endogenous, that is not the case. Changes in $\mathcal{X}$ are associated with $\mathcal{Y}$, but also $\mathcal{U}$.
 
 ```{r ivxyu2, echo=FALSE, eval=TRUE, cache=FALSE, fig.align='center'}
 tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%",
-         DiagrammeR::grViz('scripts/ivxyu2.gv', width=500, height=250, engine = 'twopi'))
+         DiagrammeR::grViz('scripts/ivxyu2.gv', width=500, height=250))
 ```
 
 
-There are now multiple effects of X on Y, both direct and indirectly from U.  We can measure the association between X and Y, but not the causal relationship.
+There are now multiple effects of $\mathcal{X}$ on $\mathcal{Y}$, both directly from $\mathcal{X}$ and indirectly from $\mathcal{U}$.  We can measure the association between $\mathcal{X}$ and $\mathcal{Y}$, but not the causal relationship.
 
 An attempt can be made to remedy the problem by using an instrument, leading the following graph.
 
 ```{r ivxyzu, echo=FALSE, eval=TRUE, cache=FALSE, fig.align='center'}
 tags$div(style="width:500px; margin:0 auto; font-family:Roboto; font-size:50%",
-         DiagrammeR::grViz('scripts/ivxyzu.gv', width=500, height=250, engine = 'twopi'))
+         DiagrammeR::grViz('scripts/ivxyzu.gv', width=500, height=250))
 ```
 
-The instrument Z affects X and thus is correlated with Y indirectly.  However, unlike X, it is uncorrelated with U.  The direct path from Z to Y is not allowed, thus leaving only its influence on X 
+The instrument $\mathcal{Z}$ affects $\mathcal{X}$ and thus is correlated with $\mathcal{Y}$ indirectly.  However, unlike $\mathcal{X}$, it is uncorrelated with $\mathcal{U}$.  This assumption excludes $\mathcal{Z}$ from having a direct effect in the
+model for $\mathcal{Y}$. If instead $\mathcal{Y}$ depended on both $\mathcal{X}$ and $\mathcal{Z}$ but only $\mathcal{X}$ has a direct path to $\mathcal{Y}$, then $\mathcal{Z}$ is basically absorbed into the error so wouldbe correlated with it. With the direct path from $\mathcal{Z}$ to $\mathcal{Y}$ not allowed, we are left with only its influence on $\mathcal{X}$ .
 
 
-Such models were commonly fit with a technique known two-stage least squares, which is demonstrated here.  I use a subset of the <span class="objclass">CigarettesSW</span> data set and <span class="func">ivreg</span> function from the <span class="pack">AER</span> package for comparison.  The data concerns cigarette consumption for the 48 continental US States from 1985–1995, though only the last year is looked at for our purposes.  Here we examine the effect packs per capita (packs) by price (rprice), using state level income (rincome). See the help file for 
+Such models were commonly fit with a technique known two-stage least squares, which is demonstrated here.  I use a subset of the <span class="objclass">CigarettesSW</span> data set and <span class="func">ivreg</span> function from the <span class="pack">AER</span> package for comparison.  The data concerns cigarette consumption for the 48 continental US States from 1985–1995, though only the last year is looked at for our purposes.  Here we examine the effect packs per capita (packs) by price (rprice), using state level income (rincome) as the instrumental variable. See the help file for the <span class="objclass">CigarettesSW</span> for more on this example.
 
-```{r ivreg, echo=-c(1:6, 10:11)}
+```{r ivreg, echo=-c(1:6, 10:11, 23)}
 library(AER)
 data("CigarettesSW")
-CigarettesSW$rprice <- with(CigarettesSW, price/cpi)
-CigarettesSW$rincome <- with(CigarettesSW, income/population/cpi)
-CigarettesSW$tdiff <- with(CigarettesSW, (taxs - tax)/cpi)
+CigarettesSW$rprice = with(CigarettesSW, price/cpi)
+CigarettesSW$rincome = with(CigarettesSW, income/population/cpi)
+CigarettesSW$tdiff = with(CigarettesSW, (taxs - tax)/cpi)
 Cigarettes = select(CigarettesSW, state, rprice, rincome, tdiff, tax, cpi, packs, year) %>% 
   filter(year=='1995')
 
@@ -358,29 +359,34 @@ Ciglog  = select(Cigarettes, packs, rprice, rincome) %>%
   mutate_all(log)
 Cigarettes = Ciglog
 
-
+# explicit 2sls
 mod0 = lm(rprice ~  rincome , data = Cigarettes)
 lm(packs ~ fitted(mod0), data = Cigarettes) 
 
-## model 
-ivmod <- ivreg(packs ~ rprice | rincome,  data = Cigarettes)
+## using AER package
+ivmod = ivreg(packs ~ rprice | rincome,  data = Cigarettes)
 summary(ivmod)
+
+ymod = lm(packs ~ rincome, data = Cigarettes)
 ```
 
+To see more clearly where the effect comes from, the coefficient of regressing Y on Z is `r  round(coef(ymod)[2], 3)`, and dividing that by the coefficient of X on Z `r round(coef(mod0)[2], 3)` will provide the ultimate effect of price on the pack of cigarettes that we see above.
 
-We can run the path model in lavaan as well. Note the slight difference between what we'd normally code up for a path model.
+We can run the path model in lavaan as well. Note the slight difference between what we'd normally code up for a path model. In order to get the same results as instrumental variable regression, we have to explicitly add an estimate of the packs disturbance with price.
 
 ```{r lavaan_ivreg}
 library(lavaan)
 mod = '
   packs ~ rprice
   rprice ~ rincome
-  # packs ~~ rprice
+  packs ~~ rprice
 '
 
-modpath = sem(mod, Ciglog, meanstructure = T)
+modpath = sem(mod, Ciglog, meanstructure = T, se = 'robust')
 summary(modpath)
 ```
+
+While instrumental variable regression is common, this is perhaps not a typcial path model seen in SEM. With SEM, a model comparison approach might be taken to compare models of competing complexity.  One issue not discussed is where instruments come from.  Generally data is not collected with acquiring them, so it might be very difficult to use such an analysis.  Furthermore, the structured causal framework that includes SEM would generally be a more flexible approach.
 
 
 

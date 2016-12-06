@@ -2,7 +2,7 @@ digraph iv {
 graph [rankdir=BT]
 
 node [shape = rectangle, style=filled, fillcolor=white, color=gray, width=.25, height=.25,
-      fontcolor=gray25, fontname=Helvetica, fixedsize=true, fontsize='5%']
+      fontcolor=gray25, fontname=Baskerville, fixedsize=true, fontsize='5%']
 
 X; Y; Z;
 

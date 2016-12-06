@@ -4,7 +4,7 @@ digraph DAG {
 
   # Initialization of node attributes
   node [shape = circle,
-        fontname = Helvetica,
+        fontname = Baskerville,
         fontsize = '5%',
         color = gray80,
         type = box,
