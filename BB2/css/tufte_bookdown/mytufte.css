@@ -59,9 +59,9 @@ pre {
   position: relative;
   width: 55%;                  /* This changes where the code chunk box ends on the right side */
   font-size: 75%;               /*changes output size; and comments*/
-  line-height: 1.2em;           /* line spacing; default seems to be about 1.5 or more */
+  line-height: 1.25em;           /* line spacing; default seems to be about 1.5 or more */
   /*border: 10px solid #ff5500;*/   /*code block and results border*/
-  background-color: #F7F7F7;   /* results background*/
+  background-color: none;   /* results background #F7F7F7*/
 
 }
 
