@@ -6,8 +6,9 @@ The following is an attempt to provide a small example to show the connection be
 
 Our goal is to estimate a parameter $\theta$, the probability that the random knucklehead from your favorite football team will score the penalty in a overtime shootout.  Let's say that for this match takes 10 shots per team before the game is decided.
 
-We can represent the following data for your team in R as follows, as well as setup some other things for later.
-`r margin_note('The fifth shot would have won the game but was taken by Wayne Rooney')`
+In R, we can represent the following data for your team as follows, as well as setup some other things for later.
+
+<span class="marginnote">The fifth shot would have won the game but was taken by Wayne Rooney'</span>
 
 ```{r goaldat}
 shots = c('goal','goal','goal','miss','miss',
@@ -101,24 +102,17 @@ pDataGivenTheta = choose(N, nGoal) * theta^nGoal * (1-theta)^nMiss
 
 ## Posterior
 
-Given the prior and likelihood, we can now compute the <span class="emph">posterior distribution</span> via Bayes theorem. 
+Given the prior and likelihood, we can now compute the <span class="emph">posterior distribution</span> via Bayes theorem. The only thing left to calculate is the denominator from Bayes theorem, then plug in the rest.
 
-```{r binomGoalPosterior, }
-# first we calculate the denominator from Bayes theorem; this is the marginal
-# probability of y
-pData = sum(pDataGivenTheta*pTheta)
+```{r binomGoalPosterior}
+pData = sum(pDataGivenTheta*pTheta)  # marginal probability of the data
 
-pThetaGivenData = pDataGivenTheta*pTheta  / pData  # Bayes theorem
+pThetaGivenData = pDataGivenTheta*pTheta / pData  # Bayes theorem
 ```
 
 Now lets examine what all we've got.
 
-```{r binomGoalResult, eval=F, echo=FALSE}
-data.frame(theta, prior=pTheta, likelihood=pDataGivenTheta, posterior=pThetaGivenData)
-```
-
-
-```{r binomGoalResultPander, echo=F}
+```{r binomGoalResult, echo=F}
 out = data.frame(theta, prior=pTheta, likelihood=pDataGivenTheta, posterior=pThetaGivenData)
 # htmlTable::htmlTable(format(round(out, 3), nsmall = 3), rnames=F)
 DT::datatable(format(round(out, 3), nsmall = 3), width='50%',
@@ -129,7 +123,7 @@ DT::datatable(format(round(out, 3), nsmall = 3), width='50%',
 # pander::pander(format(round(out, 3), nsmall = 3), width='250px')
 ```
 
-We can see that we've given most of our prior probability to the middle values with probability tapering off somewhat slowly towards either extreme.  The likelihood suggests the data is most likely for $\theta$ values .55-.64, though as we know the specific maximum likelihood estimate for $\theta$ is the proportion for the sample, or .6.  Our posterior will fall somewhere between the prior and likelihood estimates, and we can see it has shifted the bulk of the probability slightly away from center of the prior towards a $\theta$ value of .6.
+Starting with the *prior* column, we can see that with the triangular distribution, we've given most of our prior probability to the middle values with probability tapering off somewhat slowly towards either extreme.  The likelihood suggests the data is most likely for $\theta$ values .55-.64, though we know the specific maximum likelihood estimate for $\theta$ is the proportion for the sample, or .6.  Our posterior will fall somewhere between the prior and likelihood estimates, and we can see it has shifted the bulk of the probability slightly away from most likely values suggested by the prior distribution towards a $\theta$ value suggested by the data of .6.
 
 Let's go ahead and see what the mean is: <span class="marginnote">The expected value for a continuous parameter is $\operatorname{E}[X] = \int_{-\infty}^\infty xp(x)\mathrm{d}x$, and for a discrete parameter $\operatorname{E}[X] = \sum_{i=1}^\infty x_i\, p_i$, i.e. a weighted sum of the possible values times their respective probability of occurrence.</span>
 
@@ -141,7 +135,7 @@ posteriorMean
 
 So we start with a prior centered on a value of $\theta=.5$, add data whose ML estimate is $\theta=.6$, and our posterior distribution suggests we end up somewhere in between.
 
-We can perhaps understand this further via the following visuals. In each of these the prior is represented by the blue density, the likelihood by the red, and the posterior by purple.  This first is based on a different prior than just used in our example, and instead employs with the beta distribution noted among the possibilities in the code above.  While the beta distribution is highly flexible, with shape parameters $\mathcal{A}$ and $\mathcal{B}$ set to 10 and 10 we get a symmetric distribution centered on $\theta = .5$.  This would actually be a somewhat stronger prior than we might normally want to use, but serves to illustrate a point.  The mean of the beta is $\frac{\mathcal{A}}{\mathcal{A}+\mathcal{B}}$, and thus has a nice interpretation as a prior based on data with sample size equal to $\mathcal{A}+\mathcal{B}$.  The posterior distribution that results would have a mean somewhere between the maximum likelihood value and that of the prior. With the stronger prior, the posterior is pulled closer to it.
+We can perhaps understand this further via the following visualizations. In each of these the prior is represented by the blue density, the likelihood by the red, and the posterior by purple.  This first is based on a different prior than just used in our example, and instead employs the beta distribution noted among the possibilities in the [code above][Prior].  While the beta distribution is highly flexible, with shape parameters $\mathcal{A}$ and $\mathcal{B}$ set to 10 and 10 we get a symmetric distribution centered on $\theta = .5$.  This would actually be a somewhat stronger prior than we might normally want to use, but serves to illustrate a point.  The mean of the beta is $\frac{\mathcal{A}}{\mathcal{A}+\mathcal{B}}$, and thus has a nice interpretation as a prior based on data with sample size equal to $\mathcal{A}+\mathcal{B}$.  The posterior distribution that results would have a mean somewhere between the maximum likelihood value and that of the prior. With the stronger prior, the posterior is pulled closer to it.
 
 
 ```{r prior2post_1, echo=F, eval=T}
@@ -173,20 +167,21 @@ g = ggplot(aes(x=theta), data=probdat, xlim=c(0,1)) +
   lazerhawk::theme_trueMinimal() +
   theme(axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
-        axis.title.y=element_text(color='gray25'),
-        axis.title.x=element_text(color='gray25'),
+        axis.title.y=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray35'),
         plot.background = element_rect(fill = "transparent",colour = NA),
         panel.background=element_rect(fill = "transparent",colour = NA))
 g
 
 # PLOTLY CURRENTLY BREAKS MATHJAX, FANTASTIC!
 # library(plotly)
-# ggplotly(tooltip='none') %>% 
+# ggplotly(tooltip='none') %>%
 #   config(displayModeBar=F) %>%
 #   layout(paper_bgcolor=rgb(0,0,0,0), plot_bgcolor=rgb(0,0,0,0))
 ```
 
-The second utilizes a more diffuse prior of $\beta(2,2)$ [^betaunif].  The result of using the vague prior is that the likelihood gets more weight with regard to the posterior.  In fact, if we used a uniform distribution, *we would be doing the equivalent of maximum likelihood estimation*.  As such most of the commonly used methods that implement maximum likelihood can be seen as a special case of a Bayesian approach.
+
+The second utilizes a more diffuse prior of $\beta(2,2)$. <span class="marginnote">$\beta(1,1)$ is a uniform distribution.</span>  The result of using the vague prior is that the likelihood gets more weight with regard to the posterior.  In fact, if we used a uniform distribution, *we would essentially be doing the equivalent of maximum likelihood estimation*.  In that sense, many of the commonly used methods that implement maximum likelihood can be seen as a special case of a Bayesian approach.
 
 ```{r prior2post_2, echo=FALSE}
 ### more vague prior
@@ -216,14 +211,13 @@ g = ggplot(aes(x=theta), data=probdat, xlim=c(0,1)) +
   lazerhawk::theme_trueMinimal() +
   theme(axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
-        axis.title.y=element_text(color='gray25'),
-        axis.title.x=element_text(color='gray25'),
+        axis.title.y=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray35'),
         plot.background = element_rect(fill = "transparent",colour = NA),
         panel.background=element_rect(fill = "transparent",colour = NA))
 g
 # ggplotly()
 ```
-
 
 
 The third graph employs the initial $\beta(10,10)$ prior again, but this time we add more observations to the data.  Again this serves to give more weight to the likelihood, which is what we want.  As scientists, we'd want the evidence, i.e. data, to eventually outweigh our prior beliefs about the state of things the more we have of it. 
@@ -261,8 +255,8 @@ g = ggplot(aes(x=theta), data=probdat, xlim=c(0,1)) +
   lazerhawk::theme_trueMinimal() +
   theme(axis.ticks.y=element_blank(),
         axis.text.y=element_blank(),
-        axis.title.y=element_text(color='gray25'),
-        axis.title.x=element_text(color='gray25'),
+        axis.title.y=element_text(color='gray35'),
+        axis.title.x=element_text(color='gray35'),
         plot.background = element_rect(fill = "transparent",colour = NA),
         panel.background=element_rect(fill = "transparent",colour = NA))
 g
@@ -271,64 +265,63 @@ g
 # ggplotly()
 ```
 
-For an interactive demonstration of the above visuals, [see this](https://micl.shinyapps.io/prior2post/).
+For an interactive demonstration of the above, [see this](https://micl.shinyapps.io/prior2post/).
+
 
 ## Posterior predictive
 
 At this point it is hoped you have a better understanding of the process of Bayesian estimation.  Conceptually, one starts with prior beliefs about the state of the world and adds evidence to one's understanding, ultimately coming to a conclusion that serves as a combination of evidence and prior belief.  More concretely, we have a prior distribution regarding parameters, a distribution regarding the data given those parameters, and finally a posterior distribution that is the weighted combination of the two.
 
-However there is yet another distribution of interest to us- the <span class="emph">posterior predictive distribution</span>.  Stated simply, once we have the posterior distribution for $\theta$, we can then feed new or unobserved data into the data generating process and get distributions for $\tilde{y}$[^postpred].
+However there is yet another distribution of interest to us- the <span class="emph">posterior predictive distribution</span>.  Stated simply, once we have the posterior distribution for $\theta$, we can then feed (possibly new or unobserved) data into the data generating process and get distributions for $\tilde{y}$[^postpred]. Where $\tilde{y}$ can regard *any* potential observation, we can distinguish it from the case where we use the current data to produce $y^{\textrm{Rep}}$, i.e. a replicate of $y$. For example, if a regression model had predictor variables $X$, the predictor variables are identical for producing $y^{\textrm{Rep}}$ as they were in modeling $y$.  However, $\tilde{y}$ might be based on any values $\tilde{X}$ that might be feasible or interesting, whether actually observed in the data or not.  Since $y^{\textrm{Rep}}$ is an attempt to replicate the observed data based on the parameters $\theta$, we can compare our simulated data to the observed data to see how well they match. 
 
-As in Gelman, we can implement the simulation process given the data and model at hand[^yreppostpred]. In other words, $y^{\textrm{Rep}}$ is an attempt to replicate the observed data based on the parameters $\theta$. We can then compare our simulated data to the observed data to see how well they match.
+We can implement the simulation process with the data and model at hand, given a sample of values of $\theta$ drawn from the posterior. I provide the results of such a process with the following graph. Each bar graph of frequencies represents a replication of the 10 shots taken, i.e. $y^{\textrm{Rep}}$, given an estimate of $\theta$ from the posterior distribution (16 total).  These are plausible sets of 10 makes and misses, given $\theta$.
 
-
-When using typical Bayesian programming languages, we could have simulated values of the posterior predictive distribution given the actual values of $\theta$ we draw from the posterior.  <span class="marginnote"><span class="imgbigger"><img src="img/histofyrepBinom.svg" style="display:block; margin: 0 auto; width=20%"></span></span>
-I provide the results of such a process with the graph at right. Each histogram represents a replication of the data, i.e. $y^{\textrm{Rep}}$, given an estimate of $\theta$.
-
+<img src="img/histofyrepBinom.svg" style="display:block; margin: 0 auto; width=20%"></span>
 
 ```{r binomPostPred, cache=TRUE, message=FALSE, warning=FALSE, eval=FALSE, echo=FALSE}
-# using bernoulli for 1 trial at a time; see Gelman p.32
-datalist = list(y=driveNum, N=length(driveNum))
-modelcode <- "
-data{
-  int N;
-  int y[N];
-}
+# using bernoulli for 1 trial at a time; see Gelman p.32 
+# NO LONGER NECESSARY, use rstan_arm
+# datalist = list(y=shotsNum, N=length(shotsNum))
+# modelcode <- "
+# data{
+#   int N;
+#   int y[N];
+# }
+# 
+# parameters{
+#   real<lower=0, upper=1> theta;
+# }
+# 
+# model{
+#   theta ~ beta(5,5);
+#   y ~ bernoulli(theta);
+# }
+# 
+# generated quantities{
+#   vector[N] yRep;
+#   for (i in 1:N){
+#     yRep[i] <- bernoulli_rng(theta);
+#   }
+# }
+# "
+# library(rstan)
+# shotres = stan(model_code=modelcode, data=datalist, iter=12000, warmup=2000, thin=10, chains=2)
+# shotres
+# traceplot(shotres, 'theta')
+# yrep = extract(shotres, 'yRep')$yRep
+# dim(yrep)
 
-parameters{
-  real<lower=0, upper=1> theta;
-}
+shotres = stan_glm(shotsNum~1, family='binomial', iter=2250, warmup=1000, thin=10, prior=student_t())
+yrep = data.frame(posterior_predict(shotres)); colnames(yrep) = paste0('Player_', 1:10)
 
-model{
-  theta ~ beta(5,5);
-  y ~ bernoulli(theta);
-}
-
-generated quantities{
-  vector[N] yRep;
-  for (i in 1:N){
-    yRep[i] <- bernoulli_rng(theta);
-  }
-}
-"
-library(rstan)
-driveres = stan(model_code=modelcode, data=datalist, iter=12000, warmup=2000, thin=10, chains=2)
-driveres
-traceplot(driveres, 'theta')
-yrep = extract(driveres, 'yRep')$yRep
-dim(yrep)
-
-sampleIndex = sample(1:2000, 16)
-# pdf('figure/histofyrepBinom.pdf')
-# par(mfrow=c(4,4))
-# apply(yrep[sampleIndex,], 1, hist, main='', xlab='', ylim=c(0,8), xaxp=c(0,1,1)) #, xaxt='n'
-# layout(1)
-# dev.off()
+sampleIndex = sample(1:500, 16)
+yrepLong = tidyr::gather(data.frame(Sim=1:500, yrep)[sampleIndex, ], key=Player, value=Goal, -Sim) %>% 
+  arrange(Sim)
 
 library(ggplot2)
-ggplot(aes(x=factor(value)), data=reshape2::melt(yrep[sampleIndex,])) +
+ggplot(aes(x=factor(Goal, labels=c('Misses', 'Makes'))), data=yrepLong) +
   geom_bar(fill='#ff5503', color=NA, alpha=.5, width=.5) +
-  facet_wrap(~iterations, ncol=4) +
+  facet_wrap(~Sim, ncol=4) +
   labs(x='', y='') +
   theme_minimal() + 
   theme(panel.grid = element_blank(),
@@ -338,9 +331,13 @@ ggplot(aes(x=factor(value)), data=reshape2::melt(yrep[sampleIndex,])) +
     axis.ticks.y = element_blank(),
     strip.text = element_blank(),
     plot.background = element_rect(fill = "transparent",colour = NA))
-ggsave('figure/histofyrepBinom.svg', bg='transparent')
+ggsave('img/histofyrepBinom.svg', bg='transparent')
 ```
 
+
+<br>
+
+With an understanding of the key elements of Bayesian inference in hand, we can proceed to the still familiar but more complex and interesting setting of a regression model.
 
 <!-- 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -453,8 +450,7 @@ ggsave('figure/priorlikepost3.png', width=8, height=8, bg = "transparent") # png
 
 [^binomll]: See for yourself in the [binmoial likelihood][Binomial Likelihood Example] section in the appendix.
 
-[^betaunif]: $\beta(1,1)$ is a uniform distribution.
+
 
 [^postpred]: Mathematically represented as: $p(\tilde{y}|y) = \int p(\tilde{y}|\theta)p(\theta|y)\mathrm{d}\theta$ <br><br> We can get a sense of the structure of this process via the following table, taken from Gelman: <br><br> <img src="img/gelmanTable.png" style="display:block; margin: 0 auto;">
 
-[^yreppostpred]: Where $\tilde{y}$ can regard \emph{any} potential observation, we can distinguish $y^{\textrm{Rep}}$ as the case where we keep to the current data. For example, if a model had predictor variables \emph{X}, the predictor variables are identical for producing $y^{\textrm{Rep}}$ as they were in modeling y.  Conversely, $\tilde{y}$ might be based on any values $\tilde{X}$ that might be feasible or interesting, whether actually observed in the data or not.
