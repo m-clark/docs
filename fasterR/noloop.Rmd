@@ -5,8 +5,13 @@ author: |
   [<img src="../img/CSCAR_darkletter.png", width='50%'>](http://cscar.research.umich.edu/)</div>
   
 output: 
-  html_notebook:
+  html_document:
     css: notebooks.css
+    highlight: pygments
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    #css: notebooks.css
     highlight: pygments
     toc: yes
     toc_float: yes
@@ -167,15 +172,19 @@ microbenchmark(read_csv = read_csv('data/testreadr.csv', progress = F),
 
 # Data Structures
 
-While data.frames are probably the most commonly used data structures in R, they are very slow to work with.  Packages 
+In progress, skip this section...
+While data.frames are probably the most commonly used data structures in R, they are very slow to work with.  
 
-For Flux, one thing that should be added is to use data on local disk
-rather than a network volume wherever possible.  For many small files,
-this can increase speed by a factor of 3 or more with not other
-changes.  For large files, it can vary from twice as fast as unbusy,
-high-speed network storage to more than ten times as fast if the
-storage in on a hammered, slow NFS server, or going over a slow
-network connection with many hops.
+Packages dplyr, data.table, dtplyr
+
+
+From Bennet re: flux
+> For Flux, one thing that should be added is to use data on local disk rather
+than a network volume wherever possible.  For many small files, this can 
+increase speed by a factor of 3 or more with not other changes.  For large 
+files, it can vary from twice as fast as unbusy, high-speed network storage to 
+more than ten times as fast if the storage in on a hammered, slow NFS server, or
+going over a slow network connection with many hops.
 
 
 # Loops and Alternatives
@@ -398,7 +407,7 @@ As an example will use <span class="func">adply</span> on the column mean exampl
 
 ```{r plyr}
 library(plyr)
-adply(d, 2, mean)
+adply(d, 2, mean) %>% head
 ```
 
 Unfortunately, the flexibility does come at a price, and <span class="pack">plyr</span> functions are very slow (mostly because *<span class="objclass">data.frames</span> are slow*).  Using the 1000x1000 matrix again, and using <span class="func">aaply</span> to be more comparable, we see the <span class="pack">plyr</span> function is much slower.
@@ -783,6 +792,56 @@ microbenchmark(sparse_tcrossprod <- tcrossprod(mm),
 ```
 
 
+As a final point, let's return to the distance matrix computation.  We saw that using Rcpp could get us about as fast as the base R function.  It used a double loop, but we could also use RcppEigen and a matrix approach to create a crossproduct function, along with a different algorithm for calculating.  Here's the following code from the article on RcppEigen by [Bates and Eddelbuettel](http://cran.irsn.fr/web/packages/RcppEigen/vignettes/RcppEigen-Introduction.pdf).  I use the inline package to compile the string to C++ as in their example.
+
+The C++ code uses the Eigen library to create a matrix crossproduct (for one matrix) for reals (there is also a commented out line for the tcrossprod equivalent), so in the demo I show equivalence to R's crossprod by converting integers to numeric class.
+
+```{r rcppMatrix}
+crossprodCPP = '
+  using Eigen::Map;
+  using Eigen::MatrixXd;
+  using Eigen::Lower;
+  
+  const Map<MatrixXd>   A(as<Map<MatrixXd> >(AA));
+  const int             m(A.rows()), n(A.cols());
+  
+   MatrixXd              AtA(MatrixXd(n, n).setZero().selfadjointView<Lower>().rankUpdate(A.adjoint()));
+  // MatrixXd              AAt(MatrixXd(m, m).setZero().selfadjointView<Lower>().rankUpdate(A));
+
+  return List::create(Named("crossprod(A)") = AtA);
+'
+
+library(inline)
+fcprd = cxxfunction(signature(AA='matrix'), crossprodCPP, 'RcppEigen')
+fcprd(matrix(as.numeric(1:9), 3))
+crossprod(matrix(as.numeric(1:9), 3))
+```
+
+Now we create the distance function that uses that crossproduct function once, then does the rest in base R.[^betterdist]
+
+```{r distMatCpp2}
+edmcpp <- function(d, rows=F) {
+  if(rows) d= t(d)
+  ones = matrix(rep(1, ncol(d)), ncol=1) 
+  xtx = fcprd(d)[[1]]
+  edm =  sqrt(tcrossprod(ones, diag(xtx)) + tcrossprod(diag(xtx), ones) - 2*xtx)
+  edm
+}
+```
+
+Now for the timings.  We can compare it to the base R crossprod and the distance functions we tested previously.
+
+```{r}
+microbenchmark(crossprod(m),
+               fcprd(m))
+
+microbenchmark(dist(d),
+               distC(d),
+               edmcpp(d, rows = T))
+```
+
+In both cases we witness about a 4 to 5-fold speedup.
+
 # Other R builds
 
 Other versions of R exist. For those using university high performance computing, the R build you are using will be different, for example.  Here is a run down of some, partly taken from Wickham's chapter linked in the introduction of this document. There are others, but I just note the ones that still appear to be in regular development.
@@ -813,3 +872,5 @@ Two excellent texts on R programming are:
 [The Art of R Programming](https://www.nostarch.com/artofr.htm) by Norm Matloff
 
 [Advanced R](http://adv-r.had.co.nz/) by Hadley Wickham.
+
+[^betterdist]: I hope to return and extend this to the entire distance calculation using RcppEigen.
