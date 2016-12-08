@@ -1,0 +1,127 @@
+---
+title: <span style="font-size:150%; font-variant:small-caps; font-style:italic">bigR</span>
+author: |
+  <div class="title"><span style="font-size:125%; font-variant:small-caps; font-style:normal">[Michael Clark](http://m-clark.github.io)</span><br><br>
+  [<img src="../img/CSCAR_darkletter.png", width='50%'>](http://cscar.research.umich.edu/)</div>
+  
+output: 
+  html_notebook:
+    css: notebooks.css
+    highlight: pygments
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment=NA, cache=F, message = F, warnings=F, R.options=list(width=120))
+```
+
+
+```{r loadlibs, echo=FALSE, cache=FALSE}
+# library(tidyverse); library(data.table); library(feather)
+```
+
+
+<br><br><br>
+
+
+
+At present this is a personal list of resources for using R with large, possibly out-of-memory data. While there is a task views page (see below), I'm trying to keep this limited to currently developed packages, less redundant info/packages, and additional model-based experiences, all with an eye to ease of use by non-experts.
+
+# Starting point
+
+[CRAN Task Views](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
+
+- issues: includes out of data and no longer developed packages etc.
+
+# Basic parallelism
+## Packages
+parallel
+foreach and related
+
+## Spark
+[R on Spark](https://github.com/apache/spark/tree/master/R)
+
+[sparklyr](http://spark.rstudio.com) R interface for Apache Spark. Not ready for prime time.
+
+## Interfaces
+Rcpp
+
+```{r}
+# library(knitr)
+# library(runr)
+# j = proc_julia()
+# j$start()
+# knit_engines$set(julia = function(options) {
+#     knitr:::wrap(j$exec(options$code), options)
+# })
+# x = [1,2,2]
+# 
+# x + 2
+# j$stop()
+```
+
+```{julia test, eval=T}
+x = [1,2,2]
+
+x + 2
+
+using MixedModels
+
+@elapsed fit!(lmm(y ~ service + (1 | d) + (1 | s), InstEval))
+```
+
+
+# Dealing with data
+
+## Packages
+
+readr
+
+feather
+
+dtplyr
+
+dplyrXdf
+
+bigvis
+
+
+
+# Modeling
+
+## Standard LM
+## Mixed models
+
+```{r echo=F, eval=FALSE}
+library(lme4)
+system.time({
+  lmer(y ~ service + (1|d) + (1|s), data=InstEval)
+})
+
+
+
+# not viable
+# library(mgcv)  
+# system.time({
+#   gam(y ~ s(d, bs='re') + s(s, bs='re'), data=InstEval)
+# })
+
+
+# also not viable
+# library(mgcv)
+# system.time({
+#   bam(y ~ s(d, bs='re') + s(s, bs='re'), data=InstEval)
+# })
+```
+
+# Bayesian
+
+# Misc
+
+## Books
+Seamless R and C++ Integration with Rcpp
+
+## Courses
+
+[Robin Lovelace](https://github.com/Robinlovelace/R-for-Big-Data)
