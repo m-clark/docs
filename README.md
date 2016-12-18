@@ -7,43 +7,27 @@ Some of these documents are essentially like any software development and will b
 
 #### Recently updated/created, or in current/continued development
 
-[Bayesian Basics](https://github.com/m-clark/bayesian-basics)
-
-[Generalized Additive Models](https://github.com/m-clark/generalized-additive-models)
-
-[Structural Equation Models](https://github.com/m-clark/sem)
-
-[Mixed Models Overview](https://github.com/m-clark/mixed-models-overview)
-
-[FastR](https://github.com/m-clark/fastR)
-
-[BigR](https://github.com/m-clark/bigR)
-
-[Clustered Data Situations](https://github.com/m-clark/clustered-data) 
-
-[Categorical Regression Models](https://github.com/m-clark/categorical-regression-models)
-
-[Introduction to Machine Learning](https://github.com/m-clark/introduction-to-machine-learning)
+- [Bayesian Basics](https://github.com/m-clark/bayesian-basics)
+- [Generalized Additive Models](https://github.com/m-clark/generalized-additive-models)
+- [Structural Equation Models](https://github.com/m-clark/sem)
+- [Mixed Models Overview](https://github.com/m-clark/mixed-models-overview)
+- [FastR](https://github.com/m-clark/fastR)
+- [BigR](https://github.com/m-clark/bigR)
+- [Clustered Data Situations](https://github.com/m-clark/clustered-data) 
+- [Categorical Regression Models](https://github.com/m-clark/categorical-regression-models)
+- [Introduction to Machine Learning](https://github.com/m-clark/introduction-to-machine-learning)
 
 
 
 #### No current plans for update except to fix issues
 
-[Latent variables and sum scores](https://github.com/m-clark/latent-variabels-and-sum-scores)
-
-[Mixed Models Estimation](https://github.com/m-clark/mixed-models-estimation)
-
-[Mixed Models vs. Growth Curves](https://github.com/m-clark/mixed-models-growth-curves)
-
-[Sim of the above](https://github.com/m-clark/mixed-models-growth-curves-simulation)
-
-[ANOVA and Mixed Models](https://github.com/m-clark/mixed-models-anova) 
-
-[MCMC algorithms](https://github.com/m-clark/mcmc-algorithms)
-
-[Paradoxes](https://github.com/m-clark/lords-paradox) 
-
-[Correlation Measures](https://github.com/m-clark/correlation-measures)
-
-[R for Social Science](https://github.com/m-clark/R-for-social-science)
+- [Latent variables and sum scores](https://github.com/m-clark/latent-variabels-and-sum-scores)
+- [Mixed Models Estimation](https://github.com/m-clark/mixed-models-estimation)
+- [Mixed Models vs. Growth Curves](https://github.com/m-clark/mixed-models-growth-curves)
+- [Sim of the above for small sample size situations](https://github.com/m-clark/mixed-models-growth-curves-simulation)
+- [ANOVA and Mixed Models](https://github.com/m-clark/mixed-models-anova) 
+- [MCMC algorithms](https://github.com/m-clark/mcmc-algorithms)
+- [Paradoxes](https://github.com/m-clark/lords-paradox) 
+- [Correlation Measures](https://github.com/m-clark/correlation-measures)
+- [R for Social Science](https://github.com/m-clark/R-for-social-science)
 
