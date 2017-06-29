@@ -1,5 +1,10 @@
-@import url("http://fonts.googleapis.com/css?family=Roboto+Mono"); 
-@import url("http://fonts.googleapis.com/css?family=Roboto"); 
+@import url("http://fonts.googleapis.com/css?family=Roboto+Mono");
+@import url("http://fonts.googleapis.com/css?family=Roboto");
+@import url("http://fonts.googleapis.com/css?family=Roboto+Condensed");
+@import url("http://fonts.googleapis.com/css?family=Open+Sans");
+@import url('https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300');
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+
 
 .emph {
   color: #ff5500;
@@ -34,6 +39,9 @@ p {
 
 }
 
+.author {
+  font-variant: small-caps;
+}
 
 code {
   box-sizing: border-box;
@@ -62,7 +70,7 @@ pre .r {
 
 #TOC{
   font-size: 75%;
-  
+
 }
 
 .table {
