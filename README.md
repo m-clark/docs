@@ -8,6 +8,11 @@ Some of these documents are essentially like any software development, and will 
 #### Recently updated/created, or in current/continued development
 
 
+**Growth vs. Mixed**: Equivalence of the two approaches in a variety of settings.
+
+- [Doc](https://m-clark.github.io/mixed-growth-comparison/)
+- [Repo](https://github.com/m-clark/mixed-growth-comparison)
+
 **Topic Modeling**: A demonstration of Latent Dirichlet Allocation for topic modeling in R.
 
 - [Doc](https://m-clark.github.io/docs/topic_models/topic-model-demo.html)
@@ -15,7 +20,7 @@ Some of these documents are essentially like any software development, and will 
 
 **Bayesian Basics**: A conceptual introduction to Bayesian modeling with examples using R/Stan.
 
-- [Doc](https://m-clark.github.io/docs/bayesian_book/)
+- [Doc](https://m-clark.github.io/bayesian-basics/)
 - [Repo](https://github.com/m-clark/bayesian-basics)
 
 **Generalized Additive Models**: An introduction to generalized additive models with an emphasis on generalization from familiar linear models and using the mgcv package in R.
@@ -55,13 +60,15 @@ Some of these documents are essentially like any software development, and will 
 
 **Introduction to Machine Learning**: A gentle introduction to machine learning concepts with some application in R.
 
-- [Doc](http://m-clark.github.io/docs/machine_learning/)
+- [Doc](http://m-clark.github.io/docs/introduction-to-machine-learning/)
 - [Repo](https://github.com/m-clark/introduction-to-machine-learning)
 
 **Engaging the Web with R**: Document regarding the use of R for web scraping, extracting data via an API, interactive web-based visualizations, and producing web-ready documents. It serves as an overview of ways one might start to use R for web-based activities as opposed to a hand-on approach.
 
 - [Doc](https://m-clark.github.io/docs/web)
 - [Repo](https://github.com/m-clark/introduction-to-machine-learning)
+
+
 
 
 #### No current plans for update except to fix issues
