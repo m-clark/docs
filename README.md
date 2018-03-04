@@ -7,6 +7,61 @@ Some of these documents are essentially like any software development, and will 
 
 #### Recently updated/created, or in current/continued development
 
+**Generalized Additive Models**: An introduction to generalized additive models with an emphasis on generalization from familiar linear models and using the mgcv package in R.
+
+- [Doc](https://m-clark.github.io/generalized-additive-models/)
+- [Repo](https://github.com/m-clark/generalized-additive-models)
+
+**Introduction to Machine Learning**: A gentle introduction to machine learning concepts with some application in R.
+
+- [Doc](http://m-clark.github.io/introduction-to-machine-learning/)
+- [Repo](https://github.com/m-clark/introduction-to-machine-learning)
+
+**An Introduction to Text Analysis with R**: Focuses on handling text in the R environment in a general sense, with specific analytical examples such as sentiment analysis, topic modeling, and more.
+
+- [Doc](https://m-clark.github.io/text-analysis-with-R/)
+- [Repo](https://github.com/m-clark/text-analysis-with-R)
+
+**Bayesian Basics**: A conceptual introduction to Bayesian modeling with examples using R/Stan.
+
+- [Doc](https://m-clark.github.io/bayesian-basics/)
+- [Repo](https://github.com/m-clark/bayesian-basics)
+
+**Mixed Models with R**: An conceptual introduction to using R for mixed models.
+
+- [Doc](https://m-clark.github.io/mixed-models-with-R/)
+- [Repo](https://github.com/m-clark/mixed-models-with-R)
+
+**Structural Equation Models**: An intro to the approach that attempts to avoid the typical problematic depiction in the social sciences with a notably broader view.
+
+- [Doc](https://m-clark.github.io/sem/)
+- [Repo](https://github.com/m-clark/sem)
+
+**Data Processing and Visualization**: Application heavy, covering R structures, I/O, the tidyverse, ggplot2, and more.
+
+- [Doc](https://m-clark.github.io/data-processing-and-visualization/)
+- [Repo](https://github.com/m-clark/data-processing-and-visualization)
+
+**FastR**: How to make R faster before or irrespective of the machinery used.
+
+- [Doc](http://m-clark.github.io/docs/fastr.html)
+- [Repo](https://github.com/m-clark/fastR)
+
+**BigR**: 
+
+- [Doc]()  Not yet begun, mostly due to ongoing development in the R world in this arena.
+- [Repo](https://github.com/m-clark/bigR)
+
+
+**Engaging the Web with R**: Document regarding the use of R for web scraping, extracting data via an API, interactive web-based visualizations, and producing web-ready documents. It serves as an overview of ways one might start to use R for web-based activities as opposed to a hand-on approach.
+
+- [Doc](https://m-clark.github.io/docs/web)
+- [Repo](https://github.com/m-clark/webr)
+
+
+
+
+#### No current plans for update except to fix issues
 
 **Growth vs. Mixed**: Equivalence of the two approaches in a variety of settings.
 
@@ -18,35 +73,10 @@ Some of these documents are essentially like any software development, and will 
 - [Doc](https://m-clark.github.io/docs/topic_models/topic-model-demo.html)
 - [Repo](https://github.com/m-clark/topic-model-demo)
 
-**Bayesian Basics**: A conceptual introduction to Bayesian modeling with examples using R/Stan.
-
-- [Doc](https://m-clark.github.io/bayesian-basics/)
-- [Repo](https://github.com/m-clark/bayesian-basics)
-
-**Generalized Additive Models**: An introduction to generalized additive models with an emphasis on generalization from familiar linear models and using the mgcv package in R.
-
-- [Doc](https://m-clark.github.io/docs/GAM.html)
-- [Repo](https://github.com/m-clark/generalized-additive-models)
-
-**Structural Equation Models**: An intro to the approach that attempts to avoid the typical problematic depiction in the social sciences with a notably broader view.
-
-- [Doc](https://m-clark.github.io/docs/sem/)
-- [Repo](https://github.com/m-clark/sem)
-
 **Mixed Models Overview**: An overview that introduces mixed models for those with varying technical/statistical backgrounds.
 
 - [Doc](https://m-clark.github.io/docs/mixedModels/mixedModels.html)
 - [Repo](https://github.com/m-clark/mixed-models-overview)
-
-**FastR**: How to make R faster before or irrespective of the machinery used.
-
-- [Doc](http://m-clark.github.io/docs/fastr.html)
-- [Repo](https://github.com/m-clark/fastR)
-
-**BigR**: 
-
-- [Doc]()  Not yet begun.
-- [Repo](https://github.com/m-clark/bigR)
 
 **Clustered Data Situations**: A comparison of standard models, cluster robust standard errors, fixed effect models, mixed models (random effects models), generalized estimating equations (GEE), and latent growth curve models for dealing with clustered data (e.g. longitudinal, hierarchical etc.).
 
@@ -57,21 +87,6 @@ Some of these documents are essentially like any software development, and will 
 
 - [Doc](http://m-clark.github.io/docs/logregmodels.html)
 - [Repo](https://github.com/m-clark/categorical-regression-models)
-
-**Introduction to Machine Learning**: A gentle introduction to machine learning concepts with some application in R.
-
-- [Doc](http://m-clark.github.io/docs/introduction-to-machine-learning/)
-- [Repo](https://github.com/m-clark/introduction-to-machine-learning)
-
-**Engaging the Web with R**: Document regarding the use of R for web scraping, extracting data via an API, interactive web-based visualizations, and producing web-ready documents. It serves as an overview of ways one might start to use R for web-based activities as opposed to a hand-on approach.
-
-- [Doc](https://m-clark.github.io/docs/web)
-- [Repo](https://github.com/m-clark/introduction-to-machine-learning)
-
-
-
-
-#### No current plans for update except to fix issues
 
 **Latent variables and sum scores**: A comparison of two common means of dimension reduction for scale scores, and why the latter can at best be as good as the former, but won't be in practice.
 
