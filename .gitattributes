@@ -36,7 +36,7 @@ _book/*.pdf
 *.utf8.md
 *.knit.md
 
-*.html linguist-vendored
+*.html linguist-documentation=true
 *.js linguist-vendored
 *.sh linguist-vendored
 *.css linguist-vendored

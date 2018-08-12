@@ -55,8 +55,8 @@ Some of these documents are essentially like any software development, and will 
 
 **Engaging the Web with R**: Document regarding the use of R for web scraping, extracting data via an API, interactive web-based visualizations, and producing web-ready documents. It serves as an overview of ways one might start to use R for web-based activities as opposed to a hand-on approach.
 
-- [Doc](https://m-clark.github.io/docs/web)
-- [Repo](https://github.com/m-clark/webr)
+- [Doc](https://m-clark.github.io/webR)
+- [Repo](https://github.com/m-clark/webR)
 
 
 
@@ -80,7 +80,7 @@ Some of these documents are essentially like any software development, and will 
 
 **Clustered Data Situations**: A comparison of standard models, cluster robust standard errors, fixed effect models, mixed models (random effects models), generalized estimating equations (GEE), and latent growth curve models for dealing with clustered data (e.g. longitudinal, hierarchical etc.).
 
-- [Doc](http://m-clark.github.io/docs/clustered/)
+- [Doc](http://m-clark.github.io/clustered-data/)
 - [Repo](https://github.com/m-clark/clustered-data) 
 
 **Categorical Regression Models**: An overview of regression models for binary, multinomial, and ordinal outcomes, with connections among various types of models.
