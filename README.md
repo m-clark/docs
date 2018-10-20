@@ -1,6 +1,6 @@
 # docs
 
-This repository is essentially a list of other repos specific to documents that go into methodological detail regarding various statistical procedures, as well as docs that serve as a basis for the workshops I give. In addition, it contains templates, common images and so forth. The repos themselves house markdown/code/data etc. For a bit more description of specific documents see https://m-clark.github.io/documents/.  
+This repository is essentially a list of other repos specific to documents that go into methodological detail regarding various statistical procedures, as well as docs that serve as a basis for the workshops I give. In addition, it contains templates, common images and so forth. The repos themselves house markdown/code/data etc. For a bit more description of specific documents see https://m-clark.github.io/documents.  
 
 Some of these documents are essentially like any software development, and will be at least somewhat regularly updated or are actually in current development. However, this does not mean they are incomplete, and in fact its actually likely they are in a complete state.  Other documents are more or less one-offs, or at least there are no current plans to revisit.  However if you happen to come across any issues with a doc, feel free to open it in the corresponding repository.
 
